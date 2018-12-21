@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/all_articles"
+            android:icon="@drawable/ic_everything"
+            android:title="@string/all_articles_cat" />
+        <item
+            android:id="@+id/team"
+            android:icon="@drawable/ic_author_team"
+            android:title="@string/author_team_cat" />
+        <item
+            android:id="@+id/sports"
+            android:icon="@drawable/ic_running"
+            android:title="@string/sport_cat" />
+        <item
+            android:id="@+id/culture"
+            android:icon="@drawable/ic_culture"
+            android:title="@string/culture_cat" />
+        <item
+            android:id="@+id/trips"
+            android:icon="@drawable/ic_trips"
+            android:title="@string/trips_cat" />
+        <item
+            android:id="@+id/sv"
+            android:icon="@drawable/ic_link"
+            android:title="@string/sv_news_cat" />
+        <item
+            android:id="@+id/interviews"
+            android:icon="@drawable/ic_interview"
+            android:title="@string/interviews_cat" />
+        <item
+            android:id="@+id/opinion"
+            android:icon="@drawable/ic_opinion"
+            android:title="@string/opinions_cat" />
+        <item
+            android:id="@+id/knowledge"
+            android:icon="@drawable/ic_book"
+            android:title="@string/knowledge_cat" />
+        <item
+            android:id="@+id/history"
+            android:icon="@drawable/ic_history"
+            android:title="@string/history_cat" />
+        <item
+            android:id="@+id/teachers"
+            android:icon="@drawable/ic_teacher"
+            android:title="@string/teachers_cat" />
+        <item
+            android:id="@+id/other"
+            android:icon="@drawable/ic_other"
+            android:title="@string/other_cat" />
+    </group>
+</menu>

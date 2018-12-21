@@ -1,0 +1,90 @@
+<resources>
+    <!-- App name -->
+    <string name="app_name">STG News</string>
+
+    <!-- MainActivity, SearchActivity and basic Strings -->
+    <string name="no_articles">No articles found.\nCheck your connection!</string>
+    <string name="no_articles_search">No articles found.\nTry a differerent query!</string>
+    <string name="author_display_add">by\u0020</string>
+    <string name="settings_string">Settings</string>
+    <string name="about_string">About</string>
+    <string name="search_string">Search</string>
+    <string name="search_title">Articles containing \"</string>
+    <string name="search_hint">Search articles</string>
+    <string name="title_activity_search" translatable="false">SearchActivity</string>
+    <string name="share_string">Share</string>
+
+    <!--Category Strings-->
+    <string name="all_articles_cat">All Articles</string>
+    <string name="author_team_cat">Our team</string>
+    <string name="sport_cat">Sports</string>
+    <string name="culture_cat">Culture</string>
+    <string name="trips_cat">Trips</string>
+    <string name="sv_news_cat">Student representation</string>
+    <string name="interviews_cat">Interviews</string>
+    <string name="opinions_cat">Opinion</string>
+    <string name="knowledge_cat">Knowledge</string>
+    <string name="history_cat">History</string>
+    <string name="teachers_cat">Teachers</string>
+    <string name="other_cat">Other</string>
+    <string name="title_activity_about" translatable="false">AboutActivity</string>
+
+    <!--Share Strings-->
+    <string name="share_subject">Look at this article:</string>
+    <string name="share_text">Read this article: \n</string>
+    <string name="share_title">Share article</string>
+
+    <!--Settings Strings-->
+    <string name="img_settings_title">High definition</string>
+    <string name="img_settings_summary">Load images in original resolution. Looks better but might cause slowdowns and increased network usage</string>
+    <string name="title_activity_settings" translatable="false">SettingsActivity</string>
+    <string name="post_number_title">Number of posts</string>
+    <string name="post_number_summary">Number of posts that will be loaded by the App</string>
+
+    <!-- ArticleActivity Strings -->
+    <string name="comments_string">Comments:</string>
+    <string name="comments_number_title">Number of comments</string>
+    <string name="comments_number_summary">Number of comments shown below an article</string>
+    <string name="reply_bubble_text">Tap here to reply</string>
+    <string name="title_activity_read_comments" translatable="false">ReadCommentsActivity</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="title_activity_create_comment" translatable="false">CreateCommentActivity</string>
+    <string name="comments_empty_view">No comments found.\nWhy not write one by tapping here?</string>
+    <string name="comment_author_add">writes:</string>
+
+    <!-- CreateCommentActivity Strings -->
+    <string name="submit_string">Send</string>
+    <string name="name_input_string">Name</string>
+    <string name="create_comment_content_hint">Input your comment here</string>
+    <string name="create_comment_email">Email (lo-net)</string>
+    <string name="successful_post">Comment submited successfully, please check your Email to confirm it!</string>
+    <string name="unsuccessful_post">Comment not submited successfully, please try again.\nError code:</string>
+    <string name="lonet_string" translatable="false">\@stg-se.sh.lo-net2.de</string>
+    <string name="email_invalid">Please enter a valid \"lo-net\"-Email</string>
+    <string name="first_last_name_identical">Please enter a separate last name for Email generation to work correctly</string>
+    <string name="create_comments_hint_title">Hint</string>
+    <string name="create_comments_hint_name">The name you want to appear above your comment. Please use your real name. If you have to use a pseudonym, make sure it is inoffensive as it will be visible to everyone.</string>
+    <string name="create_comment_hint_email">Your lo-net address. We will send a confirmation link there. Hint: You can tap the wand icon to automatically generate this from your name.</string>
+    <string name="create_comment_hint_content">Write your comment here. Make sure to remain civil so as to not offend anyone. If we feel like your comment is inappropriate, we will delete it.</string>
+    <string name="okay">Okay</string>
+
+    <!-- AboutActivity Strings -->
+    <string name="about_welcome">We are the school newspaper of the Städtisches Gymnasium Bad Segeberg</string>
+    <string name="about_content_feedback">Do you have editorial feedback? Let us know! Either write a comment or click here to write us an Email.</string>
+    <string name="about_code_feedback">Something doesn\'t work as expected? You have a fancy feature you want to see implemented? Tap here to let our code monkeys know.</string>
+    <string name="about_code_source">Did you know that this App was created as a school project and therefore is 100% open source? Tap here to check out the GitHub repository.</string>
+    <string name="about_image_source">Most icons are taken from the Android material library, notable exceptions:</string>
+    <string name="source1" translatable="false">Hand drawn arrow set by vexels.com</string>
+    <string name="source2" translatable="false">Quill icon made by Freepik</string>
+    <string name="source3" translatable="false">from Flaticon is licensed by</string>
+    <string name="source4" translatable="false">CC 3.0 BY</string>
+    <string name="about_welcome_title">Welcome!</string>
+
+    <!-- Image description Strings -->
+    <string name="cover_image_description">Cover image of the article</string>
+    <string name="logo_content_description">Our logo. It reads "Schüler texten Gedanken" in a fancy font</string>
+    <string name="about_question_description">Question mark in a circle. Provides information on name, email and content fields when tapped.</string>
+    <string name="about_wand_description">A small magic wand. Automatically generates your lo-net Email address based on your name when tapped</string>
+    <string name="quill_description">Quill and inkwell, why not create something with it?</string>
+    <string name="arrow_description">Arrow pointing to the Add-comment button</string>
+</resources>

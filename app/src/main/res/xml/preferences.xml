@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="high_resolution"
+        android:title="@string/img_settings_title"
+        android:summary="@string/img_settings_summary"/>
+
+    <ListPreference
+        android:defaultValue="10"
+        android:entries="@array/number_names_array"
+        android:entryValues="@array/number_values_array"
+        android:key="post_number"
+        android:title="@string/post_number_title"
+        android:summary="@string/post_number_summary"/>
+
+    <ListPreference
+        android:defaultValue="10"
+        android:entries="@array/number_names_array"
+        android:entryValues="@array/number_values_array"
+        android:key="comments_number"
+        android:title="@string/comments_number_title"
+        android:summary="@string/comments_number_summary"/>
+</PreferenceScreen>

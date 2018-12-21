@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Colors chosen based on school color palette in conjunction with material.io design guidelines-->
+    <color name="colorPrimary">#b71c1c</color>
+    <color name="colorPrimaryDark">#7f0000</color>
+    <color name="colorPrimaryLight">#f05545</color>
+    <color name="colorAccent">#455a64</color>
+    <style name="textShadowLight">#f4f4f4</style>
+</resources>

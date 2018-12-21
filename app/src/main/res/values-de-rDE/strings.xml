@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">STG Schülerzeitung</string>
+    <string name="no_articles">Keine Artikel gefunden.\nÜberprüfe deine Netzwerkverbindung.</string>
+    <string name="no_articles_search">Keine Artikel gefunden.\nVersuch einen anderen Suchbegriff!</string>
+    <string name="author_display_add">von\u0020</string>
+    <string name="settings_string">Einstellungen</string>
+    <string name="about_string">Über uns</string>
+    <string name="search_string">Suche</string>
+    <string name="search_title">Artikel mit \"</string>
+    <string name="search_hint">Suche nach Artikeln</string>
+    <string name="share_string">Teilen</string>
+
+    <!--Category Strings-->
+    <string name="all_articles_cat">Alle Artikel</string>
+    <string name="author_team_cat">Unser Redaktionsteam</string>
+    <string name="sport_cat">Sport</string>
+    <string name="culture_cat">Kultur</string>
+    <string name="trips_cat">Klassenfahrten</string>
+    <string name="sv_news_cat">News der SV</string>
+    <string name="interviews_cat">Interviews</string>
+    <string name="opinions_cat">Nachgedacht - Ansichtssache</string>
+    <string name="knowledge_cat">Wissen</string>
+    <string name="history_cat">Damals</string>
+    <string name="teachers_cat">Lehrerportraits</string>
+    <string name="other_cat">Andere</string>
+
+    <!--Share Strings-->
+    <string name="share_subject">Guck dir diesen Artikel an:</string>
+    <string name="share_text">Lies jetzt diesen Artikel: \n</string>
+    <string name="share_title">Artikel teilen!</string>
+
+    <!--Settings Strings-->
+    <string name="img_settings_title">Hohe Auflösung</string>
+    <string name="img_settings_summary">Lade Originalbilder. Sieht besser aus, verlangsamt jedoch möglicherweise die App und verbraucht mehr Daten.</string>
+    <string name="post_number_title">Anzahl an Beiträgen</string>
+    <string name="post_number_summary">Beiträge, die auf der Startseite und in der Suche geladen werden.</string>
+
+    <string name="comments_string">Kommentare:</string>
+    <string name="comments_number_title">Anzahl an Kommentaren</string>
+    <string name="comments_number_summary">Kommentare die unter einem Artikel maximal angezeigt werden</string>
+    <string name="reply_bubble_text">Tippe hier um zu antworten</string>
+    <string name="comments_empty_view">Keine Kommentare gefunden.\nSchreib doch einen, indem du hier tippst</string>
+    <string name="comment_author_add">schreibt:</string>
+    <string name="submit_string">Senden</string>
+    <string name="create_comment_email">E-Mail (lo-net)</string>
+    <string name="create_comment_content_hint">Schreibe deinen Kommentar hier</string>
+    <string name="name_input_string">Name</string>
+    <string name="successful_post">Kommentar erfolgreich gesendet, bitte bestätige ihn per Mail!</string>
+    <string name="unsuccessful_post">Kommentar nicht erfolgreich, bitte versuche es erneut.\nError code:</string>
+    <string name="email_invalid">Bitte gib eine gültige lo-net E-Mail an</string>
+    <string name="first_last_name_identical">Bitte gib deinen Nachnamen ein, damit die Adressgenerierung korrekt funktioniert</string>
+    <string name="create_comments_hint_title">Hinweis</string>
+    <string name="create_comments_hint_name">Der Name der über deinem Kommentar angezeigt wird. Bitte nutze deinen echten Namen. Wenn du ein Pseudonym nutzen musst, stelle sicher, dass er niemanden beleidigen könnte, weil er für jeden sichtbar sein wird.</string>
+    <string name="create_comment_hint_email">Deine lo-net Adresse. Wir werden dir einen Bestätigungslink schicken. Tipp: Du kannst den Zauberstab neben dem Feld antippen um deine E-Mail Adresse automatisch aus deinem Namen zu generieren.</string>
+    <string name="create_comment_hint_content">Schreibe deinen Kommentar hier. Bitte bleib höflich und beleidige niemanden. Wenn wir deinen Kommentar für unangebracht halten, werden wir ihn löschen.</string>
+    <string name="okay">Okay</string>
+    <string name="about_welcome">Wir sind die Schülerzeitung des Städtischen Gymnasiums Bad Segeberg.</string>
+    <string name="about_content_feedback">Du hast redaktionelle Anmerkungen? Schreib uns einen Kommentar! Oder tippe hier um uns eine Mail zu schicken.</string>
+    <string name="about_code_feedback">Funktioniert irgendwas nicht so wie erwartet? Du hast eine schicke Idee, die wir unbedingt implementieren sollen? Schreib unseren Code-Affen hier.</string>
+    <string name="about_code_source">Wusstest du, dass diese App als Schulprojekt entstanden ist? Deshalb ist ihr Quellcode 100% Open Source. Tippe hier für das GitHub-Repository!</string>
+    <string name="about_image_source">Die meisten Icons kommen aus der Android Material Bibliothek, bemerkenswerte Ausnahmen:</string>
+    <string name="about_welcome_title">Willkommen!</string>
+
+    <string name="cover_image_description">Titelbild des Artikels</string>
+    <string name="logo_content_description">Unser Logo. Es zeigt den Text "Schüler texten Gedanken" in einer netten Schriftart</string>
+    <string name="about_question_description">Fragezeichen in einem Kreis. Zeigt Informationen über Namen, E-Mail und Inhalt an, wenn du es antippst.</string>
+    <string name="about_wand_description">Ein kleiner Zauberstab. Generiert deine lo-net E-Mail Adresse aus deinem Namen, wenn du es antippst.</string>
+    <string name="quill_description">Feder und Tintenfass, warum schreibst du nicht etwas?</string>
+    <string name="arrow_description">Pfeil, der auf den Plus-Knopf zeigt</string>
+
+</resources>

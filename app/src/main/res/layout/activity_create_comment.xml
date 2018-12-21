@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.elvers.gereon.stgnewsapp1.CreateCommentActivity">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/create_comment_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary" />
+
+    <LinearLayout
+        android:id="@+id/create_comment_content_ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/create_comment_toolbar"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/create_comment_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="@string/name_input_string"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:textSize="20sp"
+                android:autofillHints="@string/create_comment_email"
+                tools:targetApi="o" />
+            <ImageView
+                android:id="@+id/create_comment_name_question_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:padding="12dp"
+                android:src="@drawable/ic_question"
+                android:contentDescription="@string/about_question_description" />
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/create_comment_email_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="email"
+                android:background="@android:color/transparent"
+                android:hint="@string/create_comment_email"
+                android:inputType="textEmailAddress"
+                android:padding="12dp"
+                android:textSize="20sp"
+                tools:targetApi="o" />
+            <ImageView
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:id="@+id/create_comment_email_wand_iv"
+                android:layout_toLeftOf="@id/create_comment_email_question_iv"
+                android:layout_toStartOf="@id/create_comment_email_question_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_auto_fix"
+                android:contentDescription="@string/about_wand_description" />
+            <ImageView
+                android:id="@+id/create_comment_email_question_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:padding="12dp"
+                android:src="@drawable/ic_question"
+                android:contentDescription="@string/about_question_description"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <EditText
+                android:id="@+id/create_comment_content_et"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="@string/create_comment_content_hint"
+                android:inputType="textMultiLine|textAutoComplete"
+                android:padding="12dp"
+                android:textSize="20sp"
+                android:importantForAutofill="no"
+                tools:ignore="RelativeOverlap"
+                tools:targetApi="o" />
+            <ImageView
+                android:id="@+id/create_comment_content_question_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:padding="12dp"
+                android:src="@drawable/ic_question"
+                android:contentDescription="@string/about_question_description"/>
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>
