@@ -54,8 +54,7 @@ public class AboutActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent codeSourceIntent = new Intent(Intent.ACTION_VIEW);
-                // TODO: actual link here
-                codeSourceIntent.setData(Uri.parse("github.com/"));
+                codeSourceIntent.setData(Uri.parse("https://github.com/gereonelvers/stg-news"));
                 startActivity(codeSourceIntent);
             }
         });
