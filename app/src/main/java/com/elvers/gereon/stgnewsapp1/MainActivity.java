@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onRefresh() {
                 mSwipeRefreshLayout.setRefreshing(true);
                 refreshListView();
-                mSwipeRefreshLayout.setRefreshing(false);
+
             }
         });
 
@@ -339,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (articles != null && !articles.isEmpty()) {
             mAdapter.addAll(articles);
         }
+        if (mSwipeRefreshLayout.isRefreshing()){mSwipeRefreshLayout.setRefreshing(false);}
     }
 
 
