@@ -34,7 +34,7 @@ public class AboutActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent contentFeedbackIntent = new Intent(Intent.ACTION_SENDTO);
-                contentFeedbackIntent.setData(Uri.parse("mailto:stg-schuelerzeitung+content@gmail.com"));
+                contentFeedbackIntent.setData(Uri.parse("mailto:content@stg-sz.net"));
                 contentFeedbackIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback zum Inhalt");
                 startActivity(contentFeedbackIntent);
             }
@@ -44,7 +44,7 @@ public class AboutActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent codeFeedbackIntent = new Intent(Intent.ACTION_SENDTO);
-                codeFeedbackIntent.setData(Uri.parse("mailto:stg-schuelerzeitung+code@gmail.com"));
+                codeFeedbackIntent.setData(Uri.parse("mailto:tech@stg-sz.net"));
                 codeFeedbackIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback zum Code");
                 startActivity(codeFeedbackIntent);
             }
