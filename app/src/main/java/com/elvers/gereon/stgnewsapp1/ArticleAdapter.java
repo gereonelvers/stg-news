@@ -68,7 +68,10 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
 
             TextView authorTV = listItemView.findViewById(R.id.article_item_author_name_tv);
             String authorName = currentArticle.getAuthor();
-            String displayAuthor = getContext().getString(R.string.author_display_add) + authorName;
+            String displayAuthor = "";
+            if (!authorName.isEmpty()) {
+                displayAuthor = getContext().getString(R.string.author_display_add) + authorName;
+            }
             authorTV.setText(displayAuthor);
 
             TextView dateTV = listItemView.findViewById(R.id.article_item_date_tv);

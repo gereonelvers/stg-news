@@ -27,6 +27,8 @@ import android.widget.Toast;
  */
 public class CreateCommentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Integer> {
 
+    /* There are a lot of items declared outside of individual methods here.
+    This is done because they are required to be available across methods and it's more economical to simply initialize them onCreate()*/
     String articleId;
     EditText nameET;
     EditText emailET;
@@ -41,6 +43,10 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
     ImageView content_help;
     ImageView email_wand;
     AlertDialog.Builder alertDialogBuilder;
+    String lonetString;
+
+    // Tag for log messages
+    private static final String LOG_TAG = CreateCommentActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,7 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
             actionbar.setHomeAsUpIndicator(R.drawable.ic_cancel);
             actionbar.setTitle(R.string.app_name);
         }
+        lonetString = getString(R.string.lonet_string);
         loaderManager = getSupportLoaderManager();
         Intent createCommentIntent = getIntent();
         Integer idInt = createCommentIntent.getIntExtra("ARTICLE_ID", -1);
@@ -122,24 +129,28 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
             }
         });
 
+
+        // Since no one ever remembers their lo-net address, this onClickListener automatically generates it based on the input name
         email_wand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String lonetString = getString(R.string.lonet_string);
                 nameString = nameET.getText().toString();
                 if (!nameString.isEmpty()) {
                     try {
                         // Create an Array of names, only the first and last name are relevant
                         String[] emailNameParts = nameString.split(" ");
-                        if (!emailNameParts[0].equals(emailNameParts[emailNameParts.length - 1])) {
+                        // If the array contains at least 2 names, proceed with address generation
+                        if (emailNameParts.length >= 2) {
+                            // Get the first 3 characters of the first name
                             String firstName = emailNameParts[0].substring(0, 3).toLowerCase();
+                            // Since the array starts at 0 but .length returns a value starting at 1, we need to subtract 1
                             String lastName = emailNameParts[emailNameParts.length - 1].toLowerCase();
                             lonetString = firstName + "." + lastName + lonetString;
                         } else {
                             Toast.makeText(getApplicationContext(), getString(R.string.first_last_name_identical), Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
-                        Log.e("onClick", "Not working");
+                        Log.e(LOG_TAG, "Failed to create lo-net address");
                     }
                 }
                 emailET.setText(lonetString);
@@ -172,16 +183,16 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
                 emailString = emailET.getText().toString();
                 contentString = contentET.getText().toString();
                 if (articleId != null) {
-                    if (emailString.contains("stg-se.sh.lo-net2.de")) {
+                    // Check if lo-net address ending is present in email
+                    if (emailString.contains(lonetString)) {
                         loaderManager.destroyLoader(POSTER_ID);
                         loaderManager.initLoader(POSTER_ID, null, this);
                     } else {
                         Toast.makeText(this, getString(R.string.email_invalid), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Log.e("submit button", "Article ID empty");
+                    Log.e(LOG_TAG, "Article ID empty, can't submit comment");
                 }
-
                 return true;
             // Settings button
             case R.id.settings:
@@ -205,17 +216,24 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
 
     @Override
     public void onLoadFinished(@NonNull Loader<Integer> loader, Integer responseCode) {
+        // If submission was successful, status code will be 201. Return to previous activity to prevent duplicate submissions
         if (responseCode == 201) {
-            onBackPressed();
             Toast.makeText(this, getResources().getString(R.string.successful_post), Toast.LENGTH_LONG).show();
-        } else {
+            onBackPressed();
+        }
+        // If status code is anything but 201, submission was not successful.
+        // Display error message while staying in activity.
+        else {
             Toast.makeText(this, getResources().getString(R.string.unsuccessful_post) + " " + responseCode.toString(), Toast.LENGTH_LONG).show();
         }
 
     }
 
+    /**
+     * This method is only called when a more than one posting attempt is made sequentially.
+     * Since there is no data being loaded into the activity, it can be left empty (it needs to be included because it overrides a LoaderCallbacks<> method)
+     */
     @Override
-    public void onLoaderReset(@NonNull Loader<Integer> loader) {
-    }
+    public void onLoaderReset(@NonNull Loader<Integer> loader) { }
 
 }

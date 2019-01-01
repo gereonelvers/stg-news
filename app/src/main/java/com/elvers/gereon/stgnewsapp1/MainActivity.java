@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int ARTICLE_LOADER_ID = 1;
 
     /* There are a lot of items declared outside of individual methods here.
-    This is done because they are required to be available across methods */
+    This is done because they are required to be available across methods and it's more economical to simply initialize them onCreate() */
     SwipeRefreshLayout mSwipeRefreshLayout;
     ListView articleListView;
     TextView emptyView;
@@ -103,8 +103,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         menuItem.setChecked(true);
                         /* If an item is selected this means that a filter will be applied.
-                         * Hardcoding categories like this is not really elegant but since WordPress IDs are unpredictable and each category corresponds to a fixed item in the drawer_view, it is unavoidable
-                         * Once the filter is applied, the ListView is refreshed and the drawer is closed */
+                         * Hardcoding categories like this is not really elegant but since WordPress IDs are unpredictable and each category corresponds to a fixed item in the drawer_view, it is unavoidable (AFAIK)
+                         * Once the filter is applied, the ListView is refreshed and the drawer is closed
+                         *
+                         * If you want to implement a new category to filter by, first implement it in WordPress. After that, find out it's WordPress-ID,
+                         * implement it in drawer_view.xml (This is where you assign an internal ID and a drawable to represent the category)
+                         * and create a new case here. Scheme:
+                         *
+                         * case R.id.[ID you assigned in drawer_view.xml]
+                         *      filterParam = "[WordPress-ID]"
+                         *      refreshListView();
+                         *      actionBar.setTitle([Name of category])
+                         *      mDrawerLayout.closeDrawers();
+                         *      return true;
+                         *
+                         * Please don't hardcode the category name, instead create a new string resource in strings.xml and simply reference it's ID here.
+                         * You'll also want to implement the new category in Utils.xml (extractArticleFeaturesFromJson()) to make it correctly show up in list items.
+                         *
+                         */
                         if (actionbar != null) {
                             switch (menuItem.getItemId()) {
                                 case R.id.all_articles:

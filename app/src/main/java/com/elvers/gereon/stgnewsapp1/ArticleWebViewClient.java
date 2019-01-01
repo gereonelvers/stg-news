@@ -6,7 +6,9 @@ import android.webkit.WebViewClient;
 
 /**
  * Custom WebViewClient for loading article from URL
- * */
+ *
+ * @author Gereon Elvers
+ */
 public class ArticleWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {

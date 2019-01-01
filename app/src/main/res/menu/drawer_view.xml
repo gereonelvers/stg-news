@@ -45,6 +45,18 @@
             android:id="@+id/teachers"
             android:icon="@drawable/ic_teacher"
             android:title="@string/teachers_cat" />
+        <!--
+        Implement new category above this comment.
+        Scheme:
+
+        <item
+            android:id="@+id/[new ID name that fits your category]"
+            android:icon="[drawable resource (icon) that represents you category]"
+            android:title="[category name]" />
+
+        You can create a new drawable under File->New->Image Asset
+        -->
+
         <item
             android:id="@+id/other"
             android:icon="@drawable/ic_other"

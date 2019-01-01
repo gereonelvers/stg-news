@@ -36,7 +36,7 @@ final class Utils {
     // Tag for log messages
     private static final String LOG_TAG = Utils.class.getSimpleName();
 
-    // Static request URL the list of authors will be requested from. Putting it at the top like this allow easier modification of top level domain if required.
+    // Static request URL the list of authors will be requested from. Putting it at the top like this allows easier modification of top level domain if required.
     private static final String AUTHOR_REQUEST_URL = "http://stg-sz.net/wp-json/wp/v2/users/";
     private static final String BASE_REQUEST_URL = "stg-sz.net";
     private static JSONArray authorsArray;
@@ -91,8 +91,8 @@ final class Utils {
         URL url = null;
         try {
             url = new URL(stringUrl);
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Problem building the URL ", e);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Problem building the URL ");
         }
         return url;
     }
@@ -205,7 +205,7 @@ final class Utils {
                 try {
                     articleDate = inputFormat.parse(dateStringInput, p);
                 } catch (Exception e) {
-                    Log.e("formatDate:","Error parsing dateString into format");
+                    Log.e(LOG_TAG,"Error parsing dateString into format");
                 }
                 SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.getDefault());
                 String dateString = outputFormat.format(articleDate);
@@ -226,7 +226,7 @@ final class Utils {
                     try{
                     imgObj = sizes.getJSONObject("large"); }
                     catch (Exception e){
-                        Log.e(LOG_TAG, "Failed to get large image");
+                        Log.i(LOG_TAG, "Failed to get large image");
                     }
                     try {
                         if (imgObj == null) {
@@ -234,7 +234,7 @@ final class Utils {
                         }
                     }
                     catch (Exception e){
-                        Log.e(LOG_TAG, "Failed to get medium image");
+                        Log.i(LOG_TAG, "Failed to get medium image");
                     }
                     try {
                         if (imgObj == null) {
@@ -242,7 +242,7 @@ final class Utils {
                             }
                         }
                     catch (Exception e){
-                        Log.e(LOG_TAG, "Failed to get thumbnail image");
+                        Log.i(LOG_TAG, "Failed to get thumbnail image");
                         }
                     }
                     else {
@@ -255,12 +255,22 @@ final class Utils {
 
                 }
                 catch (Exception e){
-                    Log.e(LOG_TAG + "IMG Conversion for article " + i, "Can't parse img through betterFeaturedImage");
+                    Log.e(LOG_TAG , "IMG Conversion for article " + i + " Can't parse img through betterFeaturedImage");
                 }
 
 
-                /* Get article categories
+                /* Get article categories to display in ListView item
                  * The static switch statement is not really elegant, but since category IDs are unpredictable (and therefore can't be parsed in a loop), this will have to do.
+                 *
+                 * If you want to implement a new category, get its ID from WordPress and simply put it at the bottom here with the following scheme:
+                 *
+                 * case [ID]:
+                 * categoryString = String.format("%s%s ", categoryString, [Name of Category])
+                 * break;
+                 *
+                 * You'll want to put the category name into strings.xml and assign an ID which you'll reference here.
+                 *
+                 * If you want to support filtering by category as well, you'll need to implement the category in MainActivity too.
                  */
                 JSONArray categoriesArray = currentArticle.getJSONArray("categories");
                 String categoryString = "";
@@ -362,7 +372,7 @@ final class Utils {
                 try {
                     articleDate = inputFormat.parse(dateStringInput, p);
                 } catch (Exception e) {
-                    Log.e("formatDate:","Error parsing dateString into format");
+                    Log.e(LOG_TAG,"Error parsing dateString into format");
                 }
                 SimpleDateFormat outputFormatDate = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
                 SimpleDateFormat outputFormatTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -406,7 +416,9 @@ final class Utils {
                 currentAuthor = authorsArray.getJSONObject(i);
                 currentId = currentAuthor.getInt("id");
             } catch (Exception e){
-                Log.e("getAuthorName", "Finding matching author failed");
+                // This can happen if the array of authors doesn't contain an author matching the ID of the author for a certain article.
+                // If that happens, ArticleAdapter will simply hide the author field
+                Log.e(LOG_TAG, "Finding matching author failed");
             }
             if (currentId==authorID){
                 try {
@@ -425,6 +437,7 @@ final class Utils {
 
     /**
      * Request an array of authors from AUTHOR_REQUEST_URL
+     * Necessary to correctly display author name in article listview
      */
     private static void getAuthorData(){
         URL url = createUrl(AUTHOR_REQUEST_URL);
@@ -437,10 +450,14 @@ final class Utils {
         try {
             authorsArray = new JSONArray(jsonResponse);
         } catch (JSONException e) {
-            Log.e("", "Error parsing author info");
+            Log.e(LOG_TAG, "Error parsing author info");
         }
     }
 
+    /**
+     * This is the method that gets called when a comment is submitted though CreateCommentActivity.
+     * It handles posting said comment and returns a http status code.
+     */
     static int sendComment(String id, String authorName, String authorEmail, String content){
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("http");
@@ -485,6 +502,7 @@ final class Utils {
         } catch (IOException e){
             Log.e(LOG_TAG, "POST failed");}
         finally {
+            // disconnect urlConnection properly
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }

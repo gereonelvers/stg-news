@@ -23,7 +23,7 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
      * @param url is the URL the data is loaded from
      * @param context is the context it is loaded to
      *
-     * When troubleshooting the request URL, place Debugger here instead of the UriBuilder to easily get requestUrl
+     * When troubleshooting the request URL, place debugger here instead of the UriBuilder to easily get requestUrl
      */
     ArticleLoader(Context context, String url) {
         super(context);

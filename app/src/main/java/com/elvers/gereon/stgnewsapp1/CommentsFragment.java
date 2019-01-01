@@ -27,6 +27,11 @@ import java.util.List;
  */
 public class CommentsFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Comment>> {
 
+    // Tag for log messages
+    private static final String LOG_TAG = CommentsFragment.class.getSimpleName();
+
+    /* There are a lot of items declared outside of individual methods here.
+    This is done because they are required to be available across methods and it's more economical to simply initialize them onCreateView() */
     private static final String COMMENTS_REQUEST_URL = "stg-sz.net";
     private static final int COMMENT_LOADER_ID = 3;
     LoaderManager loaderManager;
@@ -38,7 +43,7 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     CommentAdapter commentAdapter;
     ListView listView;
 
-    // Parsed parameters
+    // Parsed parameter
     private Integer articleID;
 
     private String numberOfCommentsParam;
@@ -68,8 +73,11 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Set layout
         View view = inflater.inflate(R.layout.fragment_comments, container, false);
+        // Try to get article ID from Bundle
         readBundle(getArguments());
+        // Get number of comments to be loaded
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         numberOfCommentsParam = sharedPreferences.getString("comments_number", "10");
         loadingIndicator = view.findViewById(R.id.comments_loading_circle);
@@ -111,9 +119,10 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
                 commentAdapter.addAll(comments);
             }
         } catch (Exception e) {
-            Log.e("onLoadFinished", "Can't push comments to Adapter");
+            Log.e(LOG_TAG, "Can't push comments to Adapter");
         }
     }
+
 
     public void initLoaderListView() {
         commentAdapter = new CommentAdapter(getActivity(), new ArrayList<Comment>());

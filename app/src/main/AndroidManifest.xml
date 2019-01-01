@@ -34,6 +34,29 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.elvers.gereon.stgnewsapp1.MainActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="stg-sz.net"
+                    android:pathPrefix="/posts" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="stg-sz.net"
+                    android:pathPrefix="/posts" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".SearchActivity"

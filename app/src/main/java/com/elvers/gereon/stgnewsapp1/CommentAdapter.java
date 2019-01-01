@@ -28,6 +28,9 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         super(context, 0, comments);
     }
 
+    // Tag for log messages
+    private static final String LOG_TAG = CommentAdapter.class.getSimpleName();
+
     /**
      * Returns a list item view with the info of a single Comment object
      */
@@ -42,7 +45,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
 
         // Get current Comment from the list
         Comment currentComment = getItem(position);
-        Log.e("getView", "Reached getView for item "+ position);
+        Log.i(LOG_TAG, "Reached getView for item "+ position);
 
         /* The code below applies the info from the Comment to the listItemView */
         if (currentComment != null) {

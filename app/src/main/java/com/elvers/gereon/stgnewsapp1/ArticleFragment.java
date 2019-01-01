@@ -53,8 +53,11 @@ public class ArticleFragment extends Fragment {
         readBundle(getArguments());
         webView = view.findViewById(R.id.article_content_wv);
         loadingIndicator = view.findViewById(R.id.article_loading_circle);
-        // Add inapp URL parameter to notify page that it is being requested from within the App
+        // Add inapp URL parameter to notify site that it is being requested from within the App
         articleURI += "?inapp";
+        /* Javascript is necessary for some dynamic components that might be implemented in the future,
+        * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
+        */
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new ArticleWebViewClient());
         webView.setVisibility(View.INVISIBLE);
@@ -62,11 +65,13 @@ public class ArticleFragment extends Fragment {
         webView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView webView, int progress) {
                 if (progress == 100) {
+                    // Hide loading indicator and show WebView once loading is finished
                     loadingIndicator.setVisibility(View.INVISIBLE);
                     webView.setVisibility(View.VISIBLE);
                 }
             }
         });
+        // Start loading URL
         webView.loadUrl(articleURI);
 
         return view;
