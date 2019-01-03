@@ -79,6 +79,7 @@
     <string name="source3" translatable="false">from Flaticon is licensed by</string>
     <string name="source4" translatable="false">CC 3.0 BY</string>
     <string name="about_welcome_title">Welcome!</string>
+    <string name="data_protection">Data protection</string>
 
     <!-- Image description Strings -->
     <string name="cover_image_description">Cover image of the article</string>

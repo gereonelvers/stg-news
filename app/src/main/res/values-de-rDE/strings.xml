@@ -68,5 +68,6 @@
     <string name="about_wand_description">Ein kleiner Zauberstab. Generiert deine lo-net E-Mail Adresse aus deinem Namen, wenn du es antippst.</string>
     <string name="quill_description">Feder und Tintenfass, warum schreibst du nicht etwas?</string>
     <string name="arrow_description">Pfeil, der auf den Plus-Knopf zeigt</string>
+    <string name="data_protection">Datenschutzerklärung</string>
 
 </resources>

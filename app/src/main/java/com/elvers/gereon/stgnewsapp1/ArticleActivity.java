@@ -104,9 +104,14 @@ public class ArticleActivity extends AppCompatActivity {
                 }
             }
         });
-
-        // Start off by showing the article
-        showArticle();
+        // if "#comments" is present in the URI, this means that the Article has been accessed though a deeplink meant to link directly to the comments.
+        // Therefore jump straight to CommentsFragment
+        if (articleURI.contains("#comments")){
+            showComments();
+        } else {
+            // If that isn't the case, start off by showing the article
+            showArticle();
+        }
 
     }
 

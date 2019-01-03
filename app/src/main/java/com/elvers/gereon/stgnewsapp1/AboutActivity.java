@@ -39,7 +39,7 @@ public class AboutActivity extends AppCompatActivity {
                 startActivity(contentFeedbackIntent);
             }
         });
-        final TextView codeFeedbackTV = findViewById(R.id.about_code_feedback);
+        TextView codeFeedbackTV = findViewById(R.id.about_code_feedback);
         codeFeedbackTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,6 +56,15 @@ public class AboutActivity extends AppCompatActivity {
                 Intent codeSourceIntent = new Intent(Intent.ACTION_VIEW);
                 codeSourceIntent.setData(Uri.parse("https://github.com/gereonelvers/stg-news"));
                 startActivity(codeSourceIntent);
+            }
+        });
+        TextView dataProtectionTV = findViewById(R.id.data_protection);
+        dataProtectionTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent dataProtectionIntent = new Intent(Intent.ACTION_VIEW);
+                dataProtectionIntent.setData(Uri.parse("https://stg-sz.net/datenschutzerklaerung/"));
+                startActivity(dataProtectionIntent);
             }
         });
         TextView source1 = findViewById(R.id.about_link1);

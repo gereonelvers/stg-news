@@ -61,10 +61,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/data_protection"
+            android:padding="8dp"
+            android:text="@string/data_protection"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/about_sources"
             android:padding="8dp"
             android:textStyle="bold"
             android:text="@string/about_image_source"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
