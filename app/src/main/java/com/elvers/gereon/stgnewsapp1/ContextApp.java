@@ -9,7 +9,9 @@ import android.content.Context;
  * This is not good practice and usage of this class should therefore be minimized!
  * Try getContext() and Context.getApplicationContext() before falling back on this
  *
- * @author Gereon Elvers
+ *
+ * @author Gereon Elvers, taken from the following StackOverflow-Thread: https://stackoverflow.com/questions/2002288/static-way-to-get-context-in-android
+ * Answer by Jared Rummler
  */
 public class ContextApp extends Application {
     private static Application sApplication;

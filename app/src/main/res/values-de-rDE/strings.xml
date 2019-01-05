@@ -3,6 +3,8 @@
     <string name="app_name">STG Schülerzeitung</string>
     <string name="no_articles">Keine Artikel gefunden.\nÜberprüfe deine Netzwerkverbindung.</string>
     <string name="no_articles_search">Keine Artikel gefunden.\nVersuch einen anderen Suchbegriff!</string>
+    <string name="no_articles_page">Keine weiteren Artikel gefunden.\nTippe hier, um zur Liste zurückzukehren.</string>
+    <string name="no_articles_search_page">Keine weiteren Artikel gefunden.\nTippe hier, um zu den Suchergebnissen zurückzukehren.</string>
     <string name="author_display_add">von\u0020</string>
     <string name="settings_string">Einstellungen</string>
     <string name="about_string">Über uns</string>
@@ -41,6 +43,7 @@
     <string name="comments_number_summary">Kommentare die unter einem Artikel maximal angezeigt werden</string>
     <string name="reply_bubble_text">Tippe hier um zu antworten</string>
     <string name="comments_empty_view">Keine Kommentare gefunden.\nSchreib doch einen, indem du hier tippst</string>
+    <string name="comments_empty_view_page">Keine weiteren Kommentare gefunden.\nTippe hier, um zu den Kommentaren zurückzukehren.</string>
     <string name="comment_author_add">schreibt:</string>
     <string name="submit_string">Senden</string>
     <string name="create_comment_email">E-Mail (lo-net)</string>
@@ -69,5 +72,6 @@
     <string name="quill_description">Feder und Tintenfass, warum schreibst du nicht etwas?</string>
     <string name="arrow_description">Pfeil, der auf den Plus-Knopf zeigt</string>
     <string name="data_protection">Datenschutzerklärung</string>
+    <string name="refresh_string">Aktualisieren</string>
 
 </resources>

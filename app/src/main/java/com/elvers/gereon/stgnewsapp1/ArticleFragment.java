@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ public class ArticleFragment extends Fragment {
         return articleFragment;
     }
 
+    // Try to retrieve Article URI from Bundle
     private void readBundle(Bundle bundle) {
         if (bundle != null) {
             articleURI = bundle.getString("ARTICLE_URI");
@@ -44,6 +46,10 @@ public class ArticleFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+
+    /**
+     * Since this is a fragment, construction is done onCreateView() since calls to the layout need to be made though "view.", which is only available here
+     */
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -55,7 +61,8 @@ public class ArticleFragment extends Fragment {
         loadingIndicator = view.findViewById(R.id.article_loading_circle);
         // Add inapp URL parameter to notify site that it is being requested from within the App
         articleURI += "?inapp";
-        /* Javascript is necessary for some dynamic components that might be implemented in the future,
+        /*
+        * Javascript is necessary for some dynamic components that might be implemented in the future,
         * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
         */
         webView.getSettings().setJavaScriptEnabled(true);

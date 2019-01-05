@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_help_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_chevron_left_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -33,7 +33,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_question" />
+                                      <entry key="outputName" value="ic_nav_backward" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -65,6 +65,11 @@
                                 </PersistentState>
                               </value>
                             </entry>
+                          </map>
+                        </option>
+                        <option name="values">
+                          <map>
+                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

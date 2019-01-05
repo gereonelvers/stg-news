@@ -4,7 +4,9 @@
 
     <!-- MainActivity, SearchActivity and basic Strings -->
     <string name="no_articles">No articles found.\nCheck your connection!</string>
+    <string name="no_articles_page">No more articles found.\nTap here to return to the article list.</string>
     <string name="no_articles_search">No articles found.\nTry a differerent query!</string>
+    <string name="no_articles_search_page">No more articles found.\nTap here to return to results</string>
     <string name="author_display_add">by\u0020</string>
     <string name="settings_string">Settings</string>
     <string name="about_string">About</string>
@@ -50,6 +52,7 @@
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="title_activity_create_comment" translatable="false">CreateCommentActivity</string>
     <string name="comments_empty_view">No comments found.\nWhy not write one by tapping here?</string>
+    <string name="comments_empty_view_page">No more comments found.\nTap here to return to comment section.</string>
     <string name="comment_author_add">writes:</string>
 
     <!-- CreateCommentActivity Strings -->
@@ -88,4 +91,6 @@
     <string name="about_wand_description">A small magic wand. Automatically generates your lo-net Email address based on your name when tapped</string>
     <string name="quill_description">Quill and inkwell, why not create something with it?</string>
     <string name="arrow_description">Arrow pointing to the Add-comment button</string>
+    <string name="refresh_string">Refresh</string>
+
 </resources>

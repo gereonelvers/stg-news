@@ -1,5 +1,6 @@
 package com.elvers.gereon.stgnewsapp1;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,12 +20,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -45,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * {@param numberOfArticlesParam} for changing the number of posts requested
      */
 
+    // Tag for log messages
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
     // Static request URL the data will be requested from. Putting it at the top like this allow easier modification of top level domain if required
     private static final String WP_REQUEST_URL = "www.stg-sz.net";
 
@@ -60,12 +70,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     View loadingIndicator;
     String filterParam;
     String numberOfArticlesParam;
+    Integer pageNumber;
+    TextView pageNumberTV;
     private ArticleAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
 
     /**
      * onCreate() is called when the Activity is launched.
      */
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             actionbar.setHomeAsUpIndicator(R.drawable.ic_action_hamburger);
             actionbar.setTitle(R.string.app_name);
         }
+
+
         // Setting up DrawerLayout
         mDrawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -222,6 +237,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         articleListView = findViewById(R.id.article_list_view);
         articleListView.setEmptyView(emptyView);
 
+        // Inflate page picker and add below ListView
+        View pagePicker = LayoutInflater.from(this).inflate(R.layout.page_picker, null, false);
+        articleListView.addFooterView(pagePicker);
+
+        // When launching the Activity, the first page should be loaded
+        pageNumber = 1;
+
+        // Initialize page number TextView and set initial value (at this point, always 1)
+        pageNumberTV = findViewById(R.id.page_number_tv);
+        pageNumberTV.setText(pageNumber.toString());
+
+        // Implement page back-button
+        ImageView backIV = findViewById(R.id.back_iv);
+        backIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pageNumber > 1){
+                    pageNumber--;
+                    pageNumberTV.setText(pageNumber.toString());
+                    refreshListView();
+                }
+            }
+        });
+        // Implement page forward-button
+        ImageView forwardIV = findViewById(R.id.forward_iv);
+        forwardIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pageNumber++;
+                pageNumberTV.setText(pageNumber.toString());
+                refreshListView();
+            }
+        });
+
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
@@ -236,8 +285,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Load of Article objects onto listView is requested
         initLoaderListView();
-
-
     }
 
     /**
@@ -262,14 +309,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         articleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Article currentArticle = mAdapter.getItem(i);
-                Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
-                if (currentArticle != null) {
-                    articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
-                    articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitle());
-                    articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+                /*
+                 * This really, really shouldn't require a try-block, but I once managed to reach an IndexOutOfBoundsException here for some reason.
+                 * I haven't been able to reproduce it since, but I decided to keep this in a try-block anyway ¯\_(ツ)_/¯
+                 */
+                try {
+                    Article currentArticle = mAdapter.getItem(i);
+                    Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
+                    if (currentArticle != null) {
+                        articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
+                        articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitle());
+                        articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+                    }
+                    startActivity(articleIntent);
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "How did you even do this? OutOfBounds in MainActivity onItemClick");
                 }
-                startActivity(articleIntent);
             }
         });
 
@@ -286,6 +341,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             // This is the "hamburger menu" that expands the Drawer when activated
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+
+            // Refresh button
+            case R.id.refresh:
+                refreshListView();
                 return true;
 
             // Settings button
@@ -319,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * Parameters:
      * {@param filterParam} is a String containing the id of the category requested (if present)
      * {@param numberOfArticlesParam} is a String containing the number of Article objects requested from the server
+     * {@param pageNumber} is the page number loaded
      */
     @Override
     @NonNull
@@ -334,6 +395,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (!numberOfArticlesParam.isEmpty()) {
             uriBuilder.appendQueryParameter("per_page", numberOfArticlesParam);
         }
+        uriBuilder.appendQueryParameter("page", pageNumber.toString());
         return new ArticleLoader(this, uriBuilder.toString());
     }
 
@@ -348,14 +410,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // EmptyView is only visible if mAdapter is empty
         TextView emptyView = findViewById(R.id.empty_view);
-        emptyView.setText(R.string.no_articles);
+
+        if (pageNumber == 1) {
+            emptyView.setText(R.string.no_articles);
+        } else {
+            emptyView.setText(R.string.no_articles_page);
+        }
 
         // Clears the ArticleAdapter to allow the new array of Articles to be projected (if it's not empty)
         mAdapter.clear();
         if (articles != null && !articles.isEmpty()) {
             mAdapter.addAll(articles);
+        } else {
+            emptyView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (pageNumber != 1){
+                        pageNumber--;
+                        pageNumberTV.setText(pageNumber.toString());
+                        refreshListView();
+                    }
+                }
+            });
         }
-        if (mSwipeRefreshLayout.isRefreshing()){mSwipeRefreshLayout.setRefreshing(false);}
+        if (mSwipeRefreshLayout.isRefreshing()){
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
 
