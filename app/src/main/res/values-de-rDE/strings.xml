@@ -58,12 +58,6 @@
     <string name="create_comment_hint_email">Deine lo-net Adresse. Wir werden dir einen Bestätigungslink schicken. Tipp: Du kannst den Zauberstab neben dem Feld antippen um deine E-Mail Adresse automatisch aus deinem Namen zu generieren.</string>
     <string name="create_comment_hint_content">Schreibe deinen Kommentar hier. Bitte bleib höflich und beleidige niemanden. Wenn wir deinen Kommentar für unangebracht halten, werden wir ihn löschen.</string>
     <string name="okay">Okay</string>
-    <string name="about_welcome">Wir sind die Schülerzeitung des Städtischen Gymnasiums Bad Segeberg.</string>
-    <string name="about_content_feedback">Du hast redaktionelle Anmerkungen? Schreib uns einen Kommentar! Oder tippe hier um uns eine Mail zu schicken.</string>
-    <string name="about_code_feedback">Funktioniert irgendwas nicht so wie erwartet? Du hast eine schicke Idee, die wir unbedingt implementieren sollen? Schreib unseren Code-Affen hier.</string>
-    <string name="about_code_source">Wusstest du, dass diese App als Schulprojekt entstanden ist? Deshalb ist ihr Quellcode 100% Open Source. Tippe hier für das GitHub-Repository!</string>
-    <string name="about_image_source">Die meisten Icons kommen aus der Android Material Bibliothek, bemerkenswerte Ausnahmen:</string>
-    <string name="about_welcome_title">Willkommen!</string>
 
     <string name="cover_image_description">Titelbild des Artikels</string>
     <string name="logo_content_description">Unser Logo. Es zeigt den Text "Schüler texten Gedanken" in einer netten Schriftart</string>
@@ -71,7 +65,6 @@
     <string name="about_wand_description">Ein kleiner Zauberstab. Generiert deine lo-net E-Mail Adresse aus deinem Namen, wenn du es antippst.</string>
     <string name="quill_description">Feder und Tintenfass, warum schreibst du nicht etwas?</string>
     <string name="arrow_description">Pfeil, der auf den Plus-Knopf zeigt</string>
-    <string name="data_protection">Datenschutzerklärung</string>
     <string name="refresh_string">Aktualisieren</string>
 
 </resources>

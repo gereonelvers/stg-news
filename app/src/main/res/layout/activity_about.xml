@@ -13,94 +13,21 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:contentDescription="@string/logo_content_description"
+        <WebView
+            android:id="@+id/about_content_wv"
             android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:src="@drawable/schuelergedanken" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_welcome_title"
-            android:text="@string/about_welcome_title"
-            android:textColor="@color/colorPrimary"
-            android:textSize="24sp"
-            android:padding="8dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_welcome"
-            android:text="@string/about_welcome"
-            android:padding="8dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_content_feedback"
-            android:text="@string/about_content_feedback"
-            android:padding="8dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_code_feedback"
-            android:padding="8dp"
-            android:text="@string/about_code_feedback"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_code_source"
-            android:padding="8dp"
-            android:text="@string/about_code_source"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/data_protection"
-            android:padding="8dp"
-            android:text="@string/data_protection"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_sources"
-            android:padding="8dp"
-            android:textStyle="bold"
-            android:text="@string/about_image_source"/>
+            android:layout_height="wrap_content" />
 
-        <TextView
+        <ProgressBar
+            android:id="@+id/about_loading_circle"
+            style="@style/Widget.AppCompat.ProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/about_link1"
-            android:padding="8dp"
-            android:text="@string/source1"/>
-        <TextView
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_link2"
-            android:text="@string/source2"/>
-        <TextView
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_link3"
-            android:text="@string/source3"/>
-        <TextView
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/about_link4"
-            android:text="@string/source4"/>
-
-    </LinearLayout>
-    </ScrollView>
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
 
 </LinearLayout>

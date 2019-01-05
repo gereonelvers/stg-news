@@ -1,6 +1,10 @@
 package com.elvers.gereon.stgnewsapp1;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.MailTo;
+import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -17,8 +21,40 @@ public class ArticleWebViewClient extends WebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        view.loadUrl(url);
+        // Get context for intents
+        Context context = ContextApp.getContext();
+        // If the URL starts with mailto:, it needs to be handled as a mail-intent
+        if (url.startsWith("mailto:")) {
+            MailTo mt = MailTo.parse(url);
+            Intent emailIntent = createEmailIntent(mt.getTo(), mt.getSubject(), mt.getBody(), mt.getCc());
+            context.startActivity(emailIntent);
+            view.reload();
+            return true;
+        }
+        // If the URL contains stg-sz.net it will be loaded inside the WebView
+        else if (url.contains("stg-sz.net")){
+            if (!url.contains("inapp")) {
+            url += "?inapp";
+            }
+            view.loadUrl(url);
+        }
+        // Otherwise it will be handled in a regular browser instance
+        else {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            context.startActivity(browserIntent);
+        }
         return true;
+    }
+
+    // Create the actual email intent based on info from the mailto address
+    private Intent createEmailIntent(String address, String subject, String body, String cc) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[] { address });
+        intent.putExtra(Intent.EXTRA_TEXT, body);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_CC, cc);
+        intent.setType("message/rfc822");
+        return intent;
     }
 
     @Override

@@ -71,19 +71,6 @@
     <string name="create_comment_hint_content">Write your comment here. Make sure to remain civil so as to not offend anyone. If we feel like your comment is inappropriate, we will delete it.</string>
     <string name="okay">Okay</string>
 
-    <!-- AboutActivity Strings -->
-    <string name="about_welcome">We are the school newspaper of the Städtisches Gymnasium Bad Segeberg</string>
-    <string name="about_content_feedback">Do you have editorial feedback? Let us know! Either write a comment or click here to write us an Email.</string>
-    <string name="about_code_feedback">Something doesn\'t work as expected? You have a fancy feature you want to see implemented? Tap here to let our code monkeys know.</string>
-    <string name="about_code_source">Did you know that this App was created as a school project and therefore is 100% open source? Tap here to check out the GitHub repository.</string>
-    <string name="about_image_source">Most icons are taken from the Android material library, notable exceptions:</string>
-    <string name="source1" translatable="false">Hand drawn arrow set by vexels.com</string>
-    <string name="source2" translatable="false">Quill icon made by Freepik</string>
-    <string name="source3" translatable="false">from Flaticon is licensed by</string>
-    <string name="source4" translatable="false">CC 3.0 BY</string>
-    <string name="about_welcome_title">Welcome!</string>
-    <string name="data_protection">Data protection</string>
-
     <!-- Image description Strings -->
     <string name="cover_image_description">Cover image of the article</string>
     <string name="logo_content_description">Our logo. It reads "Schüler texten Gedanken" in a fancy font</string>
