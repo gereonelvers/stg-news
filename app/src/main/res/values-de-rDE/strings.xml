@@ -50,11 +50,11 @@
     <string name="create_comment_content_hint">Schreibe deinen Kommentar hier</string>
     <string name="name_input_string">Name</string>
     <string name="successful_post">Kommentar erfolgreich gesendet, bitte bestätige ihn per Mail!</string>
-    <string name="unsuccessful_post">Kommentar nicht erfolgreich, bitte versuche es erneut.\nError code:</string>
+    <string name="unsuccessful_post">Kommentar nicht erfolgreich, bitte versuche es erneut.\nFehlercode:</string>
     <string name="email_invalid">Bitte gib eine gültige lo-net E-Mail an</string>
     <string name="first_last_name_identical">Bitte gib deinen Nachnamen ein, damit die Adressgenerierung korrekt funktioniert</string>
     <string name="create_comments_hint_title">Hinweis</string>
-    <string name="create_comments_hint_name">Der Name der über deinem Kommentar angezeigt wird. Bitte nutze deinen echten Namen. Wenn du ein Pseudonym nutzen musst, stelle sicher, dass er niemanden beleidigen könnte, weil er für jeden sichtbar sein wird.</string>
+    <string name="create_comments_hint_name">Der Name, der über deinem Kommentar angezeigt wird. Bitte nutze deinen echten Namen. Wenn du ein Pseudonym nutzen musst, stelle sicher, dass es niemanden beleidigen könnte, weil es für jeden sichtbar sein wird.</string>
     <string name="create_comment_hint_email">Deine lo-net Adresse. Wir werden dir einen Bestätigungslink schicken. Tipp: Du kannst den Zauberstab neben dem Feld antippen um deine E-Mail Adresse automatisch aus deinem Namen zu generieren.</string>
     <string name="create_comment_hint_content">Schreibe deinen Kommentar hier. Bitte bleib höflich und beleidige niemanden. Wenn wir deinen Kommentar für unangebracht halten, werden wir ihn löschen.</string>
     <string name="okay">Okay</string>
