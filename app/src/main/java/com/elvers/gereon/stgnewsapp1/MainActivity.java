@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             actionbar.setTitle(R.string.app_name);
         }
 
-
         // Setting up DrawerLayout
         mDrawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
