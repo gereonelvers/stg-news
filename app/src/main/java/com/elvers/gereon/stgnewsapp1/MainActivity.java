@@ -27,11 +27,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -237,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         articleListView.setEmptyView(emptyView);
 
         // Inflate page picker and add below ListView
+        @SuppressLint("InflateParams")
         View pagePicker = LayoutInflater.from(this).inflate(R.layout.page_picker, null, false);
         articleListView.addFooterView(pagePicker);
 
