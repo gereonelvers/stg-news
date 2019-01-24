@@ -46,7 +46,7 @@
     <string name="comments_empty_view_page">Keine weiteren Kommentare gefunden.\nTippe hier, um zu den Kommentaren zurückzukehren.</string>
     <string name="comment_author_add">schreibt:</string>
     <string name="submit_string">Senden</string>
-    <string name="create_comment_email">E-Mail (lo-net)</string>
+    <string name="create_comment_email">vor.nachname</string>
     <string name="create_comment_content_hint">Schreibe deinen Kommentar hier</string>
     <string name="name_input_string">Name</string>
     <string name="successful_post">Kommentar erfolgreich gesendet, bitte bestätige ihn per Mail!</string>

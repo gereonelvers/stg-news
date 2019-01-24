@@ -59,7 +59,7 @@
     <string name="submit_string">Send</string>
     <string name="name_input_string">Name</string>
     <string name="create_comment_content_hint">Input your comment here</string>
-    <string name="create_comment_email">Email (lo-net)</string>
+    <string name="create_comment_email">fir.lastname</string>
     <string name="successful_post">Comment submited successfully, please check your Email to confirm it!</string>
     <string name="unsuccessful_post">Comment not submited successfully, please try again.\nError code:</string>
     <string name="lonet_string" translatable="false">\@stg-se.sh.lo-net2.de</string>
