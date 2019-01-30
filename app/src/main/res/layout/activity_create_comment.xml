@@ -45,48 +45,72 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorPrimaryDark"/>
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
-                android:id="@+id/create_comment_email_et"
+            <HorizontalScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:autofillHints="email"
-                android:background="@android:color/transparent"
-                android:hint="@string/create_comment_email"
-                android:inputType="textEmailAddress"
-                android:paddingVertical="12dp"
-                android:paddingLeft="12dp"
-                android:paddingRight="4dp"
-                android:textSize="20sp"
-                tools:targetApi="o" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:paddingEnd="8dp"
-                android:paddingRight="8dp"
-                android:text="@string/lonet_string"
-                android:textColor="@android:color/primary_text_light"
-                android:textSize="20sp"
-                tools:ignore="RtlSymmetry" />
+                android:layout_toLeftOf="@id/create_comment_email_wand_iv"
+                android:layout_toStartOf="@id/create_comment_email_wand_iv"
+                android:requiresFadingEdge="horizontal"
+                android:fadingEdgeLength="60dp"
+                >
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/create_comment_email_et"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="email"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/create_comment_email"
+                        android:inputType="textEmailAddress"
+                        android:paddingVertical="12dp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="4dp"
+                        android:textSize="20sp"
+                        tools:targetApi="o"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="4dp" />
+
+                    <TextView
+                        android:background="#fafafa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp"
+                        android:paddingEnd="8dp"
+                        android:paddingRight="8dp"
+                        android:text="@string/lonet_string"
+                        android:textColor="@android:color/primary_text_light"
+                        android:textSize="20sp"
+                        tools:ignore="RtlSymmetry" />
+                </LinearLayout>
+            </HorizontalScrollView>
             <ImageView
+                android:layout_toLeftOf="@id/create_comment_email_question_iv"
                 android:id="@+id/create_comment_email_wand_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/about_wand_description"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
-                android:src="@drawable/ic_auto_fix" />
+                android:paddingLeft="8dp"
+                android:src="@drawable/ic_auto_fix"
+                android:layout_toStartOf="@id/create_comment_email_question_iv" />
             <ImageView
+                android:layout_alignParentRight="true"
                 android:id="@+id/create_comment_email_question_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/about_question_description"
                 android:padding="12dp"
-                android:src="@drawable/ic_question"/>
-        </LinearLayout>
+                android:src="@drawable/ic_question"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

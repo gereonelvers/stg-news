@@ -78,10 +78,19 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
         email_wand = findViewById(R.id.create_comment_email_wand_iv);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String name_string = preferences.getString("name", "");
+        if (name_string != null && !name_string.equals("")) {
+            nameET.setText(name_string);
+            nameET.clearFocus();
+            emailET.requestFocus();
+        }
         String name_add = preferences.getString("name_add", "");
         if (name_add != null && !name_add.equals("")) {
             emailET.setText(name_add);
+            emailET.clearFocus();
+            contentET.requestFocus();
         }
+
 
 
         alertDialogBuilder = new AlertDialog.Builder(getApplication());
@@ -164,6 +173,9 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
                             // Since the array starts at 0 but .length returns a value starting at 1, we need to subtract 1
                             String lastName = emailNameParts[emailNameParts.length - 1].toLowerCase();
                             nameAdd = firstName + "." + lastName;
+                            if (emailNameParts.length > 2){
+                                Toast.makeText(getApplicationContext(), getString(R.string.name_too_long), Toast.LENGTH_SHORT).show();
+                            }
                         } else {
                             Toast.makeText(getApplicationContext(), getString(R.string.first_last_name_identical), Toast.LENGTH_SHORT).show();
                         }
@@ -235,6 +247,7 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
             Toast.makeText(this, getResources().getString(R.string.successful_post), Toast.LENGTH_LONG).show();
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("name_add", nameAdd);
+            editor.putString("name", nameString);
             editor.apply();
             onBackPressed();
         }

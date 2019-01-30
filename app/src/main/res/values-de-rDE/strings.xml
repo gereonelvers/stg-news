@@ -66,5 +66,6 @@
     <string name="quill_description">Feder und Tintenfass, warum schreibst du nicht etwas?</string>
     <string name="arrow_description">Pfeil, der auf den Plus-Knopf zeigt</string>
     <string name="refresh_string">Aktualisieren</string>
+    <string name="name_too_long">Kontrolliere deine E-Mail, die erstellte Adresse ist eventuell nicht korrekt!</string>
 
 </resources>
