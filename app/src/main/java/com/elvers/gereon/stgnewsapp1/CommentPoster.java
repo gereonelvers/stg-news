@@ -3,6 +3,8 @@ package com.elvers.gereon.stgnewsapp1;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
+import java.io.IOException;
+
 import static com.elvers.gereon.stgnewsapp1.Utils.sendComment;
 
 public class CommentPoster extends AsyncTaskLoader<Integer> {
@@ -46,6 +48,11 @@ public class CommentPoster extends AsyncTaskLoader<Integer> {
         if (mAuthorName.isEmpty() || mAuthorEmail.isEmpty() || mContent.isEmpty()) {
             return 0;
         }
-        return sendComment(mArticleId, mAuthorName, mAuthorEmail, mContent);
+        try {
+            return sendComment(mArticleId, mAuthorName, mAuthorEmail, mContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }

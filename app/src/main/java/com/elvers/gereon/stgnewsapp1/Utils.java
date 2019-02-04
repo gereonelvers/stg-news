@@ -6,6 +6,12 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import okio.BufferedSink;
 
 /**
  * Utils is a class responsible for holding static variables and methods used by multiples Activities that don't need to be contained within them.
@@ -102,62 +110,10 @@ final class Utils {
      */
     private static String makeHttpGetRequest(URL url) throws IOException {
         String jsonResponse = "";
-
-        // If the URL is null, then return an early response. No need to delay or cause IOException here.
-        if (url == null) {
-            return jsonResponse;
-        }
-
-        HttpURLConnection urlConnection = null;
-        InputStream inputStream = null;
-        try {
-            // Set parameters for the URL connection and connect
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            // If the request was successful (response code 200),
-            // then read the input stream and parse the response.
-            if (urlConnection.getResponseCode() == 200) {
-                inputStream = urlConnection.getInputStream();
-                jsonResponse = readFromStream(inputStream);
-            } else {
-                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
-            }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem retrieving the JSON results.");
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (inputStream != null) {
-                // Closing the input stream could throw an IOException, which is why
-                // the makeHttpGetRequest(URL url) method specifies than an IOException
-                // could be thrown.
-                inputStream.close();
-            }
-        }
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).build();
+        jsonResponse = client.newCall(request).execute().body().string();
         return jsonResponse;
-    }
-
-    /**
-     * Convert the {@link InputStream} into a String which contains the
-     * whole JSON response from the server.
-     */
-    private static String readFromStream(InputStream inputStream) throws IOException {
-        StringBuilder output = new StringBuilder();
-        if (inputStream != null) {
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-            BufferedReader reader = new BufferedReader(inputStreamReader);
-            String line = reader.readLine();
-            while (line != null) {
-                output.append(line);
-                line = reader.readLine();
-            }
-        }
-        return output.toString();
     }
 
 
@@ -458,7 +414,7 @@ final class Utils {
      * This is the method that gets called when a comment is submitted though CreateCommentActivity.
      * It handles posting said comment and returns a http status code.
      */
-    static int sendComment(String id, String authorName, String authorEmail, String content){
+    static int sendComment(String id, String authorName, String authorEmail, String content) throws IOException {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("http");
         uriBuilder.authority(BASE_REQUEST_URL);
@@ -474,39 +430,21 @@ final class Utils {
     /**
      * Make an HTTP request to the given URL and return a String as the response.
      */
-    private static int makeHttpPostRequest(URL url) {
+    private static int makeHttpPostRequest(URL url) throws IOException{
         Integer responseCode = 0;
 
         // If the URL is null, then return an early response. No need to delay or cause IOException here.
         if (url == null) {
             return responseCode;
         }
-
-        HttpURLConnection urlConnection = null;
-        try {
-            // Set parameters for the URL connection and connect
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
-
-            urlConnection.setRequestMethod("POST");
-
-            urlConnection.setDoOutput(true);
-            urlConnection.setDoInput(true);
-
-            urlConnection.connect();
-
-            responseCode = urlConnection.getResponseCode();
-
-        } catch (IOException e){
-            Log.e(LOG_TAG, "POST failed");}
-        finally {
-            // disconnect urlConnection properly
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = RequestBody.create(null, new byte[0]);
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(url)
+                .method("POST", requestBody)
+                .header("Content-Length", "");
+        Request request = requestBuilder.build();
+        responseCode = client.newCall(request).execute().code();
         return responseCode;
     }
 

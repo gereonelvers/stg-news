@@ -54,8 +54,7 @@
                 android:layout_toLeftOf="@id/create_comment_email_wand_iv"
                 android:layout_toStartOf="@id/create_comment_email_wand_iv"
                 android:requiresFadingEdge="horizontal"
-                android:fadingEdgeLength="60dp"
-                >
+                android:fadingEdgeLength="60dp">
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -63,10 +62,8 @@
                         android:id="@+id/create_comment_email_et"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:autofillHints="email"
                         android:background="@android:color/transparent"
                         android:hint="@string/create_comment_email"
-                        android:inputType="textEmailAddress"
                         android:paddingVertical="12dp"
                         android:paddingLeft="12dp"
                         android:paddingRight="4dp"
