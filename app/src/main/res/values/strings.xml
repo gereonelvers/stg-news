@@ -81,4 +81,6 @@
     <string name="refresh_string">Refresh</string>
     <string name="name_too_long">Check if mail-generation worked correctly!</string>
 
+
+    <string name="login_string">Login (Author)</string>
 </resources>

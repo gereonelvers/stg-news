@@ -1,12 +1,14 @@
 package com.elvers.gereon.stgnewsapp1;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -30,6 +32,8 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,10 +75,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     TextView pageNumberTV;
     private ArticleAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
+    String categoryJSONString;
+    Menu drawerMenu;
+    NavigationView navigationView;
 
     /**
      * onCreate() is called when the Activity is launched.
      */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,126 +112,48 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Setting up DrawerLayout
         mDrawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        // Item selected when launching the App is "All Articles"
-        navigationView.setCheckedItem(R.id.all_articles);
-        /* This NavigationItemSelectListener manages the change between different filter presets (filtering by categories) */
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        menuItem.setChecked(true);
-                        /* If an item is selected this means that a filter will be applied.
-                         * Hardcoding categories like this is not really elegant but since WordPress IDs are unpredictable and each category corresponds to a fixed item in the drawer_view, it is unavoidable (AFAIK)
-                         * Once the filter is applied, the ListView is refreshed and the drawer is closed
-                         *
-                         * If you want to implement a new category to filter by, first implement it in WordPress. After that, find out it's WordPress-ID,
-                         * implement it in drawer_view.xml (This is where you assign an internal ID and a drawable to represent the category)
-                         * and create a new case here. Scheme:
-                         *
-                         * case R.id.[ID you assigned in drawer_view.xml]
-                         *      filterParam = "[WordPress-ID]"
-                         *      refreshListView();
-                         *      actionBar.setTitle([Name of category])
-                         *      mDrawerLayout.closeDrawers();
-                         *      return true;
-                         *
-                         * Please don't hardcode the category name, instead create a new string resource in strings.xml and simply reference it's ID here.
-                         * You'll also want to implement the new category in Utils.xml (extractArticleFeaturesFromJson()) to make it correctly show up in list items.
-                         *
-                         */
-                        if (actionbar != null) {
-                            switch (menuItem.getItemId()) {
-                                case R.id.all_articles:
-                                    filterParam = "";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.app_name);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
+        navigationView = findViewById(R.id.nav_view);
+        drawerMenu = navigationView.getMenu();
 
-                                case R.id.team:
-                                    filterParam = "2";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.author_team_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
+        categoryJSONString = sharedPreferences.getString("categoryJSONString", "[{\"id\":1,\"count\":5,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/andere\\/\",\"name\":\"Andere\",\"slug\":\"andere\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/1\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=1\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":12,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/damals\\/\",\"name\":\"Damals\",\"slug\":\"damals\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/12\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=12\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":7,\"count\":3,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/interviews\\/\",\"name\":\"Interviews\",\"slug\":\"interviews\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/7\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=7\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":5,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/fahrten\\/\",\"name\":\"Klassenfahrten\",\"slug\":\"fahrten\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/5\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=5\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":4,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/kultur\\/\",\"name\":\"Kultur\",\"slug\":\"kultur\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/4\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=4\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":11,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/lehrer\\/\",\"name\":\"Lehrerportraits\",\"slug\":\"lehrer\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/11\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=11\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":8,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/meinung\\/\",\"name\":\"Nachgedacht - Ansichtssache\",\"slug\":\"meinung\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/8\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=8\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":6,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sv\\/\",\"name\":\"News der SV\",\"slug\":\"sv\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/6\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=6\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":3,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sport\\/\",\"name\":\"Sport\",\"slug\":\"sport\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/3\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=3\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":2,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/unser-redaktionsteam\\/\",\"name\":\"Unser Redaktionsteam\",\"slug\":\"unser-redaktionsteam\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/2\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=2\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}}]");
+            String currentCategoryJSONString = Utils.getCategories();
+            if (!currentCategoryJSONString.equals(categoryJSONString) && !currentCategoryJSONString.equals("") && !currentCategoryJSONString.isEmpty()){
+                categoryJSONString = currentCategoryJSONString;
+                sharedPreferences
+                        .edit()
+                        .putString("categoryJSONString", categoryJSONString)
+                        .apply();
+            }
+        try {
+            Utils.createMenu(categoryJSONString, navigationView.getMenu(), navigationView, mDrawerLayout);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Failed to create menu from JSON");
+        }
 
-                                case R.id.sports:
-                                    filterParam = "3";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.sport_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
+        navigationView.setCheckedItem(-1);
 
-                                case R.id.culture:
-                                    filterParam = "4";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.culture_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.trips:
-                                    filterParam = "5";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.trips_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.sv:
-                                    filterParam = "6";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.sv_news_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.interviews:
-                                    filterParam = "7";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.interviews_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.opinion:
-                                    filterParam = "8";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.opinions_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.knowledge:
-                                    filterParam = "9";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.knowledge_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.history:
-                                    filterParam = "12";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.history_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.teachers:
-                                    filterParam = "11";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.teachers_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-
-                                case R.id.other:
-                                    filterParam = "1";
-                                    refreshListView();
-                                    actionbar.setTitle(R.string.other_cat);
-                                    mDrawerLayout.closeDrawers();
-                                    return true;
-                            }
-                        }
-                        refreshListView();
-                        mDrawerLayout.closeDrawers();
-                        return true;
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                navigationView.setCheckedItem(menuItem);
+                int menuItemItemId = menuItem.getItemId();
+                if (menuItem.getItemId() == -1){
+                    filterParam = "";
+                    if (actionbar != null) {
+                        actionbar.setTitle(getString(R.string.app_name));
                     }
-                });
+                }
+                else {
+                    filterParam = Integer.toString(menuItemItemId);
+                    if (actionbar != null) {
+                                actionbar.setTitle(menuItem.getTitle());
+                    }
+                }
+                refreshListView();
+                mDrawerLayout.closeDrawers();
+                return true;
+            }
+        });
 
         // Initializing loaderManager
         loaderManager = getSupportLoaderManager();
@@ -279,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             }
         });
+
 
         // Load of Article objects onto listView is requested
         initLoaderListView();
@@ -343,6 +274,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             // Refresh button
             case R.id.refresh:
                 refreshListView();
+                return true;
+
+            case R.id.login:
+                Intent loginIntent = new Intent(Intent.ACTION_VIEW);
+                loginIntent.setData(Uri.parse("https://stg-sz.net/login"));
+                startActivity(loginIntent);
                 return true;
 
             // Settings button
@@ -420,6 +357,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mAdapter.addAll(articles);
         } else {
             emptyView.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void onClick(View v) {
                     if (pageNumber != 1){

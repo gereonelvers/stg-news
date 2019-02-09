@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Menu;
 
-import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
@@ -16,14 +19,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import okio.BufferedSink;
 
 /**
  * Utils is a class responsible for holding static variables and methods used by multiples Activities that don't need to be contained within them.
@@ -48,6 +44,7 @@ final class Utils {
     private static final String AUTHOR_REQUEST_URL = "http://stg-sz.net/wp-json/wp/v2/users/";
     private static final String BASE_REQUEST_URL = "stg-sz.net";
     private static JSONArray authorsArray;
+    private static String categoryResponse = "";
 
     /**
      * Create a private Utils constructor to prevent creation of a Utils object. This class is only meant to hold static variables and methods, it should not be called as an object!
@@ -109,7 +106,7 @@ final class Utils {
      * Make an HTTP request to the given URL and return a String as the response.
      */
     private static String makeHttpGetRequest(URL url) throws IOException {
-        String jsonResponse = "";
+        String jsonResponse;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
         jsonResponse = client.newCall(request).execute().body().string();
@@ -171,7 +168,7 @@ final class Utils {
                  */
                 Context mContext = ContextApp.getContext();
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-                Boolean isHighRes = prefs.getBoolean("high_resolution", false);
+                boolean isHighRes = prefs.getBoolean("high_resolution", false);
                 String imageUrlString = "";
                 JSONObject imgObj = null;
                 try {
@@ -214,83 +211,35 @@ final class Utils {
                     Log.e(LOG_TAG , "IMG Conversion for article " + i + " Can't parse img through betterFeaturedImage");
                 }
 
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+                JSONArray categoryJSONArray = new JSONArray(sharedPreferences.getString("categoryJSONString", "[{\"id\":1,\"count\":5,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/andere\\/\",\"name\":\"Andere\",\"slug\":\"andere\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/1\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=1\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":12,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/damals\\/\",\"name\":\"Damals\",\"slug\":\"damals\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/12\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=12\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":7,\"count\":3,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/interviews\\/\",\"name\":\"Interviews\",\"slug\":\"interviews\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/7\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=7\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":5,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/fahrten\\/\",\"name\":\"Klassenfahrten\",\"slug\":\"fahrten\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/5\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=5\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":4,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/kultur\\/\",\"name\":\"Kultur\",\"slug\":\"kultur\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/4\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=4\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":11,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/lehrer\\/\",\"name\":\"Lehrerportraits\",\"slug\":\"lehrer\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/11\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=11\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":8,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/meinung\\/\",\"name\":\"Nachgedacht - Ansichtssache\",\"slug\":\"meinung\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/8\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=8\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":6,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sv\\/\",\"name\":\"News der SV\",\"slug\":\"sv\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/6\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=6\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":3,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sport\\/\",\"name\":\"Sport\",\"slug\":\"sport\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/3\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=3\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":13,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/testcat1\\/\",\"name\":\"TestCat1\",\"slug\":\"testcat1\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/13\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=13\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}}]"));
+                JSONArray articleCategoryArray = currentArticle.getJSONArray("categories");
 
-                /* Get article categories to display in ListView item
-                 * The static switch statement is not really elegant, but since category IDs are unpredictable (and therefore can't be parsed in a loop), this will have to do.
-                 *
-                 * If you want to implement a new category, get its ID from WordPress and simply put it at the bottom here with the following scheme:
-                 *
-                 * case [ID]:
-                 * categoryString = String.format("%s%s ", categoryString, [Name of Category])
-                 * break;
-                 *
-                 * You'll want to put the category name into strings.xml and assign an ID which you'll reference here.
-                 *
-                 * If you want to support filtering by category as well, you'll need to implement the category in MainActivity too.
-                 */
-                JSONArray categoriesArray = currentArticle.getJSONArray("categories");
-                String categoryString = "";
-                int currentCategory;
-                for (int a=0; a<categoriesArray.length();a++){
-                    currentCategory = categoriesArray.getInt(a);
-                    switch (currentCategory){
-                        case 12:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.history_cat));
-                            break;
+                StringBuilder categoryString = new StringBuilder();
+                boolean isFirstCategory = true;
 
-                        case 7:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.interviews_cat));
-                            break;
-
-                        case 4:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.culture_cat));
-                            break;
-
-                        case 5:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.trips_cat));
-                            break;
-
-                        case 11:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.teachers_cat));
-                            break;
-
-                        case 8:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.opinions_cat));
-                            break;
-
-                        case 6:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.sv_news_cat));
-                            break;
-
-                        case 3:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.sport_cat));
-                            break;
-
-                        case 2:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.author_team_cat));
-                            break;
-
-                        case 9:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.knowledge_cat));
-                            break;
-
-                        case 1:
-                            categoryString = String.format("%s%s, ", categoryString, mContext.getString(R.string.other_cat));
-                            break;
+                for (int q=0; q<categoryJSONArray.length(); q++) {
+                    JSONObject currentCategory = categoryJSONArray.getJSONObject(q);
+                    int cat1 = currentCategory.getInt("id");
+                    for (int w=0; w<articleCategoryArray.length(); w++) {
+                        int currentArticleCat = articleCategoryArray.getInt(w);
+                        if (cat1==currentArticleCat) {
+                            if (isFirstCategory) {
+                                categoryString.append(currentCategory.getString("name"));
+                                isFirstCategory = false;
+                            } else {
+                                categoryString.append(", ").append(currentCategory.getString("name"));
+                            }
+                        }
                     }
-                }
-
-                /* Since ", " is added after every category, this statement removes it from the end String if it's not empty */
-                if (!categoryString.equals("")){
-                    categoryString = categoryString.substring(0, categoryString.length() - 2);
                 }
 
 
                 /* After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the array */
-                Article article = new Article(id, titleString, authorString, dateString, urlString, imageUrlString, categoryString);
+                Article article = new Article(id, titleString, authorString, dateString, urlString, imageUrlString, categoryString.toString());
                 articles.add(article);
             }
-        }
+    }
         catch (Exception e){
             Log.e(LOG_TAG, "Problem parsing article JSON");
         }
@@ -431,7 +380,7 @@ final class Utils {
      * Make an HTTP request to the given URL and return a String as the response.
      */
     private static int makeHttpPostRequest(URL url) throws IOException{
-        Integer responseCode = 0;
+        int responseCode = 0;
 
         // If the URL is null, then return an early response. No need to delay or cause IOException here.
         if (url == null) {
@@ -446,6 +395,68 @@ final class Utils {
         Request request = requestBuilder.build();
         responseCode = client.newCall(request).execute().code();
         return responseCode;
+    }
+
+
+    static String getCategories() {
+        Uri.Builder uriBuilder = new Uri.Builder();
+        uriBuilder
+                .scheme("http")
+                .authority(BASE_REQUEST_URL)
+                .appendPath("wp-json")
+                .appendPath("wp")
+                .appendPath("v2")
+                .appendPath("categories");
+        URL requestURL = createUrl(uriBuilder.toString());
+        OkHttpClient client = new OkHttpClient();
+        final Request request = new Request.Builder().url(requestURL).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                Log.e(LOG_TAG, "Failed to get categories from server");
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                categoryResponse = response.body().string();
+
+            }
+        });
+
+        return categoryResponse;
+    }
+
+    static void createMenu(String categoryString, Menu navigationMenu, NavigationView navigationView, DrawerLayout drawerLayout) throws JSONException {
+        JSONArray categoryArray = null;
+        try {
+            categoryArray = new JSONArray(categoryString);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Failed to parse new categoryString");
+        }
+        if (categoryArray != null){
+            navigationMenu.add(R.id.mainGroup, -1, 0, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
+        for(int i = 0; i<categoryArray.length(); i++){
+
+            // Get current category from Array
+            JSONObject currentCategory = categoryArray.getJSONObject(i);
+
+            // Get WordPress category ID
+            int id = currentCategory.getInt("id");
+
+            // Get category name
+            String name = currentCategory.getString("name");
+
+            navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/id, /*Order*/i+2, /*name*/name);
+            }
+
+            for (int j=0; j<navigationMenu.size(); j++) {
+                navigationMenu.getItem(j).setCheckable(true);
+            }
+
+            navigationView.invalidate();
+            drawerLayout.invalidate();
+            drawerLayout.requestLayout();
+        }
     }
 
 }

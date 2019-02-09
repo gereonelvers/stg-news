@@ -51,15 +51,18 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
 
         /* The code below applies the info from the Article to the listItemView */
         if (currentArticle != null) {
+
             ImageView coverIV = listItemView.findViewById(R.id.article_item_cover_iv);
-            // Set optimal image ScaleType depending on screen rotation
-            if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                coverIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            } else {
-                coverIV.setScaleType(ImageView.ScaleType.FIT_XY);
-            }
             String coverImageString = currentArticle.getCoverImage();
-            Glide.with(super.getContext()).load(coverImageString).into(coverIV);
+            if (!coverImageString.isEmpty()){
+            Glide.with(super.getContext()).load(coverImageString).centerCrop().into(coverIV);
+            } else {
+                coverIV.setVisibility(View.GONE);
+                coverIV.setAdjustViewBounds(true);
+            }
+
+
+
 
             TextView titleTV = listItemView.findViewById(R.id.article_item_title_tv);
             String title = currentArticle.getTitle();

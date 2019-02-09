@@ -15,6 +15,10 @@
         android:id="@+id/refresh"
         android:title="@string/refresh_string"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/login"
+        android:title="@string/login_string"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/settings"

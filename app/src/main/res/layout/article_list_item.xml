@@ -13,12 +13,12 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="170dp"
             android:adjustViewBounds="true"
-            android:maxHeight="160dp"
             android:id="@+id/article_item_cover_iv"
             android:background="@android:color/darker_gray"
             android:contentDescription="@string/cover_image_description"/>
+
 
         <TextView
             android:paddingLeft="8dp"
