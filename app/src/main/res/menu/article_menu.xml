@@ -10,6 +10,11 @@
         android:icon="@drawable/ic_share"/>
 
     <item
+        android:id="@+id/login"
+        android:title="@string/login_string"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/settings"
         android:title="@string/settings_string"
         app:showAsAction="never" />

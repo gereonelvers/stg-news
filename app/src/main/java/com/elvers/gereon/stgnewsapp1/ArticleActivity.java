@@ -3,6 +3,7 @@ package com.elvers.gereon.stgnewsapp1;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -154,6 +155,14 @@ public class ArticleActivity extends AppCompatActivity {
                 // launches share recipient chooser with share_title as title
                 startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)));
                 return true;
+
+            // Login in browser
+            case R.id.login:
+                Intent loginIntent = new Intent(Intent.ACTION_VIEW);
+                loginIntent.setData(Uri.parse("https://stg-sz.net/login"));
+                startActivity(loginIntent);
+                return true;
+
             // Settings button
             case R.id.settings:
                 Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
