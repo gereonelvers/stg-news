@@ -147,7 +147,8 @@ public class ArticleActivity extends AppCompatActivity {
                 // subject text: share_subject
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_subject));
                 // main text: share_text
-                String shareUrlString = articleURI;
+                String shareUrlString;
+                shareUrlString = articleURI;
                 if (isComments) {
                     shareUrlString += "#comments";
                 }
@@ -155,6 +156,15 @@ public class ArticleActivity extends AppCompatActivity {
                 // launches share recipient chooser with share_title as title
                 startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)));
                 return true;
+
+
+            //TODO: Fix open in browser
+            // Open in browser
+//            case R.id.open_in_browser:
+//                Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+//                browserIntent.setData(Uri.parse(articleURI));
+//                startActivity(browserIntent);
+//                return true;
 
             // Login in browser
             case R.id.login:

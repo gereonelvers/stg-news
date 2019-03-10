@@ -55,7 +55,7 @@
     <string name="first_last_name_identical">Bitte gib deinen Nachnamen ein, damit die Adressgenerierung korrekt funktioniert</string>
     <string name="create_comments_hint_title">Hinweis</string>
     <string name="create_comments_hint_name">Der Name, der über deinem Kommentar angezeigt wird. Bitte nutze deinen echten Namen. Wenn du ein Pseudonym nutzen musst, stelle sicher, dass es niemanden beleidigen könnte, weil es für jeden sichtbar sein wird.</string>
-    <string name="create_comment_hint_email">Deine lo-net Adresse. Wir werden dir einen Bestätigungslink schicken. Tipp: Du kannst den Zauberstab neben dem Feld antippen um deine E-Mail Adresse automatisch aus deinem Namen zu generieren.</string>
+    <string name="create_comment_hint_email">Wir werden dir einen Bestätigungslink schicken, mit dem du deinen Kommentar freischaltest. Tipp: Du kannst den Zauberstab neben dem Feld antippen um deine E-Mail Adresse automatisch aus deinem Namen zu generieren.</string>
     <string name="create_comment_hint_content">Schreibe deinen Kommentar hier. Bitte bleib höflich und beleidige niemanden. Wenn wir deinen Kommentar für unangebracht halten, werden wir ihn löschen.</string>
     <string name="okay">Okay</string>
 
@@ -68,4 +68,6 @@
     <string name="refresh_string">Aktualisieren</string>
     <string name="name_too_long">Kontrolliere deine E-Mail, die erstellte Adresse ist eventuell nicht korrekt!</string>
     <string name="login_string">Anmelden (Autoren)</string>
+    <string name="open_in_browser">Im Browser öffnen</string>
+    <string name="school_page">Zur Schul-Website</string>
 </resources>

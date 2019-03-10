@@ -83,4 +83,6 @@
 
 
     <string name="login_string">Login (Author)</string>
+    <string name="open_in_browser">Open in browser</string>
+    <string name="school_page">School website</string>
 </resources>

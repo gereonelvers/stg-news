@@ -9,6 +9,12 @@
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_share"/>
 
+
+    <!--<item-->
+        <!--android:id="@+id/open_in_browser"-->
+        <!--android:title="@string/open_in_browser"-->
+        <!--app:showAsAction="never"/>-->
+
     <item
         android:id="@+id/login"
         android:title="@string/login_string"

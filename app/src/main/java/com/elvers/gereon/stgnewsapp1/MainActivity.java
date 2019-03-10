@@ -282,6 +282,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivity(loginIntent);
                 return true;
 
+            case R.id.school_page:
+                Intent schoolIntent = new Intent(Intent.ACTION_VIEW);
+                schoolIntent.setData(Uri.parse("http://stg-segeberg.de"));
+                startActivity(schoolIntent);
+                return true;
+
             // Settings button
             case R.id.settings:
                 Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);

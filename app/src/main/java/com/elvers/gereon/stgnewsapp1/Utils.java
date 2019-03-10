@@ -41,7 +41,7 @@ final class Utils {
     private static final String LOG_TAG = Utils.class.getSimpleName();
 
     // Static request URL the list of authors will be requested from. Putting it at the top like this allows easier modification of top level domain if required.
-    private static final String AUTHOR_REQUEST_URL = "http://stg-sz.net/wp-json/wp/v2/users/";
+    private static final String AUTHOR_REQUEST_URL = "http://stg-sz.net/wp-json/wp/v2/users?per_page=99";
     private static final String BASE_REQUEST_URL = "stg-sz.net";
     private static JSONArray authorsArray;
     private static String categoryResponse = "";
@@ -406,7 +406,8 @@ final class Utils {
                 .appendPath("wp-json")
                 .appendPath("wp")
                 .appendPath("v2")
-                .appendPath("categories");
+                .appendPath("categories")
+                .appendQueryParameter("per_page", "99");
         URL requestURL = createUrl(uriBuilder.toString());
         OkHttpClient client = new OkHttpClient();
         final Request request = new Request.Builder().url(requestURL).build();
