@@ -1,7 +1,6 @@
 package com.elvers.gereon.stgnewsapp1;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.text.Html;
 import android.text.Spanned;
@@ -49,6 +48,7 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
         // Get current Article from the list
         Article currentArticle = getItem(position);
 
+
         /* The code below applies the info from the Article to the listItemView */
         if (currentArticle != null) {
 
@@ -60,9 +60,6 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
                 coverIV.setVisibility(View.GONE);
                 coverIV.setAdjustViewBounds(true);
             }
-
-
-
 
             TextView titleTV = listItemView.findViewById(R.id.article_item_title_tv);
             String title = currentArticle.getTitle();
@@ -84,6 +81,7 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
             TextView categoryTV = listItemView.findViewById(R.id.article_item_category_tv);
             String categoryString = currentArticle.getCategory();
             categoryTV.setText(categoryString);
+
         }
         // return the finished listItemView
         return listItemView;

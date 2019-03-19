@@ -12,77 +12,87 @@
         android:background="@color/colorPrimary">
 
         <ImageView
+            android:id="@+id/article_item_cover_iv"
             android:layout_width="match_parent"
             android:layout_height="170dp"
             android:adjustViewBounds="true"
-            android:id="@+id/article_item_cover_iv"
             android:background="@android:color/darker_gray"
-            android:contentDescription="@string/cover_image_description"/>
+            android:contentDescription="@string/cover_image_description" />
 
 
         <TextView
-            android:paddingLeft="8dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
             android:id="@+id/article_item_title_tv"
+            style="@style/ShadowedText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/article_item_date_tv"
-            android:textSize="22sp"
-            style="@style/ShadowedText"
-            android:textColor="@android:color/primary_text_dark_nodisable"
-            tools:text="This is a test-title." />
-        <TextView
-            style="@style/ShadowedText"
-            android:paddingLeft="8dp"
             android:paddingStart="8dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="8dp"
             android:paddingEnd="8dp"
             android:paddingRight="8dp"
-            android:paddingTop="4dp"
+            android:paddingBottom="8dp"
+            android:textColor="@android:color/primary_text_dark_nodisable"
+            android:textSize="22sp"
+            tools:text="This is a test-title." />
+
+        <TextView
             android:id="@+id/article_item_date_tv"
+            style="@style/ShadowedText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_gravity="end"
             android:gravity="end"
-            android:textColor="@android:color/primary_text_dark_nodisable"
-            android:textSize="12sp"
-            tools:text="26.11.2018, 07:54"
-            tools:ignore="RelativeOverlap" />
-    </RelativeLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/article_item_author_name_tv"
-            android:paddingLeft="4dp"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            android:paddingRight="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            tools:text="by Gereon Elvers"
-            android:paddingBottom="8dp"
-            android:layout_weight="1"/>
-        <TextView
-            android:id="@+id/article_item_category_tv"
-            android:paddingLeft="8dp"
             android:paddingStart="8dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
             android:paddingEnd="8dp"
             android:paddingRight="8dp"
-            android:layout_width="0dp"
+            android:textColor="@android:color/primary_text_dark_nodisable"
+            android:textSize="12sp"
+            tools:ignore="RelativeOverlap"
+            tools:text="26.11.2018, 07:54" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/article_item_author_name_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            tools:text="Opinion"
-            android:textColor="@color/colorPrimary"
+            android:includeFontPadding="false"
+            android:paddingStart="4dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
             android:paddingBottom="8dp"
+            android:textSize="16sp"
+            tools:text="by Gereon Elvers" />
+
+        <TextView
+            android:id="@+id/article_item_category_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/article_item_author_name_tv"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="-8dp"
+            android:gravity="end|bottom"
+            android:includeFontPadding="false"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp"
+            android:paddingEnd="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:gravity="end"
-            android:layout_weight="3"/>
-    </LinearLayout>
+            tools:text="Opinion" />
+
+    </RelativeLayout>
+
 </LinearLayout>

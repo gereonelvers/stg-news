@@ -4,11 +4,11 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 
@@ -65,7 +65,10 @@ public class ArticleFragment extends Fragment {
         * Javascript is necessary for some dynamic components that might be implemented in the future,
         * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
         */
-        webView.getSettings().setJavaScriptEnabled(true);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setAppCacheEnabled(false);
+
         webView.setWebViewClient(new ArticleWebViewClient());
         webView.setVisibility(View.INVISIBLE);
         // Setting up loading indicator (spinning circle)
@@ -78,10 +81,17 @@ public class ArticleFragment extends Fragment {
                 }
             }
         });
+
         // Start loading URL
         webView.loadUrl(articleURI);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        webView.clearCache(true);
     }
 
 }
