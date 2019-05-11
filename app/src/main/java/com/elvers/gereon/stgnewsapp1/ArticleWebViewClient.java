@@ -59,7 +59,8 @@ public class ArticleWebViewClient extends WebViewClient {
 
     @Override
     public void onPageFinished(WebView view, String url) {
-        super.onPageFinished(view, url);
+        // Adds some padding below content so FAB doesn't interfere
+        view.loadUrl("javascript:(function(){ document.body.style.paddingBottom = '56px'})();");
     }
 
 }
