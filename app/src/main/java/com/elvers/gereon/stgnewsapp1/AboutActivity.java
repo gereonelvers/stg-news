@@ -21,6 +21,7 @@ import android.webkit.WebView;
 public class AboutActivity extends AppCompatActivity {
 
     static final String ABOUT_URL = "https://stg-sz.net/ueber-uns/?inapp";
+    WebView webView;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -37,7 +38,7 @@ public class AboutActivity extends AppCompatActivity {
             actionbar.setTitle(R.string.about_string);
         }
 
-        WebView webView = findViewById(R.id.about_content_wv);
+        webView = findViewById(R.id.about_content_wv);
         final View loadingIndicator = findViewById(R.id.about_loading_circle);
 
         /*
@@ -57,7 +58,11 @@ public class AboutActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    @Override
+    public void onResume(){
+        super.onResume();
         // Start loading URL
         webView.loadUrl(ABOUT_URL);
     }

@@ -59,7 +59,7 @@ public class ArticleFragment extends Fragment {
         readBundle(getArguments());
         webView = view.findViewById(R.id.article_content_wv);
         loadingIndicator = view.findViewById(R.id.article_loading_circle);
-        // Add inapp URL parameter to notify site that it is being requested from within the App
+        // Add "inapp"-URL parameter to notify site that it is being requested from within the App
         articleURI += "?inapp";
         /*
         * Javascript is necessary for some dynamic components that might be implemented in the future,
@@ -82,10 +82,14 @@ public class ArticleFragment extends Fragment {
             }
         });
 
-        // Start loading URL
-        webView.loadUrl(articleURI);
-
         return view;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        // Actually start loading URL
+        webView.loadUrl(articleURI);
     }
 
     @Override
