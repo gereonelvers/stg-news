@@ -62,6 +62,15 @@
                 tools:text="26.11.2018, 07:54" />
         </RelativeLayout>
 
+        <ProgressBar
+            android:id="@+id/img_load_indicator"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:indeterminate="true"
+            android:progressTint="@color/colorPrimaryDark"
+            tools:targetApi="lollipop" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

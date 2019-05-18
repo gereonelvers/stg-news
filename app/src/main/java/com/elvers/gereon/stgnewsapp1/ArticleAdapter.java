@@ -1,7 +1,9 @@
 package com.elvers.gereon.stgnewsapp1;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -9,8 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+
 import java.util.List;
 
 
@@ -52,10 +62,32 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
         /* The code below applies the info from the Article to the listItemView */
         if (currentArticle != null) {
 
+            final ProgressBar imageProgressBar = listItemView.findViewById(R.id.img_load_indicator);
+
             ImageView coverIV = listItemView.findViewById(R.id.article_item_cover_iv);
             String coverImageString = currentArticle.getCoverImage();
-            if (!coverImageString.isEmpty()){
-            Glide.with(super.getContext()).load(coverImageString).centerCrop().into(coverIV);
+            if (!coverImageString.isEmpty()) {
+                Glide.with(super.getContext())
+                        .load(coverImageString)
+                        .centerCrop()
+                        .thumbnail(0.25f)
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                // Remove load indicator if load fails
+                                imageProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                // Turn loading indicator into layout separator to indicate load success
+                                imageProgressBar.setIndeterminate(false);
+                                imageProgressBar.setProgress(100);
+                                return false;
+                            }
+                        })
+                        .into(coverIV);
             } else {
                 coverIV.setVisibility(View.GONE);
                 coverIV.setAdjustViewBounds(true);
