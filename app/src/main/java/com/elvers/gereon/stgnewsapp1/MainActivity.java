@@ -36,6 +36,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -73,11 +74,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     String numberOfArticlesParam;
     Integer pageNumber;
     TextView pageNumberTV;
-    private ArticleAdapter mAdapter;
-    private DrawerLayout mDrawerLayout;
     String categoryJSONString;
     Menu drawerMenu;
     NavigationView navigationView;
+    ArrayList<String> favoritesArray;
+    boolean isFavoriteSelected;
+    private ArticleAdapter mAdapter;
+    private DrawerLayout mDrawerLayout;
 
     /**
      * onCreate() is called when the Activity is launched.
@@ -97,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         filterParam = "";
 
         // Getting numberOfArticlesParam from SharedPreferences (default: 10; modifiable through Preferences). This is the number of articles requested from the backend.
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         numberOfArticlesParam = sharedPreferences.getString("post_number", "10");
 
         // Setting up Actionbar
@@ -116,14 +119,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         drawerMenu = navigationView.getMenu();
 
         categoryJSONString = sharedPreferences.getString("categoryJSONString", "[{\"id\":1,\"count\":5,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/andere\\/\",\"name\":\"Andere\",\"slug\":\"andere\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/1\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=1\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":12,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/damals\\/\",\"name\":\"Damals\",\"slug\":\"damals\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/12\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=12\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":7,\"count\":3,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/interviews\\/\",\"name\":\"Interviews\",\"slug\":\"interviews\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/7\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=7\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":5,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/fahrten\\/\",\"name\":\"Klassenfahrten\",\"slug\":\"fahrten\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/5\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=5\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":4,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/kultur\\/\",\"name\":\"Kultur\",\"slug\":\"kultur\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/4\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=4\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":11,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/lehrer\\/\",\"name\":\"Lehrerportraits\",\"slug\":\"lehrer\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/11\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=11\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":8,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/meinung\\/\",\"name\":\"Nachgedacht - Ansichtssache\",\"slug\":\"meinung\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/8\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=8\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":6,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sv\\/\",\"name\":\"News der SV\",\"slug\":\"sv\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/6\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=6\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":3,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sport\\/\",\"name\":\"Sport\",\"slug\":\"sport\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/3\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=3\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":2,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/unser-redaktionsteam\\/\",\"name\":\"Unser Redaktionsteam\",\"slug\":\"unser-redaktionsteam\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/2\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=2\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}}]");
-            String currentCategoryJSONString = Utils.getCategories();
-            if (!currentCategoryJSONString.equals(categoryJSONString) && !currentCategoryJSONString.equals("") && !currentCategoryJSONString.isEmpty()){
-                categoryJSONString = currentCategoryJSONString;
-                sharedPreferences
-                        .edit()
-                        .putString("categoryJSONString", categoryJSONString)
-                        .apply();
-            }
+        String currentCategoryJSONString = Utils.getCategories();
+        if (!currentCategoryJSONString.equals(categoryJSONString) && !currentCategoryJSONString.equals("") && !currentCategoryJSONString.isEmpty()) {
+            categoryJSONString = currentCategoryJSONString;
+            sharedPreferences
+                    .edit()
+                    .putString("categoryJSONString", categoryJSONString)
+                    .apply();
+        }
         try {
             Utils.createMenu(categoryJSONString, navigationView.getMenu(), navigationView, mDrawerLayout);
         } catch (JSONException e) {
@@ -137,16 +140,33 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 navigationView.setCheckedItem(menuItem);
                 int menuItemItemId = menuItem.getItemId();
-                if (menuItem.getItemId() == -1){
+                if (menuItem.getItemId() == -1) {
                     filterParam = "";
                     if (actionbar != null) {
                         actionbar.setTitle(getString(R.string.app_name));
                     }
+                    isFavoriteSelected = false;
                 }
-                else {
-                    filterParam = Integer.toString(menuItemItemId);
+                // Favorite articles
+                else if (menuItem.getTitle().equals(getString(R.string.favorites_title))) {
+                    isFavoriteSelected = true;
+                    filterParam = "";
+                    String favoritesString = sharedPreferences.getString("favorites", "");
+                    favoritesArray = null;
+                    if (favoritesString != null) {
+                        favoritesArray = new ArrayList<>(Arrays.asList(favoritesString.split(",")));
+                    }
                     if (actionbar != null) {
-                                actionbar.setTitle(menuItem.getTitle());
+                        actionbar.setTitle(getString(R.string.favorites_title));
+                    }
+                    pageNumber = 1;
+                    pageNumberTV.setText(pageNumber.toString());
+
+                } else {
+                    filterParam = Integer.toString(menuItemItemId);
+                    isFavoriteSelected = false;
+                    if (actionbar != null) {
+                        actionbar.setTitle(menuItem.getTitle());
                     }
                 }
                 refreshListView();
@@ -180,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         backIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pageNumber > 1){
+                if (pageNumber > 1) {
                     pageNumber--;
                     pageNumberTV.setText(pageNumber.toString());
                     refreshListView();
@@ -209,7 +229,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             }
         });
-
 
         // Load of Article objects onto listView is requested
         initLoaderListView();
@@ -315,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     /**
      * This method is called when creating a new ArticleLoader. It creates a modified query URL (by adding the filter parameters listed below) and initializes the ArticleLoader.
-     *
+     * <p>
      * Parameters:
      * {@param filterParam} is a String containing the id of the category requested (if present)
      * {@param numberOfArticlesParam} is a String containing the number of Article objects requested from the server
@@ -325,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @NonNull
     public Loader<List<Article>> onCreateLoader(int i, Bundle bundle) {
         Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("http");
+        uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
         uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("posts");
 
@@ -335,7 +354,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (!numberOfArticlesParam.isEmpty()) {
             uriBuilder.appendQueryParameter("per_page", numberOfArticlesParam);
         }
+        if (isFavoriteSelected) {
+            for (int j = 0; j < favoritesArray.size(); j++) {
+                uriBuilder.appendQueryParameter("include[]", favoritesArray.get(j));
+            }
+        }
         uriBuilder.appendQueryParameter("page", pageNumber.toString());
+        Log.e("Query URI: ", uriBuilder.toString());
         return new ArticleLoader(this, uriBuilder.toString());
     }
 
@@ -366,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onClick(View v) {
-                    if (pageNumber != 1){
+                    if (pageNumber != 1) {
                         pageNumber--;
                         pageNumberTV.setText(pageNumber.toString());
                         refreshListView();
@@ -374,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
             });
         }
-        if (mSwipeRefreshLayout.isRefreshing()){
+        if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
     }

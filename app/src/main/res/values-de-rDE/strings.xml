@@ -70,4 +70,9 @@
     <string name="login_string">Anmelden (Autoren)</string>
     <string name="open_in_browser">Im Browser öffnen</string>
     <string name="school_page">Zur Schul-Website</string>
+    <string name="favorites_title">Favoriten</string>
+    <string name="added_to_favorites">Zu Favoriten hinzugefügt</string>
+    <string name="removed_from_favorites">Aus Favoriten entfernt</string>
+    <string name="favorite_action">Zu Favoriten hinzufügen</string>
+    <string name="favorites_remove_action">Aus Favoriten entfernen</string>
 </resources>

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single"
         android:id="@+id/mainGroup">
+    </group>
+    <group>
+        <item android:title="@string/favorites_title"
+            android:id="@+id/favorites_selectable"/>
     </group>
 </menu>

@@ -10,10 +10,11 @@
         android:icon="@drawable/ic_share"/>
 
 
-    <!--<item-->
-        <!--android:id="@+id/open_in_browser"-->
-        <!--android:title="@string/open_in_browser"-->
-        <!--app:showAsAction="never"/>-->
+    <item
+        android:id="@+id/favorite_menu_item"
+        android:title="@string/favorites_title"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_star"/>
 
     <item
         android:id="@+id/login"

@@ -2,9 +2,11 @@ package com.elvers.gereon.stgnewsapp1;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +20,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+
+import static com.elvers.gereon.stgnewsapp1.ContextApp.getContext;
 
 
 /**
@@ -40,7 +50,10 @@ public class ArticleActivity extends AppCompatActivity {
     Drawable ic_chat;
     Drawable ic_plus;
     String titleString;
-
+    SharedPreferences sharedPreferences;
+    boolean isFavorite;
+    String articleIdString;
+    private List<String> favoritesList;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -58,10 +71,10 @@ public class ArticleActivity extends AppCompatActivity {
         Intent articleIntent = getIntent();
 
         /*
-        * First attempt to get article data through regular methods.
-        * If that fails, we can assume the activity was started through a deeplink and we have to make do with just the URL.
-        * Both are executed in try blocks for easier debugging (and to make sure the app doesn't crash when both methods fail)
-        */
+         * First attempt to get article data through regular methods.
+         * If that fails, we can assume the activity was started through a deeplink and we have to make do with just the URL.
+         * Both are executed in try blocks for easier debugging (and to make sure the app doesn't crash when both methods fail)
+         */
         try {
             titleString = articleIntent.getStringExtra("ARTICLE_TITLE");
             articleID = articleIntent.getIntExtra("ARTICLE_ID", -1);
@@ -70,7 +83,7 @@ public class ArticleActivity extends AppCompatActivity {
             if (actionbar != null) {
                 actionbar.setTitle(titleSpanned);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Failed to get article data through regular intent");
         }
         try {
@@ -81,9 +94,15 @@ public class ArticleActivity extends AppCompatActivity {
                 // Since we can only get Strings from the intent, the segment is then parsed into an integer
                 articleID = Integer.parseInt(articleIDString);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Failed to get article data through deeplink intent");
         }
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        getFavorites();
+
+        articleIdString = Integer.toString(articleID);
+        checkFavorite(articleIdString, favoritesList);
 
 
         // FAB, drawables and FragmentManager are initialized here to save resources when switching between fragments later
@@ -107,15 +126,27 @@ public class ArticleActivity extends AppCompatActivity {
         });
         // if "#comments" is present in the URI, this means that the Article has been accessed though a deeplink meant to link directly to the comments.
         // Therefore jump straight to CommentsFragment
-        if (articleURI.contains("#comments")){
+        if (articleURI.contains("#comments")) {
             showComments();
         } else {
             // If that isn't the case, start off by showing the article
             showArticle();
         }
-
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem favoriteMenuItem = menu.findItem(R.id.favorite_menu_item);
+        checkFavorite(articleIdString, favoritesList);
+        if (isFavorite) {
+            favoriteMenuItem.setTitle(getString(R.string.favorites_remove_action));
+            favoriteMenuItem.setIcon(R.drawable.ic_star_dark);
+        } else {
+            favoriteMenuItem.setTitle(getString(R.string.favorite_action));
+            favoriteMenuItem.setIcon(R.drawable.ic_star_border_dark);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
 
     /**
      * Setting OptionsMenu on ActionBar
@@ -156,15 +187,24 @@ public class ArticleActivity extends AppCompatActivity {
                 // launches share recipient chooser with share_title as title
                 startActivity(Intent.createChooser(shareIntent, getString(R.string.share_title)));
                 return true;
+            case R.id.favorite_menu_item:
+                getFavorites();
+                checkFavorite(articleIdString, favoritesList);
+                if (isFavorite) {
+                    unfavorite(articleIdString, favoritesList);
+                    item.setIcon(R.drawable.ic_star_border_dark);
+                    item.setTitle(getString(R.string.favorite_action));
+                    checkFavorite(articleIdString, favoritesList);
+                    Toast.makeText(getContext(), getString(R.string.removed_from_favorites), Toast.LENGTH_SHORT).show();
+                } else {
+                    favorite(articleIdString, favoritesList);
+                    item.setIcon(R.drawable.ic_star_dark);
+                    item.setTitle(getString(R.string.favorites_remove_action));
+                    checkFavorite(articleIdString, favoritesList);
+                    Toast.makeText(getContext(), getString(R.string.added_to_favorites), Toast.LENGTH_SHORT).show();
+                }
+                return true;
 
-
-            //TODO: Fix open in browser
-            // Open in browser
-//            case R.id.open_in_browser:
-//                Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-//                browserIntent.setData(Uri.parse(articleURI));
-//                startActivity(browserIntent);
-//                return true;
 
             // Login in browser
             case R.id.login:
@@ -219,4 +259,80 @@ public class ArticleActivity extends AppCompatActivity {
         fab.setImageDrawable(ic_chat);
         isComments = false;
     }
+
+    /**
+     * Remove list item from favorites
+     */
+    private void unfavorite(String articleID, List<String> favoritesList) {
+        // Remove all instances of article-ID from List
+        for (int i = 0; i < favoritesList.size(); i++) {
+            String currentFavorite = favoritesList.get(i);
+            if (currentFavorite.equals(articleID)) {
+                //noinspection SuspiciousListRemoveInLoop
+                favoritesList.remove(i);
+            }
+        }
+        // SharedPreferences can't store a ArrayList, so the list is converted into a String
+        StringBuilder favoritesStringBuilder = new StringBuilder();
+        for (String s : favoritesList) {
+            favoritesStringBuilder.append(s);
+            // Individual items are separated by commas
+            favoritesStringBuilder.append(",");
+        }
+        String favoriteString = favoritesStringBuilder.toString();
+        // Regex to remove front-loaded commas
+        favoriteString = favoriteString.replaceAll(Matcher.quoteReplacement("^,+"), "");
+        sharedPreferences.edit().putString("favorites", favoriteString).apply();
+        isFavorite = false;
+
+    }
+
+    /**
+     * Add the list item to favorites
+     */
+    private void favorite(String articleID, List<String> favoritesList) {
+        // Add item to List of article-IDs
+        favoritesList.add(articleID);
+        // SharedPreferences can't store a ArrayList, so the list is converted into a String
+        StringBuilder favoritesStringBuilder = new StringBuilder();
+        for (String s : favoritesList) {
+            favoritesStringBuilder.append(s);
+            // Individual items are separated by commas
+            favoritesStringBuilder.append(",");
+        }
+        String favoriteString = favoritesStringBuilder.toString();
+        // Regex to remove front-loaded commas
+        favoriteString = favoriteString.replaceAll(Matcher.quoteReplacement("^,+"), "");
+        sharedPreferences.edit().putString("favorites", favoriteString).apply();
+        isFavorite = true;
+
+    }
+
+    /**
+     * Get favorites from SharedPreferences as String, then convert it to an Arraylist
+     */
+    private void getFavorites() {
+        String favorites = sharedPreferences.getString("favorites", "");
+        assert favorites != null;
+        String[] favoritesStringArray = favorites.split(",");
+        favoritesList = new ArrayList<>();
+        Collections.addAll(favoritesList, favoritesStringArray);
+    }
+
+    /**
+     * Check if article is listed as a favorite
+     */
+    private void checkFavorite(String articleID, List<String> favoritesList) {
+        boolean hasChanged = false;
+        for (int i = 0; i < favoritesList.size(); i++) {
+            if (favoritesList.get(i).contains(articleID)) {
+                isFavorite = true;
+                hasChanged = true;
+            }
+        }
+        if (!hasChanged) {
+            isFavorite = false;
+        }
+    }
+
 }

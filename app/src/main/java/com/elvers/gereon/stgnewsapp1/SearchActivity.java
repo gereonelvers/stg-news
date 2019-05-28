@@ -209,7 +209,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     @NonNull
     public Loader<List<Article>> onCreateLoader(int i, Bundle bundle) {
         Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("http");
+        uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
         uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("posts");
         if (!requestTerm.isEmpty()) {

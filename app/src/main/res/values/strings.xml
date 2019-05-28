@@ -85,4 +85,9 @@
     <string name="login_string">Login (Author)</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="school_page">School website</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="removed_from_favorites">Removed from favorites</string>
+    <string name="favorite_action">Add to favorites</string>
+    <string name="favorites_remove_action">Remove from favorites</string>
 </resources>
