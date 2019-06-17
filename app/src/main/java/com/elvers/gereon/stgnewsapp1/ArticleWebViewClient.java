@@ -41,6 +41,7 @@ public class ArticleWebViewClient extends WebViewClient {
         // Otherwise it will be handled in a regular browser instance
         else {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(browserIntent);
         }
         return true;
