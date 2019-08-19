@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/dialogBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +17,8 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:id="@+id/comment_author_name_tv"
-        tools:text="Test Author Name" />
+        tools:text="Test Author Name"
+        android:textColor="?attr/authorTextColor" />
 
     <TextView
         android:paddingRight="4dp"
@@ -27,11 +29,13 @@
         android:layout_height="wrap_content"
         android:id="@+id/comment_date_tv"
         android:gravity="end"
-        tools:text="12.12.2018"/>
+        tools:text="12.12.2018"
+        android:textColor="?attr/authorTextColor"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <!-- TODO dark bubble -->
     <TextView
         android:gravity="center_vertical"
         android:background="@drawable/comment_bubble_backdrop"
@@ -52,7 +56,8 @@
             android:paddingEnd="4dp"
             android:id="@+id/comment_time_tv"
             tools:text="17:15"
-            tools:ignore="RtlSymmetry" />
+            tools:ignore="RtlSymmetry"
+            android:textColor="?attr/authorTextColor"/>
     </LinearLayout>
     <View android:background="@color/colorPrimaryDark"
         android:layout_marginBottom="16dp"

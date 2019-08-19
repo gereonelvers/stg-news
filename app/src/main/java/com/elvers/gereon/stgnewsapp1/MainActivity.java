@@ -20,6 +20,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -89,6 +90,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // enable/disable dark mode for hole app
+        AppCompatDelegate.setDefaultNightMode(sharedPreferences.getBoolean("dark_mode", false) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+
+        // overwriting theme for eventually enabled/disabled dark mode
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
+
         super.onCreate(savedInstanceState);
         // Setting XML base layout
         setContentView(R.layout.activity_main);
@@ -100,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         filterParam = "";
 
         // Getting numberOfArticlesParam from SharedPreferences (default: 10; modifiable through Preferences). This is the number of articles requested from the backend.
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         numberOfArticlesParam = sharedPreferences.getString("post_number", "10");
 
         // Setting up Actionbar

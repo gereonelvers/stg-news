@@ -3,6 +3,7 @@ package com.elvers.gereon.stgnewsapp1;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 
 /**
@@ -18,6 +19,13 @@ public class SettingsActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // overwriting theme for eventually enabled/disabled dark mode
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -27,8 +35,9 @@ public class SettingsActivity extends AppCompatActivity {
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setTitle(R.string.settings_string);
         }
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_ll, new SettingsFragment()).commit();
-
-
+        SettingsFragment settingsFragment = new SettingsFragment();
+        settingsFragment.setRootActivity(this);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_ll, settingsFragment).commit();
     }
+
 }

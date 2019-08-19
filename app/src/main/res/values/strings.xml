@@ -42,6 +42,7 @@
     <string name="title_activity_settings" translatable="false">SettingsActivity</string>
     <string name="post_number_title">Number of posts</string>
     <string name="post_number_summary">Number of posts that will be loaded by the App</string>
+    <string name="dark_mode_title">Dark Mode</string>
 
     <!-- ArticleActivity Strings -->
     <string name="comments_string">Comments:</string>

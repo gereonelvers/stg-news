@@ -37,6 +37,7 @@
     <string name="img_settings_summary">Lade Originalbilder. Sieht besser aus, verlangsamt jedoch möglicherweise die App und verbraucht mehr Daten.</string>
     <string name="post_number_title">Anzahl an Beiträgen</string>
     <string name="post_number_summary">Beiträge, die auf der Startseite und in der Suche geladen werden.</string>
+    <string name="dark_mode_title">Dunkler Modus</string>
 
     <string name="comments_string">Kommentare:</string>
     <string name="comments_number_title">Anzahl an Kommentaren</string>
