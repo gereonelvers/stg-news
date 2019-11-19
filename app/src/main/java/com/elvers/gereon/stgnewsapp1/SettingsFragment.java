@@ -1,5 +1,5 @@
 package com.elvers.gereon.stgnewsapp1;
-import android.content.Intent;
+
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.preference.Preference;
@@ -32,7 +32,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     } else {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                     }
-                    if(rootActivity != null) {
+
+                    // reload current activity so theme will be updated
+                    if(rootActivity != null) { // rootActivity.recreate() is buggy here
                         rootActivity.finish();
                         startActivity(rootActivity.getIntent());
                     }

@@ -54,12 +54,7 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // overwriting theme for eventually enabled/disabled dark mode
-        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            setTheme(R.style.AppThemeDark);
-        } else {
-            setTheme(R.style.AppTheme);
-        }
+        Utils.updateNightMode(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_comment);
@@ -68,15 +63,19 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
         final ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
             actionbar.setDisplayHomeAsUpEnabled(true);
-            actionbar.setHomeAsUpIndicator(R.drawable.ic_cancel);
+            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                actionbar.setHomeAsUpIndicator(R.drawable.ic_cancel_dark);
+            } else {
+                actionbar.setHomeAsUpIndicator(R.drawable.ic_cancel_light);
+            }
             actionbar.setTitle(R.string.app_name);
         }
 
         lonetString = getString(R.string.lonet_string);
         loaderManager = getSupportLoaderManager();
         Intent createCommentIntent = getIntent();
-        Integer idInt = createCommentIntent.getIntExtra("ARTICLE_ID", -1);
-        articleId = idInt.toString();
+        int articleId = createCommentIntent.getIntExtra("ARTICLE_ID", -1);
+        this.articleId = String.valueOf(articleId);
         nameET = findViewById(R.id.create_comment_name_et);
         emailET = findViewById(R.id.create_comment_email_et);
         contentET = findViewById(R.id.create_comment_content_et);
@@ -194,6 +193,13 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
                 emailET.setText(nameAdd);
             }
         });
+    }
+
+    @Override
+    protected void onRestart() {
+        Utils.updateNightMode(this);
+        super.onRestart();
+        recreate();
     }
 
     @Override

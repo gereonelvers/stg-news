@@ -59,12 +59,7 @@ public class ArticleActivity extends AppCompatActivity {
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // overwriting theme for eventually enabled/disabled dark mode
-        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            setTheme(R.style.AppThemeDark);
-        } else {
-            setTheme(R.style.AppTheme);
-        }
+        Utils.updateNightMode(this);
 
         super.onCreate(savedInstanceState);
         // Setting XML base layout
@@ -115,8 +110,8 @@ public class ArticleActivity extends AppCompatActivity {
 
         // FAB, drawables and FragmentManager are initialized here to save resources when switching between fragments later
         fab = findViewById(R.id.fab);
-        ic_chat = getResources().getDrawable(R.drawable.ic_chat);
-        ic_plus = getResources().getDrawable(R.drawable.ic_plus);
+        ic_chat = getResources().getDrawable(R.drawable.ic_chat_dark);
+        ic_plus = getResources().getDrawable(R.drawable.ic_plus_dark);
         fragmentManager = getSupportFragmentManager();
 
         // FAB should either show comments or open CreateCommentActivity, depending on which fragment is active
@@ -132,9 +127,9 @@ public class ArticleActivity extends AppCompatActivity {
                 }
             }
         });
-        // if "#comments" is present in the URI, this means that the Article has been accessed though a deeplink meant to link directly to the comments.
+        // if "#comments" is present in the URI, this means that the Article has been accessed though a deeplink meant to link directly to the comments or the activity has been restarted and the last instance showed the comments.
         // Therefore jump straight to CommentsFragment
-        if (articleURI.contains("#comments")) {
+        if (articleURI.contains("#comments") || (savedInstanceState != null && savedInstanceState.containsKey("isComments") && savedInstanceState.getBoolean("isComments"))) {
             showComments();
         } else {
             // If that isn't the case, start off by showing the article
@@ -148,12 +143,27 @@ public class ArticleActivity extends AppCompatActivity {
         checkFavorite(articleIdString, favoritesList);
         if (isFavorite) {
             favoriteMenuItem.setTitle(getString(R.string.favorites_remove_action));
-            favoriteMenuItem.setIcon(R.drawable.ic_star_dark);
+            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                favoriteMenuItem.setIcon(R.drawable.ic_star_dark);
+            } else {
+                favoriteMenuItem.setIcon(R.drawable.ic_star_light);
+            }
         } else {
             favoriteMenuItem.setTitle(getString(R.string.favorite_action));
-            favoriteMenuItem.setIcon(R.drawable.ic_star_border_dark);
+            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                favoriteMenuItem.setIcon(R.drawable.ic_star_border_dark);
+            } else {
+                favoriteMenuItem.setIcon(R.drawable.ic_star_border_light);
+            }
         }
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onRestart() {
+        Utils.updateNightMode(this);
+        super.onRestart();
+        recreate();
     }
 
     /**
@@ -200,13 +210,21 @@ public class ArticleActivity extends AppCompatActivity {
                 checkFavorite(articleIdString, favoritesList);
                 if (isFavorite) {
                     unfavorite(articleIdString, favoritesList);
-                    item.setIcon(R.drawable.ic_star_border_dark);
+                    if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                        item.setIcon(R.drawable.ic_star_border_dark);
+                    } else {
+                        item.setIcon(R.drawable.ic_star_border_light);
+                    }
                     item.setTitle(getString(R.string.favorite_action));
                     checkFavorite(articleIdString, favoritesList);
                     Toast.makeText(getContext(), getString(R.string.removed_from_favorites), Toast.LENGTH_SHORT).show();
                 } else {
                     favorite(articleIdString, favoritesList);
-                    item.setIcon(R.drawable.ic_star_dark);
+                    if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                        item.setIcon(R.drawable.ic_star_dark);
+                    } else {
+                        item.setIcon(R.drawable.ic_star_light);
+                    }
                     item.setTitle(getString(R.string.favorites_remove_action));
                     checkFavorite(articleIdString, favoritesList);
                     Toast.makeText(getContext(), getString(R.string.added_to_favorites), Toast.LENGTH_SHORT).show();
@@ -317,7 +335,7 @@ public class ArticleActivity extends AppCompatActivity {
     }
 
     /**
-     * Get favorites from SharedPreferences as String, then convert it to an Arraylist
+     * Get favorites from SharedPreferences as String, then convert it to an ArrayList
      */
     private void getFavorites() {
         String favorites = sharedPreferences.getString("favorites", "");
@@ -343,4 +361,13 @@ public class ArticleActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Save data which will be given to new instance/recreated instance of this activity; this is needed to remember to show comments after visiting the settings
+     * @param outState will contain all information to pass to new instance
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isComments", isComments);
+    }
 }

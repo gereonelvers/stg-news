@@ -92,15 +92,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        // enable/disable dark mode for hole app
+        // set night mode state for app
         AppCompatDelegate.setDefaultNightMode(sharedPreferences.getBoolean("dark_mode", false) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
 
-        // overwriting theme for eventually enabled/disabled dark mode
-        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            setTheme(R.style.AppThemeDark);
-        } else {
-            setTheme(R.style.AppTheme);
-        }
+        Utils.updateNightMode(this);
 
         super.onCreate(savedInstanceState);
         // Setting XML base layout
@@ -121,7 +116,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         final ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
             actionbar.setDisplayHomeAsUpEnabled(true);
-            actionbar.setHomeAsUpIndicator(R.drawable.ic_action_hamburger);
+            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_dark);
+            } else {
+                actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_light);
+            }
             actionbar.setTitle(R.string.app_name);
         }
 
@@ -335,12 +334,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * Refresh listView when returning to the MainActivity. This is necessary to make sure the data is up to date when returning to the App
+     * Recreate activity when returning to the MainActivity. This is necessary to make sure the right theme is set and data is up to date when returning to the Activity
      */
     @Override
     public void onRestart() {
+        Utils.updateNightMode(this);
         super.onRestart();
-        refreshListView();
+        recreate(); // will also update content
     }
 
 

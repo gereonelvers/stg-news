@@ -3,15 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.elvers.gereon.stgnewsapp1.CreateCommentActivity"
-    android:background="?attr/backgroundColor">
+    tools:context="com.elvers.gereon.stgnewsapp1.CreateCommentActivity">
     <android.support.v7.widget.Toolbar
         android:id="@+id/create_comment_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:titleTextColor="?attr/primaryTextColor"/>
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
     <LinearLayout
         android:id="@+id/create_comment_content_ll"
@@ -28,6 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="@string/create_comment_email"
+                android:textColorHint="?attr/textColorHint"
                 android:background="@android:color/transparent"
                 android:hint="@string/name_input_string"
                 android:inputType="textPersonName"
@@ -42,7 +41,7 @@
                 android:layout_alignParentRight="true"
                 android:contentDescription="@string/about_question_description"
                 android:padding="12dp"
-                android:src="@drawable/ic_question" />
+                android:src="?attr/iconQuestion" />
         </RelativeLayout>
         <View
             android:layout_width="match_parent"
@@ -67,6 +66,7 @@
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:hint="@string/create_comment_email"
+                        android:textColorHint="?attr/textColorHint"
                         android:paddingVertical="12dp"
                         android:paddingLeft="12dp"
                         android:paddingRight="4dp"
@@ -76,7 +76,6 @@
                         android:paddingEnd="4dp" />
 
                     <TextView
-                        android:background="#fafafa"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -85,7 +84,7 @@
                         android:paddingEnd="8dp"
                         android:paddingRight="8dp"
                         android:text="@string/lonet_string"
-                        android:textColor="@android:color/primary_text_light"
+                        android:textColor="?attr/textColorHint"
                         android:textSize="20sp"
                         tools:ignore="RtlSymmetry" />
                 </LinearLayout>
@@ -108,7 +107,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/about_question_description"
                 android:padding="12dp"
-                android:src="@drawable/ic_question"
+                android:src="?attr/iconQuestion"
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
         <View
@@ -124,6 +123,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:hint="@string/create_comment_content_hint"
+                android:textColorHint="?attr/textColorHint"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine|textAutoComplete"
                 android:padding="12dp"
@@ -138,7 +138,7 @@
                 android:layout_alignParentRight="true"
                 android:contentDescription="@string/about_question_description"
                 android:padding="12dp"
-                android:src="@drawable/ic_question"/>
+                android:src="?attr/iconQuestion"/>
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

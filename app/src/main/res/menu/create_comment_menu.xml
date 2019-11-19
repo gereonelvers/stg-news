@@ -6,7 +6,7 @@
         android:id="@+id/submit"
         android:title="@string/submit_string"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_submit"/>
+        android:icon="?attr/iconSubmit"/>
 
     <item
         android:id="@+id/settings"

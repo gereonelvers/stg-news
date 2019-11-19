@@ -64,6 +64,8 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.updateNightMode(this);
+
         super.onCreate(savedInstanceState);
         // Setting XML base layout
         setContentView(R.layout.activity_search);
@@ -188,7 +190,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
      * Refreshing mListView when returning to SearchActivity to make sure results are up-to-date.
      */
     @Override
-    public void onRestart() {
+    public void onRestart() { // there is no option to change the theme from this activity, so I don't have to recreate the activity
         super.onRestart();
         mAdapter.clear();
         loadingIndicator.setVisibility(View.VISIBLE);

@@ -7,7 +7,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/dialogBackground"
         tools:ignore="UselessParent">
 
         <android.support.v4.widget.SwipeRefreshLayout
@@ -52,7 +51,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center_horizontal"
-                android:textColor="?attr/secondaryTextColor"
                 android:textSize="16sp"
                 tools:text="@string/comments_empty_view" />
 
@@ -69,7 +67,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2" />
 
-                <!-- TODO invert arrow colors -->
                 <ImageView
                     android:id="@+id/comments_empty_view_arrow_iv"
                     android:layout_width="0dp"
@@ -82,7 +79,7 @@
                     android:paddingBottom="24dp"
                     android:scaleType="fitXY"
                     tools:ignore="RtlSymmetry"
-                    tools:src="@drawable/ic_arrow" />
+                    tools:src="?attr/iconArrow" />
             </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>

@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -187,7 +188,11 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
             loadingIndicator.setVisibility(View.GONE);
             if (pageNumber == 1) {
                 emptyView_tv.setText(getString(R.string.comments_empty_view));
-                emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow);
+                if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                    emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_dark);
+                } else {
+                    emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_light);
+                }
                 emptyView_quill_iv.setImageResource(R.drawable.ic_quill);
             } else {
                 emptyView_tv.setText(getString(R.string.comments_empty_view_page));

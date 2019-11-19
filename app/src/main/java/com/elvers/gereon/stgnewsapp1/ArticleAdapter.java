@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -150,8 +151,18 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
             });
 
             // Initialize drawables to save resources for repeated uses
-            final Drawable star = getContext().getResources().getDrawable(R.drawable.ic_star);
-            final Drawable unstar = getContext().getResources().getDrawable(R.drawable.ic_star_border);
+            final Drawable star;
+            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                star = getContext().getResources().getDrawable(R.drawable.ic_star_dark);
+            } else {
+                star = getContext().getResources().getDrawable(R.drawable.ic_star_light);
+            }
+            final Drawable unstar;
+            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                unstar = getContext().getResources().getDrawable(R.drawable.ic_star_border_dark);
+            } else {
+                unstar = getContext().getResources().getDrawable(R.drawable.ic_star_border_light);
+            }
             final ImageView swipe_star_iv = listItemView.findViewById(R.id.swipe_star_iv);
 
             // Initializing SharedPreferences

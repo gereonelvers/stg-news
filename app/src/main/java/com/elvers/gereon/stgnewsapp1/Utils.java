@@ -1,11 +1,13 @@
 package com.elvers.gereon.stgnewsapp1;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.Menu;
 
@@ -457,6 +459,18 @@ final class Utils {
             navigationView.invalidate();
             drawerLayout.invalidate();
             drawerLayout.requestLayout();
+        }
+    }
+
+    /**
+     * Sets the theme of the activity based on the current night mode setting
+     * @param activity activity to update
+     */
+    public static void updateNightMode(Activity activity) {
+        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            activity.setTheme(R.style.AppThemeDark);
+        } else {
+            activity.setTheme(R.style.AppTheme);
         }
     }
 
