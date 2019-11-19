@@ -26,17 +26,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
-                if(o instanceof Boolean) {
-                    if((Boolean)o) {
+                if (o instanceof Boolean) {
+                    if ((Boolean) o) {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                     } else {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                     }
 
                     // reload current activity so theme will be updated
-                    if(rootActivity != null) { // rootActivity.recreate() is buggy here
-                        rootActivity.finish();
-                        startActivity(rootActivity.getIntent());
+                    if (rootActivity != null) {
+                        rootActivity.recreate();
                     }
                     return true;
                 }

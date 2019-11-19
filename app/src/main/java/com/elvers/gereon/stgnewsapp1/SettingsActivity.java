@@ -31,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         SettingsFragment settingsFragment = new SettingsFragment();
         settingsFragment.setRootActivity(this);
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_ll, settingsFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_ll, settingsFragment).commit();
     }
 
 }
