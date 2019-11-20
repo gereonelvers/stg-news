@@ -13,6 +13,9 @@ document.getElementById('content').style.background = bg_color;
 var textElements = document.getElementsByTagName('p');
 for (i = 0; i < textElements.length; i++) {
     textElements[i].style.color = primary_text_color;
+    if(textElements[i].className.includes('has-very-light-gray-background-color')) {
+        textElements[i].style.background = 'rgb(75, 75, 75)';
+    }
 }
 
 var textElements = document.getElementsByTagName('a');
