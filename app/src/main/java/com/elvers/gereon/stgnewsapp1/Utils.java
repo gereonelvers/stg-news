@@ -460,4 +460,11 @@ final class Utils {
         }
     }
 
+    /**
+     * Sets night mode state which is used to determine which theme should be used for all activities
+     */
+    static void updateGlobalNightMode(Activity activity) {
+        AppCompatDelegate.setDefaultNightMode(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("dark_mode", false) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
 }

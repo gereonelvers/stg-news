@@ -59,6 +59,7 @@ public class ArticleActivity extends AppCompatActivity {
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.updateGlobalNightMode(this); // If the app is started directly into this activity, the theme should also be set correctly
         Utils.updateNightMode(this);
 
         super.onCreate(savedInstanceState);

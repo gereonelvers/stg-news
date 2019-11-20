@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // set night mode state for app
-        AppCompatDelegate.setDefaultNightMode(sharedPreferences.getBoolean("dark_mode", false) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+        Utils.updateGlobalNightMode(this);
 
         Utils.updateNightMode(this);
 
