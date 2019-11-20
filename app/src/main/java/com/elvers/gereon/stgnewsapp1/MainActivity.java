@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     boolean isFavoriteSelected;
     private ArticleAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
+    private Bundle savedInstanceState;
 
     /**
      * onCreate() is called when the Activity is launched.
@@ -95,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this.savedInstanceState = savedInstanceState;
+
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // set night mode state for app
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         articleListView.addFooterView(pagePicker);
 
         // When launching the Activity, the first page should be loaded
-        pageNumber = 1;
+        pageNumber = savedInstanceState != null ? savedInstanceState.getInt("pageNumber", 1) : 1;
 
         // Initialize page number TextView and set initial value (at this point, always 1)
         pageNumberTV = findViewById(R.id.page_number_tv);
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     pageNumber--;
                     pageNumberTV.setText(pageNumber.toString());
                     refreshListView();
+                    articleListView.setSelection(0);
                 }
             }
         });
@@ -220,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 pageNumber++;
                 pageNumberTV.setText(pageNumber.toString());
                 refreshListView();
+                articleListView.setSelection(0);
             }
         });
 
@@ -230,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onRefresh() {
                 mSwipeRefreshLayout.setRefreshing(true);
+                articleListView.setSelection(0);
                 updateCategories();
                 refreshListView();
 
@@ -298,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             // Refresh button
             case R.id.refresh:
+                articleListView.setSelection(0);
                 updateCategories();
                 refreshListView();
                 return true;
@@ -394,6 +401,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.clear();
         if (articles != null && !articles.isEmpty()) {
             mAdapter.addAll(articles);
+
+            if(savedInstanceState != null) {
+                articleListView.setSelection(Math.max(savedInstanceState.getInt("articlePos", 0) - 2, 0));
+            }
         } else {
             emptyView.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("SetTextI18n")
@@ -402,6 +413,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     if (pageNumber != 1) {
                         pageNumber--;
                         pageNumberTV.setText(pageNumber.toString());
+                        articleListView.setSelection(0);
                         refreshListView();
                     }
                 }
@@ -442,6 +454,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(@NonNull Loader<List<Article>> loader) {
         mAdapter.clear();
+    }
+
+    /**
+     * Save information for new instance
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("pageNumber", pageNumber);
+        outState.putInt("articlePos", articleListView.getLastVisiblePosition());
     }
 
     /**

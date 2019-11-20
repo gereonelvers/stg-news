@@ -259,7 +259,7 @@ public class ArticleActivity extends AppCompatActivity {
         if (isComments) {
             showArticle();
         } else {
-            NavUtils.navigateUpFromSameTask(this);
+            super.onBackPressed();
         }
     }
 
