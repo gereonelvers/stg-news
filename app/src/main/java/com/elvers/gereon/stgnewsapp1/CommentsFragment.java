@@ -170,7 +170,7 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     @NonNull
     public Loader<List<Comment>> onCreateLoader(int i, Bundle bundle) {
         Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("http");
+        uriBuilder.scheme("https");
         uriBuilder.authority(COMMENTS_REQUEST_URL);
         uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("comments");
         uriBuilder.appendQueryParameter("post", articleID.toString());

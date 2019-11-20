@@ -41,7 +41,7 @@ final class Utils {
     private static final String LOG_TAG = Utils.class.getSimpleName();
 
     // Static request URL the list of authors will be requested from. Putting it at the top like this allows easier modification of top level domain if required.
-    private static final String AUTHOR_REQUEST_URL = "http://stg-sz.net/wp-json/wp/v2/users?per_page=99";
+    private static final String AUTHOR_REQUEST_URL = "https://stg-sz.net/wp-json/wp/v2/users?per_page=99";
     private static final String BASE_REQUEST_URL = "stg-sz.net";
     private static JSONArray authorsArray;
     private static String categoryResponse = "";
@@ -359,7 +359,7 @@ final class Utils {
      */
     static int sendComment(String id, String authorName, String authorEmail, String content) throws IOException {
         Uri.Builder uriBuilder = new Uri.Builder();
-        uriBuilder.scheme("http");
+        uriBuilder.scheme("https");
         uriBuilder.authority(BASE_REQUEST_URL);
         uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("comments");
         uriBuilder.appendQueryParameter("post", id)
@@ -395,7 +395,7 @@ final class Utils {
     static String getCategories() {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder
-                .scheme("http")
+                .scheme("https")
                 .authority(BASE_REQUEST_URL)
                 .appendPath("wp-json")
                 .appendPath("wp")
