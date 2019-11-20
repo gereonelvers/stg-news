@@ -37,10 +37,10 @@
 
     <TextView
         android:gravity="center_vertical"
-        android:background="@drawable/comment_bubble_backdrop"
+        android:background="?attr/commentBubbleBackdrop"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/primary_text_light"
+        android:textColor="?android:textColorPrimary"
         android:id="@+id/comment_content_tv"
         android:padding="8dp"
         android:layout_marginRight="8dp"

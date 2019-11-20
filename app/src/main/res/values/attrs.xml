@@ -6,6 +6,7 @@
         <attr name="textColorHint" format="color" />
 
         <attr name="listItemBackground" format="reference" />
+        <attr name="commentBubbleBackdrop" format="reference" />
 
         <attr name="iconAutoFix" format="reference" />
         <attr name="iconSearch" format="reference" />

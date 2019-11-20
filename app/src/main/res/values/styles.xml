@@ -23,6 +23,7 @@
         <item name="iconStarBorder">@drawable/ic_star_border_light</item>
         <item name="iconSubmit">@drawable/ic_submit_light</item>
         <item name="iconArrow">@drawable/ic_arrow_light</item>
+        <item name="commentBubbleBackdrop">@drawable/comment_bubble_backdrop_light</item>
 
         <item name="android:colorBackground">@android:color/background_light</item>
         <item name="android:textColorPrimary">@android:color/primary_text_light_nodisable</item>
@@ -51,6 +52,7 @@
         <item name="iconStarBorder">@drawable/ic_star_border_dark</item>
         <item name="iconSubmit">@drawable/ic_submit_dark</item>
         <item name="iconArrow">@drawable/ic_arrow_dark</item>
+        <item name="commentBubbleBackdrop">@drawable/comment_bubble_backdrop_dark</item>
 
         <item name="android:colorBackground">@android:color/background_dark</item>
         <item name="android:textColorPrimary">@android:color/primary_text_dark_nodisable</item>
