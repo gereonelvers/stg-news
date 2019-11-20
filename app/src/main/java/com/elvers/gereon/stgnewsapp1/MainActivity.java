@@ -144,8 +144,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if(categoryData.isEmpty()) // reduce loading time for revisiting activity; categories will be updated by refreshing articles
             updateCategories();
 
-        navigationView.setCheckedItem(-1);
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -170,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     if (actionbar != null) {
                         actionbar.setTitle(getString(R.string.favorites_title));
                     }
-                    pageNumber = 1;
                     pageNumberTV.setText(pageNumber.toString());
 
                 } else {
@@ -180,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         actionbar.setTitle(menuItem.getTitle());
                     }
                 }
+                pageNumber = 1;
                 refreshListView();
                 mDrawerLayout.closeDrawers();
                 return true;
@@ -464,6 +462,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onSaveInstanceState(outState);
         outState.putInt("pageNumber", pageNumber);
         outState.putInt("articlePos", articleListView.getLastVisiblePosition());
+        outState.putInt("category", navigationView.getCheckedItem().getOrder());
     }
 
     /**
@@ -492,7 +491,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 try {
                     MainActivity.this.categoryData = categoryData;
                     Utils.createMenu(categoryData, navigationView.getMenu(), navigationView, mDrawerLayout);
-                    navigationView.setCheckedItem(-1);
+                    if(savedInstanceState != null) {
+                        navigationView.setCheckedItem(navigationView.getMenu().getItem(savedInstanceState.getInt("category", 0)));
+                        filterParam = String.valueOf(navigationView.getCheckedItem().getItemId());
+                        refreshListView(); // increases loading time :c
+                    } else {
+                        navigationView.setCheckedItem(-1);
+                    }
                     loaderManager.destroyLoader(CATEGORY_LOADER_ID); // i don't want android to run this method without asking me
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Failed to setup article category menu: " + e.toString());
