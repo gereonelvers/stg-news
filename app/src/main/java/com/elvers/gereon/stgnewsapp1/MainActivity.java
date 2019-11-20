@@ -462,7 +462,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onSaveInstanceState(outState);
         outState.putInt("pageNumber", pageNumber);
         outState.putInt("articlePos", articleListView.getLastVisiblePosition());
-        outState.putInt("category", navigationView.getCheckedItem().getOrder());
+        if(navigationView.getCheckedItem() != null) {
+            outState.putInt("category", navigationView.getCheckedItem().getOrder());
+        }
     }
 
     /**
@@ -491,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 try {
                     MainActivity.this.categoryData = categoryData;
                     Utils.createMenu(categoryData, navigationView.getMenu(), navigationView, mDrawerLayout);
-                    if(savedInstanceState != null) {
+                    if(savedInstanceState != null && savedInstanceState.containsKey("category")) {
                         navigationView.setCheckedItem(navigationView.getMenu().getItem(savedInstanceState.getInt("category", 0)));
                         filterParam = String.valueOf(navigationView.getCheckedItem().getItemId());
                         refreshListView(); // increases loading time :c
