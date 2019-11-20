@@ -173,6 +173,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
                     if (currentArticle != null) {
                         articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
                         articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitle());
+                        articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
                     }
                     startActivity(articleIntent);
                 } catch (Exception e) {
@@ -201,7 +202,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
 
     /**
      * This method is called when creating a new ArticleLoader. It creates a modified query URL (by adding the filter parameters listed below) and initializes the ArticleLoader.
-     *
+     * <p>
      * Parameters:
      * {@param requestTerm} is a String containing the search term
      * {@param numberOfArticlesParam} is a String containing the number of Article objects requested from the server
