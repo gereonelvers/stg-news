@@ -11,11 +11,9 @@ import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.Menu;
 
-import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -413,18 +411,11 @@ final class Utils {
         URL requestURL = createUrl(uriBuilder.toString());
         OkHttpClient client = new OkHttpClient();
         final Request request = new Request.Builder().url(requestURL).build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-                Log.e(LOG_TAG, "Failed to get categories from server");
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                categoryResponse = response.body().string();
-
-            }
-        });
+        try {
+            categoryResponse = client.newCall(request).execute().body().string();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Failed to get categories from server");
+        }
 
         return categoryResponse;
     }

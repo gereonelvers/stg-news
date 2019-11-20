@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -63,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     // Assign loader static ID (enables easier implementation of possible future loaders)
     private static final int ARTICLE_LOADER_ID = 1;
+    private static final int CATEGORY_LOADER_ID = 2;
+
+    // Every MainActivity instance should have one CategoryCallbackHandler
+    private CategoryCallbackHandler categoryCallbackHandler = new CategoryCallbackHandler();
 
     /* There are a lot of items declared outside of individual methods here.
     This is done because they are required to be available across methods and it's more economical to simply initialize them onCreate() */
@@ -75,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     String numberOfArticlesParam;
     Integer pageNumber;
     TextView pageNumberTV;
-    String categoryJSONString;
+    String categoryData = ""; // should never be null
     Menu drawerMenu;
     NavigationView navigationView;
     ArrayList<String> favoritesArray;
@@ -129,20 +134,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         navigationView = findViewById(R.id.nav_view);
         drawerMenu = navigationView.getMenu();
 
-        categoryJSONString = sharedPreferences.getString("categoryJSONString", "[{\"id\":1,\"count\":5,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/andere\\/\",\"name\":\"Andere\",\"slug\":\"andere\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/1\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=1\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":12,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/damals\\/\",\"name\":\"Damals\",\"slug\":\"damals\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/12\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=12\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":7,\"count\":3,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/interviews\\/\",\"name\":\"Interviews\",\"slug\":\"interviews\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/7\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=7\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":5,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/fahrten\\/\",\"name\":\"Klassenfahrten\",\"slug\":\"fahrten\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/5\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=5\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":4,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/kultur\\/\",\"name\":\"Kultur\",\"slug\":\"kultur\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/4\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=4\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":11,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/lehrer\\/\",\"name\":\"Lehrerportraits\",\"slug\":\"lehrer\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/11\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=11\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":8,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/meinung\\/\",\"name\":\"Nachgedacht - Ansichtssache\",\"slug\":\"meinung\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/8\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=8\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":6,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sv\\/\",\"name\":\"News der SV\",\"slug\":\"sv\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/6\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=6\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":3,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sport\\/\",\"name\":\"Sport\",\"slug\":\"sport\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/3\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=3\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":2,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/unser-redaktionsteam\\/\",\"name\":\"Unser Redaktionsteam\",\"slug\":\"unser-redaktionsteam\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/2\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=2\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}}]");
-        String currentCategoryJSONString = Utils.getCategories();
-        if (!currentCategoryJSONString.equals(categoryJSONString) && !currentCategoryJSONString.equals("") && !currentCategoryJSONString.isEmpty()) {
-            categoryJSONString = currentCategoryJSONString;
-            sharedPreferences
-                    .edit()
-                    .putString("categoryJSONString", categoryJSONString)
-                    .apply();
-        }
-        try {
-            Utils.createMenu(categoryJSONString, navigationView.getMenu(), navigationView, mDrawerLayout);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Failed to create menu from JSON");
-        }
+        // Initializing loaderManager
+        loaderManager = getSupportLoaderManager();
+
+        // Start loading categories
+        if(categoryData.isEmpty()) // reduce loading time for revisiting activity; categories will be updated by refreshing articles
+            updateCategories();
 
         navigationView.setCheckedItem(-1);
 
@@ -185,9 +182,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return true;
             }
         });
-
-        // Initializing loaderManager
-        loaderManager = getSupportLoaderManager();
 
         // EmptyView (The message that is shown when ListView is empty) is initialized and set on ListView
         emptyView = findViewById(R.id.empty_view);
@@ -236,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onRefresh() {
                 mSwipeRefreshLayout.setRefreshing(true);
+                updateCategories();
                 refreshListView();
 
             }
@@ -303,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             // Refresh button
             case R.id.refresh:
+                updateCategories();
                 refreshListView();
                 return true;
 
@@ -448,5 +444,43 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.clear();
     }
 
+    /**
+     * Starts asynchronous update of categories (menu)
+     */
+    private void updateCategories() {
+        loaderManager.initLoader(CATEGORY_LOADER_ID, null, categoryCallbackHandler);
+    }
+
+    /**
+     * Handles asynchronous update of categories (menu)
+     */
+    private class CategoryCallbackHandler implements LoaderManager.LoaderCallbacks<String> {
+        @NonNull
+        @Override
+        public Loader<String> onCreateLoader(int i, @Nullable Bundle bundle) {
+            return new CategoryLoader(MainActivity.this);
+        }
+
+        /**
+         * Put received categories into the (left) category menu
+         */
+        @Override
+        public void onLoadFinished(@NonNull Loader<String> loader, String categoryData) {
+            if(!categoryData.isEmpty()) {
+                try {
+                    MainActivity.this.categoryData = categoryData;
+                    Utils.createMenu(categoryData, navigationView.getMenu(), navigationView, mDrawerLayout);
+                    navigationView.setCheckedItem(-1);
+                    loaderManager.destroyLoader(CATEGORY_LOADER_ID); // i don't want android to run this method without asking me
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Failed to setup article category menu: " + e.toString());
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<String> loader) { }
+    }
 
 }
