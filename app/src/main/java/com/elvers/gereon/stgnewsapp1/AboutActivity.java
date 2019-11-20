@@ -12,7 +12,7 @@ import android.webkit.WebView;
 
 /**
  * Activity that shows "About" information like sources and feedback links
- *
+ * <p>
  * Points a WebView to a static WordPress-Post that contains this info.
  * This makes edit easier in the future, because it increases parity between website and App (no need to maintain content twice)
  *
@@ -48,7 +48,7 @@ public class AboutActivity extends AppCompatActivity {
          * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
          */
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new ArticleWebViewClient());
+        webView.setWebViewClient(new ArticleWebViewClient(getAssets()));
         webView.setVisibility(View.INVISIBLE);
         // Setting up loading indicator (spinning circle)
         webView.setWebChromeClient(new WebChromeClient() {
@@ -63,7 +63,7 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         // Start loading URL
         webView.loadUrl(ABOUT_URL);

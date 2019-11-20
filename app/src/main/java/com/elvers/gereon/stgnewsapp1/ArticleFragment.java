@@ -24,7 +24,8 @@ public class ArticleFragment extends Fragment {
     private String articleURI;
 
     // Required empty public constructor
-    public ArticleFragment() {}
+    public ArticleFragment() {
+    }
 
     public static ArticleFragment newInstance(String articleURI) {
         Bundle bundle = new Bundle();
@@ -62,14 +63,14 @@ public class ArticleFragment extends Fragment {
         // Add "inapp"-URL parameter to notify site that it is being requested from within the App
         articleURI += "?inapp";
         /*
-        * Javascript is necessary for some dynamic components that might be implemented in the future,
-        * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
-        */
+         * Javascript is necessary for some dynamic components that might be implemented in the future,
+         * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
+         */
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(false);
 
-        webView.setWebViewClient(new ArticleWebViewClient());
+        webView.setWebViewClient(new ArticleWebViewClient(getActivity().getAssets()));
         webView.setVisibility(View.INVISIBLE);
         // Setting up loading indicator (spinning circle)
         webView.setWebChromeClient(new WebChromeClient() {
@@ -86,14 +87,14 @@ public class ArticleFragment extends Fragment {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         // Actually start loading URL
         webView.loadUrl(articleURI);
     }
 
     @Override
-    public void onDestroyView(){
+    public void onDestroyView() {
         super.onDestroyView();
         webView.clearCache(true);
     }
