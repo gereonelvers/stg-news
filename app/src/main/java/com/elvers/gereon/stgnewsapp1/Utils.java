@@ -49,7 +49,8 @@ final class Utils {
     /**
      * Create a private Utils constructor to prevent creation of a Utils object. This class is only meant to hold static variables and methods, it should not be called as an object!
      */
-    private Utils(){}
+    private Utils() {
+    }
 
     /**
      * Query the WordPress site and return a list of {@link Article} objects.
@@ -114,14 +115,13 @@ final class Utils {
     }
 
 
-
     /**
      * Return a list of {@link Article} objects that has been built up from
      * parsing the given JSON response.
      */
-    private static List<Article> extractArticleFeaturesFromJson(String articleJSON){
+    private static List<Article> extractArticleFeaturesFromJson(String articleJSON) {
         // Check for empty JSON response
-        if(articleJSON.isEmpty()){
+        if (articleJSON.isEmpty()) {
             return null;
         }
 
@@ -131,7 +131,7 @@ final class Utils {
         try {
             JSONArray articleArray = new JSONArray(articleJSON);
             /* This loop iterates over the articleArray to parse the JSONArray into an array of articles */
-            for(int i = 0; i<articleArray.length(); i++){
+            for (int i = 0; i < articleArray.length(); i++) {
 
                 // Get current Article from Array
                 JSONObject currentArticle = articleArray.getJSONObject(i);
@@ -158,7 +158,7 @@ final class Utils {
                 try {
                     articleDate = inputFormat.parse(dateStringInput, p);
                 } catch (Exception e) {
-                    Log.e(LOG_TAG,"Error parsing dateString into format");
+                    Log.e(LOG_TAG, "Error parsing dateString into format");
                 }
                 SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.getDefault());
                 String dateString = outputFormat.format(articleDate);
@@ -174,41 +174,37 @@ final class Utils {
                 try {
                     JSONObject betterFeaturedImage = currentArticle.getJSONObject("better_featured_image");
                     if (!isHighRes) {
-                    JSONObject media_details = betterFeaturedImage.getJSONObject("media_details");
-                    JSONObject sizes = media_details.getJSONObject("sizes");
-                    try{
-                    imgObj = sizes.getJSONObject("large"); }
-                    catch (Exception e){
-                        Log.i(LOG_TAG, "Failed to get large image");
-                    }
-                    try {
-                        if (imgObj == null) {
-                            imgObj = sizes.getJSONObject("medium");
+                        JSONObject media_details = betterFeaturedImage.getJSONObject("media_details");
+                        JSONObject sizes = media_details.getJSONObject("sizes");
+                        try {
+                            imgObj = sizes.getJSONObject("large");
+                        } catch (Exception e) {
+                            Log.i(LOG_TAG, "Failed to get large image");
                         }
-                    }
-                    catch (Exception e){
-                        Log.i(LOG_TAG, "Failed to get medium image");
-                    }
-                    try {
-                        if (imgObj == null) {
-                            imgObj = sizes.getJSONObject("thumbnail");
+                        try {
+                            if (imgObj == null) {
+                                imgObj = sizes.getJSONObject("medium");
                             }
+                        } catch (Exception e) {
+                            Log.i(LOG_TAG, "Failed to get medium image");
                         }
-                    catch (Exception e){
-                        Log.i(LOG_TAG, "Failed to get thumbnail image");
+                        try {
+                            if (imgObj == null) {
+                                imgObj = sizes.getJSONObject("thumbnail");
+                            }
+                        } catch (Exception e) {
+                            Log.i(LOG_TAG, "Failed to get thumbnail image");
                         }
-                    }
-                    else {
+                    } else {
                         imgObj = betterFeaturedImage;
-                        }
+                    }
 
                     if (imgObj != null) {
-                    imageUrlString = imgObj.getString("source_url");
+                        imageUrlString = imgObj.getString("source_url");
                     }
 
-                }
-                catch (Exception e){
-                    Log.e(LOG_TAG , "IMG Conversion for article " + i + " Can't parse img through betterFeaturedImage");
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "IMG Conversion for article " + i + " Can't parse img through betterFeaturedImage");
                 }
 
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -218,12 +214,12 @@ final class Utils {
                 StringBuilder categoryString = new StringBuilder();
                 boolean isFirstCategory = true;
 
-                for (int q=0; q<categoryJSONArray.length(); q++) {
+                for (int q = 0; q < categoryJSONArray.length(); q++) {
                     JSONObject currentCategory = categoryJSONArray.getJSONObject(q);
                     int cat1 = currentCategory.getInt("id");
-                    for (int w=0; w<articleCategoryArray.length(); w++) {
+                    for (int w = 0; w < articleCategoryArray.length(); w++) {
                         int currentArticleCat = articleCategoryArray.getInt(w);
-                        if (cat1==currentArticleCat) {
+                        if (cat1 == currentArticleCat) {
                             if (isFirstCategory) {
                                 categoryString.append(currentCategory.getString("name"));
                                 isFirstCategory = false;
@@ -239,17 +235,16 @@ final class Utils {
                 Article article = new Article(id, titleString, authorString, dateString, urlString, imageUrlString, categoryString.toString());
                 articles.add(article);
             }
-    }
-        catch (Exception e){
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Problem parsing article JSON");
         }
         return articles;
     }
 
-    private static List<Comment> extractCommentFeaturesFromJson(String commentJSON){
+    private static List<Comment> extractCommentFeaturesFromJson(String commentJSON) {
 
         if (commentJSON.isEmpty()) {
-        return null;
+            return null;
         }
 
         List<Comment> comments = new ArrayList<>();
@@ -258,7 +253,7 @@ final class Utils {
         try {
             JSONArray commentArray = new JSONArray(commentJSON);
             /* This loop iterates over the commentArray to parse the JSONArray into an array of Comments */
-            for(int i = 0; i<commentArray.length(); i++){
+            for (int i = 0; i < commentArray.length(); i++) {
 
                 // Get current Comment from Array
                 JSONObject currentComment = commentArray.getJSONObject(i);
@@ -277,7 +272,7 @@ final class Utils {
                 try {
                     articleDate = inputFormat.parse(dateStringInput, p);
                 } catch (Exception e) {
-                    Log.e(LOG_TAG,"Error parsing dateString into format");
+                    Log.e(LOG_TAG, "Error parsing dateString into format");
                 }
                 SimpleDateFormat outputFormatDate = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
                 SimpleDateFormat outputFormatTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -292,8 +287,7 @@ final class Utils {
                 Comment comment = new Comment(id, authorString, dateString, timeString, contentString);
                 comments.add(comment);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Problem parsing comment JSON");
         }
         return comments;
@@ -301,36 +295,36 @@ final class Utils {
 
     /**
      * Since the WordPress API only provides author ID (not the complete name), the process to retrieve names is a little more intricate, which is why it's moved into a separate method.
-     *
+     * <p>
      * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once per request (in getAuthorData())
      * The array is then stored as authorsArray. extractArticleFeaturesFromJson() then retrieves the author ID from currentArticle and iterates against authorsArray until a match is found.
      */
-    private static String getAuthorName(int authorID){
+    private static String getAuthorName(int authorID) {
         String authorName = "";
 
         // Fill authorsArray with author data (if it's empty)
-        if (authorsArray == null){
+        if (authorsArray == null) {
             getAuthorData();
         }
 
         // Iterate over authorsArray until currentId (the author ID of currentArticle) matches authorID (the changing ID of the authors in authorsArray)
-        for(int i = 0; i<authorsArray.length(); i++){
+        for (int i = 0; i < authorsArray.length(); i++) {
             int currentId = 0;
             JSONObject currentAuthor = null;
             try {
                 currentAuthor = authorsArray.getJSONObject(i);
                 currentId = currentAuthor.getInt("id");
-            } catch (Exception e){
+            } catch (Exception e) {
                 // This can happen if the array of authors doesn't contain an author matching the ID of the author for a certain article.
                 // If that happens, ArticleAdapter will simply hide the author field
                 Log.e(LOG_TAG, "Finding matching author failed");
             }
-            if (currentId==authorID){
+            if (currentId == authorID) {
                 try {
                     if (currentAuthor != null) {
                         authorName = currentAuthor.getString("name");
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     Log.e(LOG_TAG, "Failed to get author name");
                 }
             }
@@ -344,7 +338,7 @@ final class Utils {
      * Request an array of authors from AUTHOR_REQUEST_URL
      * Necessary to correctly display author name in article listview
      */
-    private static void getAuthorData(){
+    private static void getAuthorData() {
         URL url = createUrl(AUTHOR_REQUEST_URL);
         String jsonResponse = null;
         try {
@@ -379,7 +373,7 @@ final class Utils {
     /**
      * Make an HTTP request to the given URL and return a String as the response.
      */
-    private static int makeHttpPostRequest(URL url) throws IOException{
+    private static int makeHttpPostRequest(URL url) throws IOException {
         int responseCode = 0;
 
         // If the URL is null, then return an early response. No need to delay or cause IOException here.
@@ -427,23 +421,23 @@ final class Utils {
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Failed to parse new categoryString");
         }
-        if (categoryArray != null){
+        if (categoryArray != null) {
             navigationMenu.add(R.id.mainGroup, -1, 0, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
-        for(int i = 0; i<categoryArray.length(); i++){
+            for (int i = 0; i < categoryArray.length(); i++) {
 
-            // Get current category from Array
-            JSONObject currentCategory = categoryArray.getJSONObject(i);
+                // Get current category from Array
+                JSONObject currentCategory = categoryArray.getJSONObject(i);
 
-            // Get WordPress category ID
-            int id = currentCategory.getInt("id");
+                // Get WordPress category ID
+                int id = currentCategory.getInt("id");
 
-            // Get category name
-            String name = currentCategory.getString("name");
+                // Get category name
+                String name = currentCategory.getString("name");
 
-            navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/id, /*Order*/i+2, /*name*/name);
+                navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/id, /*Order*/i + 2, /*name*/name);
             }
 
-            for (int j=0; j<navigationMenu.size(); j++) {
+            for (int j = 0; j < navigationMenu.size(); j++) {
                 navigationMenu.getItem(j).setCheckable(true);
             }
 
@@ -455,10 +449,11 @@ final class Utils {
 
     /**
      * Sets the theme of the activity based on the current night mode setting
+     *
      * @param activity activity to update
      */
-    public static void updateNightMode(Activity activity) {
-        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+    static void updateNightMode(Activity activity) {
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             activity.setTheme(R.style.AppThemeDark);
         } else {
             activity.setTheme(R.style.AppTheme);
