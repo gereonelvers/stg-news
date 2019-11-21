@@ -397,25 +397,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // Clears the ArticleAdapter to allow the new array of Articles to be projected (if it's not empty)
         mAdapter.clear();
-        if (articles != null && !articles.isEmpty()) {
+        if (articles == null || articles.isEmpty()) {
+            emptyView.setText(articles == null ? R.string.no_articles_network : R.string.no_articles);
+            emptyView.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onClick(View v) {
+                    if (pageNumber > 1) {
+                        pageNumber--;
+                        pageNumberTV.setText(pageNumber.toString());
+                    }
+                    articleListView.setSelection(0);
+                    refreshListView();
+                }
+            });
+        } else {
             mAdapter.addAll(articles);
 
             if(savedInstanceState != null) {
                 articleListView.setSelection(Math.max(savedInstanceState.getInt("articlePos", 0) - 2, 0));
             }
-        } else {
-            emptyView.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View v) {
-                    if (pageNumber != 1) {
-                        pageNumber--;
-                        pageNumberTV.setText(pageNumber.toString());
-                        articleListView.setSelection(0);
-                        refreshListView();
-                    }
-                }
-            });
         }
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
