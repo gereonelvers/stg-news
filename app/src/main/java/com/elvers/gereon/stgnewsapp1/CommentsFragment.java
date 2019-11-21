@@ -85,6 +85,9 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if(getActivity() == null)
+            throw new RuntimeException("getActivity() returned null");
+
         // Set layout
         View view = inflater.inflate(R.layout.fragment_comments, container, false);
         // Try to get article ID from Bundle

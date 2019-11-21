@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <EditText
-                        android:id="@+id/create_comment_email_et"
+                        android:id="@+id/create_comment_mail_et"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
@@ -73,7 +73,9 @@
                         android:textSize="20sp"
                         tools:targetApi="o"
                         android:paddingStart="12dp"
-                        android:paddingEnd="4dp" />
+                        android:paddingEnd="4dp"
+                        android:autofillHints=""
+                        android:inputType="text" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -98,6 +100,7 @@
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:src="@drawable/ic_auto_fix"
                 android:layout_toStartOf="@id/create_comment_email_question_iv" />
             <ImageView

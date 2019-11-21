@@ -77,7 +77,7 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
         int articleId = createCommentIntent.getIntExtra("ARTICLE_ID", -1);
         this.articleId = String.valueOf(articleId);
         nameET = findViewById(R.id.create_comment_name_et);
-        emailET = findViewById(R.id.create_comment_email_et);
+        emailET = findViewById(R.id.create_comment_mail_et);
         contentET = findViewById(R.id.create_comment_content_et);
         name_help = findViewById(R.id.create_comment_name_question_iv);
         email_help = findViewById(R.id.create_comment_email_question_iv);

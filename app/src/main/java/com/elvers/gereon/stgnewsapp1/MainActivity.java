@@ -496,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Utils.createMenu(categoryData, navigationView.getMenu(), navigationView, mDrawerLayout);
                     if(savedInstanceState != null && savedInstanceState.containsKey("category")) {
                         navigationView.setCheckedItem(navigationView.getMenu().getItem(savedInstanceState.getInt("category", 0)));
-                        int id = navigationView.getCheckedItem().getOrder();
+                        int id = navigationView.getCheckedItem() == null ? 0 : navigationView.getCheckedItem().getOrder();
                         if(id != 0 && id != 1) {
                             filterParam = String.valueOf(id - 1);
                         } else {
