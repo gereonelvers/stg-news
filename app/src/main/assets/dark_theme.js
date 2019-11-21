@@ -6,6 +6,7 @@ var figcaption_color = 'rgb(119, 127, 136)';
 var ol_color = 'rgb(176, 59, 59)';
 var h3_color = 'rgb(180, 48, 48)';
 var h4_color = 'rgb(140, 48, 48)';
+var h6_color = 'rgb(119, 63, 63)';
 
 document.getElementsByTagName('body')[0].style.background = bg_color;
 document.getElementById('content').style.background = bg_color;
@@ -49,6 +50,11 @@ for(i = 0; i < textElements.length; i++) {
 var textElements = document.getElementsByTagName('h4');
 for(i = 0; i < textElements.length; i++) {
     textElements[i].style.color = h4_color;
+}
+
+var textElements = document.getElementsByTagName('h6');
+for(i = 0; i < textElements.length; i++) {
+    textElements[i].style.color = h6_color;
 }
 
 document.getElementsByClassName('entry-title')[0].style.color = headline_color;
