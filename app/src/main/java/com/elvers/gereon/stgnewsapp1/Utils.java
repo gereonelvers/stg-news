@@ -422,7 +422,7 @@ final class Utils {
             Log.e(LOG_TAG, "Failed to parse new categoryString");
         }
         if (categoryArray != null) {
-            navigationMenu.add(R.id.mainGroup, -1, 0, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
+            navigationMenu.add(R.id.mainGroup, -1, 1, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
             for (int i = 0; i < categoryArray.length(); i++) {
 
                 // Get current category from Array

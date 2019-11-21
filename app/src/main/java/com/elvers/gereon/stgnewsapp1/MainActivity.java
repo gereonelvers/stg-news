@@ -148,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 navigationView.setCheckedItem(menuItem);
+                pageNumber = 1;
+                pageNumberTV.setText(pageNumber.toString());
                 int menuItemItemId = menuItem.getItemId();
                 if (menuItem.getItemId() == -1) {
                     filterParam = "";
@@ -168,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     if (actionbar != null) {
                         actionbar.setTitle(getString(R.string.favorites_title));
                     }
-                    pageNumberTV.setText(pageNumber.toString());
 
                 } else {
                     filterParam = Integer.toString(menuItemItemId);
@@ -177,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         actionbar.setTitle(menuItem.getTitle());
                     }
                 }
-                pageNumber = 1;
                 refreshListView();
                 mDrawerLayout.closeDrawers();
                 return true;
@@ -496,15 +496,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     if(savedInstanceState != null && savedInstanceState.containsKey("category")) {
                         navigationView.setCheckedItem(navigationView.getMenu().getItem(savedInstanceState.getInt("category", 0)));
                         int id = navigationView.getCheckedItem().getOrder();
-                        if(id != 0 && id != -1) {
-                            filterParam = String.valueOf(navigationView.getCheckedItem().getOrder());
+                        if(id != 0 && id != 1) {
+                            filterParam = String.valueOf(id - 1);
                         } else {
                             filterParam = "";
                         }
 
                         refreshListView(); // increases loading time :c
                     } else {
-                        navigationView.setCheckedItem(-1);
+                        navigationView.setCheckedItem(navigationView.getMenu().getItem(1));
                     }
                     loaderManager.destroyLoader(CATEGORY_LOADER_ID); // i don't want android to run this method without asking me
                 } catch (JSONException e) {
