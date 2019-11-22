@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private ArticleAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
     private Bundle savedInstanceState;
+    private ActionBar actionBar;
+    private SharedPreferences sharedPreferences;
 
     /**
      * onCreate() is called when the Activity is launched.
@@ -95,10 +97,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @SuppressLint("SetTextI18n")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         this.savedInstanceState = savedInstanceState;
-
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // set night mode state for app
         Utils.updateGlobalNightMode(this);
@@ -112,24 +113,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Finding loading indicator in layout
         loadingIndicator = findViewById(R.id.loading_circle);
 
-        /*Initializing filterParam so it can be concatenated with WP_REQUEST_URL even if no filter is applied (would be "null" otherwise)*/
+        // Initializing filterParam so it can be concatenated with WP_REQUEST_URL even if no filter is applied (would be "null" otherwise)
         filterParam = "";
 
         // Getting numberOfArticlesParam from SharedPreferences (default: 10; modifiable through Preferences). This is the number of articles requested from the backend.
         numberOfArticlesParam = sharedPreferences.getString("post_number", "10");
 
-        // Setting up Actionbar
+        // Setting up ActionBar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final ActionBar actionbar = getSupportActionBar();
-        if (actionbar != null) {
-            actionbar.setDisplayHomeAsUpEnabled(true);
-            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_dark);
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_dark);
             } else {
-                actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_light);
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_light);
             }
-            actionbar.setTitle(R.string.app_name);
+            actionBar.setTitle(R.string.app_name);
         }
 
         // Setting up DrawerLayout
@@ -141,45 +142,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         loaderManager = getSupportLoaderManager();
 
         // Start loading categories
-        if(categoryData.isEmpty()) // reduce loading time for revisiting activity; categories will be updated by refreshing articles
+        if (categoryData.isEmpty()) // reduce loading time for revisiting activity; categories will be updated by refreshing articles
             updateCategories();
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                navigationView.setCheckedItem(menuItem);
                 pageNumber = 1;
-                pageNumberTV.setText(pageNumber.toString());
-                int menuItemItemId = menuItem.getItemId();
-                if (menuItem.getItemId() == -1) {
-                    filterParam = "";
-                    if (actionbar != null) {
-                        actionbar.setTitle(getString(R.string.app_name));
-                    }
-                    isFavoriteSelected = false;
-                }
-                // Favorite articles
-                else if (menuItem.getTitle().equals(getString(R.string.favorites_title))) {
-                    isFavoriteSelected = true;
-                    filterParam = "";
-                    String favoritesString = sharedPreferences.getString("favorites", "");
-                    favoritesArray = null;
-                    if (favoritesString != null) {
-                        favoritesArray = new ArrayList<>(Arrays.asList(favoritesString.split(",")));
-                    }
-                    if (actionbar != null) {
-                        actionbar.setTitle(getString(R.string.favorites_title));
-                    }
-
-                } else {
-                    filterParam = Integer.toString(menuItemItemId);
-                    isFavoriteSelected = false;
-                    if (actionbar != null) {
-                        actionbar.setTitle(menuItem.getTitle());
-                    }
-                }
-                refreshListView();
-                mDrawerLayout.closeDrawers();
+                forceResetArticlePos();
+                displayContentByMenuItem(menuItem);
                 return true;
             }
         });
@@ -194,10 +165,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         View pagePicker = LayoutInflater.from(this).inflate(R.layout.page_picker, null, false);
         articleListView.addFooterView(pagePicker);
 
-        // When launching the Activity, the first page should be loaded
+        // When launching the Activity, the page from the previous instance should be loaded (otherwise the first page)
         pageNumber = savedInstanceState != null ? savedInstanceState.getInt("pageNumber", 1) : 1;
 
-        // Initialize page number TextView and set initial value (at this point, always 1)
+        // Initialize page number TextView and set initial value
         pageNumberTV = findViewById(R.id.page_number_tv);
         pageNumberTV.setText(pageNumber.toString());
 
@@ -209,8 +180,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (pageNumber > 1) {
                     pageNumber--;
                     pageNumberTV.setText(pageNumber.toString());
-                    refreshListView();
-                    articleListView.setSelection(0);
+                    forceResetArticlePos();
+                    displayContentByMenuItem(navigationView.getCheckedItem());
                 }
             }
         });
@@ -221,8 +192,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(View v) {
                 pageNumber++;
                 pageNumberTV.setText(pageNumber.toString());
-                refreshListView();
-                articleListView.setSelection(0);
+                forceResetArticlePos();
+                displayContentByMenuItem(navigationView.getCheckedItem());
             }
         });
 
@@ -232,16 +203,52 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                forceResetArticlePos();
                 mSwipeRefreshLayout.setRefreshing(true);
-                articleListView.setSelection(0);
-                updateCategories();
                 refreshListView();
-
             }
         });
 
         // Load of Article objects onto listView is requested
         initLoaderListView();
+    }
+
+    /**
+     * This method is called by the navigationView click listener after categories loaded and a previous instance existed
+     */
+    private void displayContentByMenuItem(MenuItem menuItem) {
+        navigationView.setCheckedItem(menuItem);
+        int menuItemItemId = menuItem.getItemId();
+        if (menuItem.getItemId() == -1) {
+            filterParam = "";
+            if (actionBar != null) {
+                actionBar.setTitle(getString(R.string.app_name));
+            }
+            isFavoriteSelected = false;
+        }
+        // Favorite articles
+        else if (menuItem.getItemId() == -2) {
+            isFavoriteSelected = true;
+            filterParam = "";
+            String favoritesString = sharedPreferences.getString("favorites", "");
+            favoritesArray = null;
+            if (favoritesString != null) {
+                favoritesArray = new ArrayList<>(Arrays.asList(favoritesString.split(",")));
+            }
+            if (actionBar != null) {
+                actionBar.setTitle(getString(R.string.favorites_title));
+            }
+
+        } else {
+            filterParam = Integer.toString(menuItemItemId);
+            isFavoriteSelected = false;
+            if (actionBar != null) {
+                actionBar.setTitle(menuItem.getTitle());
+            }
+        }
+        pageNumberTV.setText(String.valueOf(pageNumber));
+        refreshListView();
+        mDrawerLayout.closeDrawers();
     }
 
     /**
@@ -302,8 +309,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             // Refresh button
             case R.id.refresh:
-                articleListView.setSelection(0);
-                updateCategories();
+                forceResetArticlePos();
                 refreshListView();
                 return true;
 
@@ -407,14 +413,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         pageNumber--;
                         pageNumberTV.setText(pageNumber.toString());
                     }
-                    articleListView.setSelection(0);
+                    forceResetArticlePos();
                     refreshListView();
                 }
             });
         } else {
             mAdapter.addAll(articles);
 
-            if(savedInstanceState != null) {
+            if (savedInstanceState != null) {
                 articleListView.setSelection(Math.max(savedInstanceState.getInt("articlePos", 0) - 2, 0));
             }
         }
@@ -463,9 +469,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onSaveInstanceState(outState);
         outState.putInt("pageNumber", pageNumber);
         outState.putInt("articlePos", articleListView.getLastVisiblePosition());
-        if(navigationView.getCheckedItem() != null) {
-            outState.putInt("category", navigationView.getCheckedItem().getOrder());
+        if (navigationView.getCheckedItem() != null) {
+            outState.putInt("categoryId", navigationView.getCheckedItem().getItemId());
         }
+    }
+
+    private void forceResetArticlePos() {
+        articleListView.setSelection(0);
+        if (savedInstanceState != null)
+            savedInstanceState.putInt("articlePos", 0);
     }
 
     /**
@@ -490,22 +502,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          */
         @Override
         public void onLoadFinished(@NonNull Loader<String> loader, String categoryData) {
-            if(!categoryData.isEmpty()) {
+            if (!categoryData.isEmpty()) {
                 try {
                     MainActivity.this.categoryData = categoryData;
                     Utils.createMenu(categoryData, navigationView.getMenu(), navigationView, mDrawerLayout);
-                    if(savedInstanceState != null && savedInstanceState.containsKey("category")) {
-                        navigationView.setCheckedItem(navigationView.getMenu().getItem(savedInstanceState.getInt("category", 0)));
-                        int id = navigationView.getCheckedItem() == null ? 0 : navigationView.getCheckedItem().getOrder();
-                        if(id != 0 && id != 1) {
-                            filterParam = String.valueOf(id - 1);
-                        } else {
-                            filterParam = "";
-                        }
-
-                        refreshListView(); // increases loading time :c
+                    if (savedInstanceState != null && savedInstanceState.containsKey("categoryId")) {
+                        int id = savedInstanceState.getInt("categoryId", -1);
+                        displayContentByMenuItem(navigationView.getMenu().findItem(id));
                     } else {
-                        navigationView.setCheckedItem(navigationView.getMenu().getItem(1));
+                        navigationView.setCheckedItem(-1);
                     }
                     loaderManager.destroyLoader(CATEGORY_LOADER_ID); // i don't want android to run this method without asking me
                 } catch (JSONException e) {
@@ -516,7 +521,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         @Override
-        public void onLoaderReset(@NonNull Loader<String> loader) { }
+        public void onLoaderReset(@NonNull Loader<String> loader) {
+        }
     }
 
 }

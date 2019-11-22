@@ -422,6 +422,7 @@ final class Utils {
             Log.e(LOG_TAG, "Failed to parse new categoryString");
         }
         if (categoryArray != null) {
+            navigationMenu.add(R.id.mainGroup, -2, 0, R.string.favorites_title);
             navigationMenu.add(R.id.mainGroup, -1, 1, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
             for (int i = 0; i < categoryArray.length(); i++) {
 

@@ -4,7 +4,6 @@
         android:id="@+id/mainGroup">
     </group>
     <group>
-        <item android:title="@string/favorites_title"
-            android:id="@+id/favorites_selectable"/>
+        <!-- items will be added in Utils.createMenu() -->
     </group>
 </menu>
