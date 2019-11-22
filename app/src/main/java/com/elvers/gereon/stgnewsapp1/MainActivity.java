@@ -209,8 +209,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
-        // Load of Article objects onto listView is requested
-        initLoaderListView();
+        // Load of Article objects onto listView is requested if there is no previous instance. Otherwise this will be handles inside CategoryCallbackHandler.onLoadFinished()
+        if(savedInstanceState == null)
+            initLoaderListView();
     }
 
     /**
@@ -254,9 +255,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     /**
      * This method is called when performing a refresh of the ListView while the Layout remains visible
      * It dumps the old Adapter and makes corrects the visibility of loadingIndicator and emptyView so make the user aware that new data is about to appear
+     * This works even if there is no old data
      */
     public void refreshListView() {
-        mAdapter.clear();
+        if(mAdapter != null)
+            mAdapter.clear();
         loadingIndicator.setVisibility(View.VISIBLE);
         initLoaderListView();
         emptyView.setVisibility(View.INVISIBLE);
