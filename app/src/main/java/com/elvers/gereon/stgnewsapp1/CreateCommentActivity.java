@@ -63,7 +63,7 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
         final ActionBar actionbar = getSupportActionBar();
         if (actionbar != null) {
             actionbar.setDisplayHomeAsUpEnabled(true);
-            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                 actionbar.setHomeAsUpIndicator(R.drawable.ic_cancel_dark);
             } else {
                 actionbar.setHomeAsUpIndicator(R.drawable.ic_cancel_light);
@@ -97,7 +97,6 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
             emailET.clearFocus();
             contentET.requestFocus();
         }
-
 
 
         alertDialogBuilder = new AlertDialog.Builder(getApplication());
@@ -180,14 +179,15 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
                             // Since the array starts at 0 but .length returns a value starting at 1, we need to subtract 1
                             String lastName = emailNameParts[emailNameParts.length - 1].toLowerCase();
                             nameAdd = firstName + "." + lastName;
-                            if (emailNameParts.length > 2){
+                            if (emailNameParts.length > 2) {
                                 Toast.makeText(getApplicationContext(), getString(R.string.name_too_long), Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Toast.makeText(getApplicationContext(), getString(R.string.first_last_name_identical), Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
-                        Log.e(LOG_TAG, "Failed to create lo-net address");
+                        Log.e(LOG_TAG, "Failed to create lo-net address: " + e.toString());
+                        e.printStackTrace();
                     }
                 }
                 emailET.setText(nameAdd);

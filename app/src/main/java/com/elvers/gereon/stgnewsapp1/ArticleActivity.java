@@ -88,7 +88,8 @@ public class ArticleActivity extends AppCompatActivity {
                 actionbar.setTitle(titleSpanned);
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Failed to get article data through regular intent");
+            Log.e(LOG_TAG, "Failed to get article data through regular intent: " + e.toString());
+            e.printStackTrace();
         }
         try {
             if (articleURI == null) {
@@ -99,7 +100,8 @@ public class ArticleActivity extends AppCompatActivity {
                 articleID = Integer.parseInt(articleIDString);
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Failed to get article data through deeplink intent");
+            Log.e(LOG_TAG, "Failed to get article data through deeplink intent: " + e.toString());
+            e.printStackTrace();
         }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -144,14 +146,14 @@ public class ArticleActivity extends AppCompatActivity {
         checkFavorite(articleIdString, favoritesList);
         if (isFavorite) {
             favoriteMenuItem.setTitle(getString(R.string.favorites_remove_action));
-            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                 favoriteMenuItem.setIcon(R.drawable.ic_star_dark);
             } else {
                 favoriteMenuItem.setIcon(R.drawable.ic_star_light);
             }
         } else {
             favoriteMenuItem.setTitle(getString(R.string.favorite_action));
-            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                 favoriteMenuItem.setIcon(R.drawable.ic_star_border_dark);
             } else {
                 favoriteMenuItem.setIcon(R.drawable.ic_star_border_light);
@@ -211,7 +213,7 @@ public class ArticleActivity extends AppCompatActivity {
                 checkFavorite(articleIdString, favoritesList);
                 if (isFavorite) {
                     unfavorite(articleIdString, favoritesList);
-                    if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                    if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                         item.setIcon(R.drawable.ic_star_border_dark);
                     } else {
                         item.setIcon(R.drawable.ic_star_border_light);
@@ -221,7 +223,7 @@ public class ArticleActivity extends AppCompatActivity {
                     Toast.makeText(getContext(), getString(R.string.removed_from_favorites), Toast.LENGTH_SHORT).show();
                 } else {
                     favorite(articleIdString, favoritesList);
-                    if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                    if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                         item.setIcon(R.drawable.ic_star_dark);
                     } else {
                         item.setIcon(R.drawable.ic_star_light);
@@ -364,6 +366,7 @@ public class ArticleActivity extends AppCompatActivity {
 
     /**
      * Save data which will be given to new instance/recreated instance of this activity; this is needed to remember to show comments after visiting the settings
+     *
      * @param outState will contain all information to pass to new instance
      */
     @Override

@@ -2,12 +2,15 @@ package com.elvers.gereon.stgnewsapp1;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import java.io.IOException;
 
 import static com.elvers.gereon.stgnewsapp1.Utils.sendComment;
 
 public class CommentPoster extends AsyncTaskLoader<Integer> {
+
+    private static final String LOG_TAG = CommentPoster.class.getSimpleName();
 
     private String mArticleId;
     private String mAuthorEmail;
@@ -17,14 +20,13 @@ public class CommentPoster extends AsyncTaskLoader<Integer> {
     /**
      * Constructing a new CommentPoster
      *
-     * @param context is the context it is loaded to
-     * @param articleId is the ID of the article the comment will be posted to
-     * @param authorName is the name of the comment poster
+     * @param context     is the context it is loaded to
+     * @param articleId   is the ID of the article the comment will be posted to
+     * @param authorName  is the name of the comment poster
      * @param authorEmail is the email of the comment poster
-     * @param content is the content of the comment
-     *
-     * When troubleshooting the request URL, place Debugger here instead of the UriBuilder to easily get requestUrl
-     *
+     * @param content     is the content of the comment
+     *                    <p>
+     *                    When troubleshooting the request URL, place Debugger here instead of the UriBuilder to easily get requestUrl
      * @author Gereon Elvers
      */
     CommentPoster(Context context, String articleId, String authorName, String authorEmail, String content) {
@@ -51,6 +53,7 @@ public class CommentPoster extends AsyncTaskLoader<Integer> {
         try {
             return sendComment(mArticleId, mAuthorName, mAuthorEmail, mContent);
         } catch (IOException e) {
+            Log.e(LOG_TAG, "Failed to post comment: " + e.toString());
             e.printStackTrace();
             return 0;
         }

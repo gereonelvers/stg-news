@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.MailTo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -20,6 +21,8 @@ import java.io.InputStream;
  * @author Gereon Elvers
  */
 public class ArticleWebViewClient extends WebViewClient {
+
+    private static final String LOG_TAG = ArticleWebViewClient.class.getSimpleName();
 
     private String darkThemeJs = "";
 
@@ -36,6 +39,7 @@ public class ArticleWebViewClient extends WebViewClient {
             in.close();
             darkThemeJs = "(function(){ " + new String(bos.toByteArray()) + " })();";
         } catch (IOException e) {
+            Log.e(LOG_TAG, "Failed to load dark theme js script: " + e.toString());
             e.printStackTrace();
         }
     }

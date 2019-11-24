@@ -14,7 +14,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,9 +31,6 @@ import java.util.List;
  * @author Gereon Elvers
  */
 public class SearchActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Article>> {
-
-    // Tag for log messages
-    private static final String LOG_TAG = SearchActivity.class.getSimpleName();
 
     // Static request URL the data will be requested from. Putting it at the top like this allow easier modification of top level domain if required
     private static final String WP_REQUEST_URL = "www.stg-sz.net";
@@ -163,11 +159,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                /*
-                 * This really, really shouldn't require a try-block, but I once managed to reach an IndexOutOfBoundsException here for some reason.
-                 * I haven't been able to reproduce it since, but I decided to keep this in a try-block anyway ¯\_(ツ)_/¯
-                 */
-                try {
+                if (mAdapter.getCount() > i) {
                     Article currentArticle = mAdapter.getItem(i);
                     Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
                     if (currentArticle != null) {
@@ -176,8 +168,6 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
                         articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
                     }
                     startActivity(articleIntent);
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "How did you even do this? OutOfBounds in SearchActivity onItemClick");
                 }
             }
         });

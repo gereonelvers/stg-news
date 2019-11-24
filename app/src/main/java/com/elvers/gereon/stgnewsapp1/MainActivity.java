@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
 
         // Load of Article objects onto listView is requested if there is no previous instance. Otherwise this will be handles inside CategoryCallbackHandler.onLoadFinished()
-        if(savedInstanceState == null)
+        if (savedInstanceState == null)
             initLoaderListView();
     }
 
@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * This works even if there is no old data
      */
     public void refreshListView() {
-        if(mAdapter != null)
+        if (mAdapter != null)
             mAdapter.clear();
         loadingIndicator.setVisibility(View.VISIBLE);
         initLoaderListView();
@@ -276,11 +276,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         articleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                /*
-                 * This really, really shouldn't require a try-block, but I once managed to reach an IndexOutOfBoundsException here for some reason.
-                 * I haven't been able to reproduce it since, but I decided to keep this in a try-block anyway ¯\_(ツ)_/¯
-                 */
-                try {
+                if (mAdapter.getCount() > i) {
                     Article currentArticle = mAdapter.getItem(i);
                     Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
                     if (currentArticle != null) {
@@ -289,8 +285,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
                     }
                     startActivity(articleIntent);
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "How did you even do this? OutOfBounds in MainActivity onItemClick");
                 }
             }
         });

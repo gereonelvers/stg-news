@@ -64,7 +64,8 @@ final class Utils {
         try {
             jsonResponse = makeHttpGetRequest(url);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem making the HTTP request.");
+            Log.e(LOG_TAG, "Problem making the HTTP request: " + e.toString());
+            e.printStackTrace();
         }
 
         // Extract relevant fields from the JSON response and create a list of {@link Article}s. Return it.
@@ -83,7 +84,8 @@ final class Utils {
         try {
             jsonResponse = makeHttpGetRequest(url);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem making the HTTP request.");
+            Log.e(LOG_TAG, "Problem making the HTTP request: " + e.toString());
+            e.printStackTrace();
         }
 
         // Extract relevant fields from the JSON response and create a list of {@link Article}s. Return it.
@@ -98,7 +100,8 @@ final class Utils {
         try {
             url = new URL(stringUrl);
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Problem building the URL ");
+            Log.e(LOG_TAG, "Problem building the URL: " + e.toString());
+            e.printStackTrace();
         }
         return url;
     }
@@ -158,7 +161,8 @@ final class Utils {
                 try {
                     articleDate = inputFormat.parse(dateStringInput, p);
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, "Error parsing dateString into format");
+                    Log.e(LOG_TAG, "Error parsing dateString into format: " + e.toString());
+                    e.printStackTrace();
                 }
                 SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy, HH:mm", Locale.getDefault());
                 String dateString = outputFormat.format(articleDate);
@@ -204,7 +208,8 @@ final class Utils {
                     }
 
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, "IMG Conversion for article " + i + " Can't parse img through betterFeaturedImage");
+                    Log.e(LOG_TAG, "IMG Conversion for article " + i + " Can't parse img through betterFeaturedImage: " + e.toString());
+                    e.printStackTrace();
                 }
 
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -236,7 +241,8 @@ final class Utils {
                 articles.add(article);
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Problem parsing article JSON");
+            Log.e(LOG_TAG, "Problem parsing article JSON: " + e.toString());
+            e.printStackTrace();
         }
         return articles;
     }
@@ -272,7 +278,8 @@ final class Utils {
                 try {
                     articleDate = inputFormat.parse(dateStringInput, p);
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, "Error parsing dateString into format");
+                    Log.e(LOG_TAG, "Error parsing dateString into format: " + e.toString());
+                    e.printStackTrace();
                 }
                 SimpleDateFormat outputFormatDate = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
                 SimpleDateFormat outputFormatTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -288,7 +295,8 @@ final class Utils {
                 comments.add(comment);
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Problem parsing comment JSON");
+            Log.e(LOG_TAG, "Problem parsing comment JSON: " + e.toString());
+            e.printStackTrace();
         }
         return comments;
     }
@@ -317,7 +325,8 @@ final class Utils {
             } catch (Exception e) {
                 // This can happen if the array of authors doesn't contain an author matching the ID of the author for a certain article.
                 // If that happens, ArticleAdapter will simply hide the author field
-                Log.e(LOG_TAG, "Finding matching author failed");
+                Log.e(LOG_TAG, "Finding matching author failed: " + e.toString());
+                e.printStackTrace();
             }
             if (currentId == authorID) {
                 try {
@@ -325,7 +334,8 @@ final class Utils {
                         authorName = currentAuthor.getString("name");
                     }
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, "Failed to get author name");
+                    Log.e(LOG_TAG, "Failed to get author name: " + e.toString());
+                    e.printStackTrace();
                 }
             }
         }
@@ -344,12 +354,14 @@ final class Utils {
         try {
             jsonResponse = makeHttpGetRequest(url);
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem making the HTTP request.", e);
+            Log.e(LOG_TAG, "Problem making the HTTP request: " + e.toString());
+            e.printStackTrace();
         }
         try {
             authorsArray = new JSONArray(jsonResponse);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Error parsing author info");
+            Log.e(LOG_TAG, "Error parsing author info: " + e.toString());
+            e.printStackTrace();
         }
     }
 
@@ -408,7 +420,8 @@ final class Utils {
         try {
             categoryResponse = client.newCall(request).execute().body().string();
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Failed to get categories from server");
+            Log.e(LOG_TAG, "Failed to get categories from server: " + e.toString());
+            e.printStackTrace();
         }
 
         return categoryResponse;
@@ -419,7 +432,8 @@ final class Utils {
         try {
             categoryArray = new JSONArray(categoryString);
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Failed to parse new categoryString");
+            Log.e(LOG_TAG, "Failed to parse new categoryString: " + e.toString());
+            e.printStackTrace();
         }
         if (categoryArray != null) {
             navigationMenu.add(R.id.mainGroup, -2, 0, R.string.favorites_title);

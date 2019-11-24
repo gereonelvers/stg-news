@@ -85,7 +85,7 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(getActivity() == null)
+        if (getActivity() == null)
             throw new RuntimeException("getActivity() returned null");
 
         // Set layout
@@ -120,7 +120,7 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
         backIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pageNumber > 1){
+                if (pageNumber > 1) {
                     pageNumber--;
                     pageNumberTV.setText(pageNumber.toString());
                     refreshListView();
@@ -163,7 +163,7 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
 
     /**
      * This method is called when creating a new CommentLoader. It creates a modified query URL (by adding the filter parameters listed below) and initializes the CommentLoader.
-     *
+     * <p>
      * Parameters:
      * {@param articleID} is the ID of the Article)
      * {@param numberOfCommentsParam} is a String containing the number of Comment objects requested from the server
@@ -191,7 +191,7 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
             loadingIndicator.setVisibility(View.GONE);
             if (pageNumber == 1) {
                 emptyView_tv.setText(getString(R.string.comments_empty_view));
-                if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                     emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_dark);
                 } else {
                     emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_light);
@@ -220,7 +220,8 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
                 }
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Can't push comments to Adapter");
+            Log.e(LOG_TAG, "Can't push comments to Adapter: " + e.toString());
+            e.printStackTrace();
         }
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
