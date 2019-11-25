@@ -65,6 +65,8 @@
         <item name="android:dialogTheme">@style/AppThemeDark.DialogTheme</item>
         <item name="alertDialogTheme">@style/AppThemeDark.DialogTheme</item>
         <item name="android:alertDialogTheme">@style/AppThemeDark.DialogTheme</item>
+
+        <item name="android:navigationBarColor">@android:color/background_dark</item>
     </style>
 
     <style name="AppThemeDark.DialogTheme" parent="Theme.AppCompat.Dialog">
