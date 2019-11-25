@@ -185,12 +185,13 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
                         } else {
                             Toast.makeText(getApplicationContext(), getString(R.string.first_last_name_identical), Toast.LENGTH_SHORT).show();
                         }
+
+                        emailET.setText(nameAdd);
                     } catch (Exception e) {
                         Log.e(LOG_TAG, "Failed to create lo-net address: " + e.toString());
                         e.printStackTrace();
                     }
                 }
-                emailET.setText(nameAdd);
             }
         });
     }
