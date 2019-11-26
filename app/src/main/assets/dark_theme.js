@@ -20,16 +20,10 @@ for (i = 0; i < textElements.length; i++) {
 }
 
 var textElements = document.getElementsByTagName('a');
-var dummy = document.createElement('dummy');
-dummy.innerHTML = textElements[3].innerHTML;
-textElements[3].parentNode.replaceChild(dummy, textElements[3]);
-var dummy = document.createElement('dummy');
-dummy.innerHTML = textElements[3].innerHTML;
-textElements[3].parentNode.replaceChild(dummy, textElements[3]);
-
-var textElements = document.getElementsByTagName('a');
 for(i = 0; i < textElements.length; i++) {
     textElements[i].style.color = link_color;
+    textElements[i].style.transition = undefined;
+    textElements[i].style.boxShadow = 'none';
 }
 
 var textElements = document.getElementsByTagName('figcaption');
