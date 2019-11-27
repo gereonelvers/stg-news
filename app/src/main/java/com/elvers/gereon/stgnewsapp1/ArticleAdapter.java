@@ -25,6 +25,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.daimajia.swipe.SwipeLayout;
+import com.elvers.gereon.stgnewsapp1.api.Article;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -3,9 +3,9 @@ package com.elvers.gereon.stgnewsapp1;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import java.util.List;
+import com.elvers.gereon.stgnewsapp1.api.Comment;
 
-import static com.elvers.gereon.stgnewsapp1.Utils.fetchCommentData;
+import java.util.List;
 
 public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     private String mUrl;
@@ -37,6 +37,6 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
         if (mUrl == null) {
             return null;
         }
-        return fetchCommentData(mUrl);
+        return Utils.fetchComments(mUrl);
     }
 }

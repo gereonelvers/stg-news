@@ -1,11 +1,11 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.api;
 
 /**
  * An {@link Article} object contains information related to a single Article.
  *
  * @author Gereon Elvers
  */
-class Article {
+public class Article {
     private int mId;
     private String mTitle;
     private String mAuthor;
@@ -25,7 +25,7 @@ class Article {
      * @param coverImage is the image URL of the cover image (if present)
      * @param category   contains the first three categories of the article (concatenated as String; ", ..." added if more than three categories are present)
      */
-    Article(int id, String title, String author, String date, String url, String coverImage, String category) {
+    public Article(int id, String title, String author, String date, String url, String coverImage, String category) {
         mId = id;
         mTitle = title;
         mAuthor = author;
@@ -39,31 +39,31 @@ class Article {
      * The following methods return the individual components of the Article (think of the Article object as a container containing the other objects)
      */
 
-    int getId() {
+    public int getId() {
         return mId;
     }
 
-    String getTitle() {
+    public String getTitle() {
         return mTitle;
     }
 
-    String getAuthor() {
+    public String getAuthor() {
         return mAuthor;
     }
 
-    String getDate() {
+    public String getDate() {
         return mDate;
     }
 
-    String getUrl() {
+    public String getUrl() {
         return mUrl;
     }
 
-    String getCoverImage() {
+    public String getCoverImage() {
         return mCoverImage;
     }
 
-    String getCategory() {
+    public String getCategory() {
         return mCategory;
     }
 

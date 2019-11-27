@@ -1,7 +1,7 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.api;
 
 
-class Comment {
+public class Comment {
     private int mId;
     private String mAuthor;
     private String mDate;
@@ -16,7 +16,7 @@ class Comment {
      * @param date       is the publication date of the Comment
      * @param content    is the content of the Comment as String
      */
-    Comment(int id, String author, String date, String time, String content) {
+    public Comment(int id, String author, String date, String time, String content) {
         mId = id;
         mAuthor = author;
         mDate = date;
@@ -28,23 +28,23 @@ class Comment {
      * The following methods return the individual components of the Comment (think of the Comment object as a container containing the other objects)
      */
 
-    int getId() {
+    public int getId() {
         return mId;
     }
 
-    String getAuthor() {
+    public String getAuthor() {
         return mAuthor;
     }
 
-    String getDate() {
+    public String getDate() {
         return mDate;
     }
 
-    String getTime(){
+    public String getTime(){
         return mTime;
     }
 
-    String getContent(){
+    public String getContent(){
         return mContent;
     }
 

@@ -35,7 +35,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONException;
+import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     String numberOfArticlesParam;
     Integer pageNumber;
     TextView pageNumberTV;
-    String categoryData = ""; // should never be null
     Menu drawerMenu;
     NavigationView navigationView;
     ArrayList<String> favoritesArray;
@@ -141,10 +141,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Initializing loaderManager
         loaderManager = getSupportLoaderManager();
 
-        // Start loading categories
-        if (categoryData.isEmpty()) // reduce loading time for revisiting activity; categories will be updated by refreshing articles
-            updateCategories();
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -171,6 +167,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Initialize page number TextView and set initial value
         pageNumberTV = findViewById(R.id.page_number_tv);
         pageNumberTV.setText(pageNumber.toString());
+
+        // Start loading categories
+        if (Utils.categoryResponse == null) // reduce loading time
+            startCategoryUpdate();
+        else if(navigationView.getMenu().size() == 0)
+            displayCachedCategories();
 
         // Implement page back-button
         ImageView backIV = findViewById(R.id.back_iv);
@@ -209,13 +211,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
-        // Load of Article objects onto listView is requested if there is no previous instance. Otherwise this will be handles inside CategoryCallbackHandler.onLoadFinished()
+        // Start loading Article objects into listView is requested if there is no previous instance. Otherwise this will be handled inside CategoryCallbackHandler.onLoadFinished()
         if (savedInstanceState == null)
             initLoaderListView();
     }
 
     /**
-     * This method is called by the navigationView click listener after categories loaded and a previous instance existed
+     * This method is called by the navigationView click listener and after categories loaded and a previous instance existed
      */
     private void displayContentByMenuItem(MenuItem menuItem) {
         navigationView.setCheckedItem(menuItem);
@@ -307,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             // Refresh button
             case R.id.refresh:
                 forceResetArticlePos();
+                startCategoryUpdate();
                 refreshListView();
                 return true;
 
@@ -411,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         pageNumberTV.setText(pageNumber.toString());
                     }
                     forceResetArticlePos();
+                    startCategoryUpdate();
                     refreshListView();
                 }
             });
@@ -478,19 +482,33 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * Starts asynchronous update of categories (menu)
+     * Starts asynchronous update of categories for navigation view
      */
-    private void updateCategories() {
+    private void startCategoryUpdate() {
         loaderManager.initLoader(CATEGORY_LOADER_ID, null, categoryCallbackHandler);
+    }
+
+    /**
+     * Adds cached categories to the navigation view
+     */
+    private void displayCachedCategories() {
+        navigationView.getMenu().clear(); // remove all items
+        Utils.createCategoryMenu(navigationView.getMenu(), navigationView, mDrawerLayout);
+        if (savedInstanceState != null && savedInstanceState.containsKey("categoryId")) {
+            int id = savedInstanceState.getInt("categoryId", -1);
+            displayContentByMenuItem(navigationView.getMenu().findItem(id));
+        } else {
+            navigationView.setCheckedItem(-1);
+        }
     }
 
     /**
      * Handles asynchronous update of categories (menu)
      */
-    private class CategoryCallbackHandler implements LoaderManager.LoaderCallbacks<String> {
+    private class CategoryCallbackHandler implements LoaderManager.LoaderCallbacks<CategoryResponse> {
         @NonNull
         @Override
-        public Loader<String> onCreateLoader(int i, @Nullable Bundle bundle) {
+        public Loader<CategoryResponse> onCreateLoader(int i, @Nullable Bundle bundle) {
             return new CategoryLoader(MainActivity.this);
         }
 
@@ -498,19 +516,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          * Put received categories into the (left) category menu
          */
         @Override
-        public void onLoadFinished(@NonNull Loader<String> loader, String categoryData) {
-            if (!categoryData.isEmpty()) {
+        public void onLoadFinished(@NonNull Loader<CategoryResponse> loader, CategoryResponse categoryData) {
+            if (!categoryData.getCategories().isEmpty()) {
                 try {
-                    MainActivity.this.categoryData = categoryData;
-                    Utils.createMenu(categoryData, navigationView.getMenu(), navigationView, mDrawerLayout);
-                    if (savedInstanceState != null && savedInstanceState.containsKey("categoryId")) {
-                        int id = savedInstanceState.getInt("categoryId", -1);
-                        displayContentByMenuItem(navigationView.getMenu().findItem(id));
-                    } else {
-                        navigationView.setCheckedItem(-1);
-                    }
+                    displayCachedCategories();
                     loaderManager.destroyLoader(CATEGORY_LOADER_ID); // i don't want android to run this method without asking me
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     Log.e(LOG_TAG, "Failed to setup article category menu: " + e.toString());
                     e.printStackTrace();
                 }
@@ -518,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         @Override
-        public void onLoaderReset(@NonNull Loader<String> loader) {
+        public void onLoaderReset(@NonNull Loader<CategoryResponse> loader) {
         }
     }
 

@@ -4,9 +4,11 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 
-public class CategoryLoader extends AsyncTaskLoader<String> {
+import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
 
-    public CategoryLoader(Context context) {
+public class CategoryLoader extends AsyncTaskLoader<CategoryResponse> {
+
+    CategoryLoader(Context context) {
         super(context);
     }
 
@@ -17,7 +19,7 @@ public class CategoryLoader extends AsyncTaskLoader<String> {
 
     @Nullable
     @Override
-    public String loadInBackground() {
-        return Utils.getCategories();
+    public CategoryResponse loadInBackground() {
+        return Utils.updateCategories();
     }
 }

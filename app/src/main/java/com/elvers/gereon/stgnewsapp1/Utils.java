@@ -11,9 +11,14 @@ import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.Menu;
 
+import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.api.AuthorResponse;
+import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
+import com.elvers.gereon.stgnewsapp1.api.Comment;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,11 +45,15 @@ final class Utils {
     // Tag for log messages
     private static final String LOG_TAG = Utils.class.getSimpleName();
 
+    private static final SimpleDateFormat wpDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMAN);
+
+    // Cached API responses
+    public static CategoryResponse categoryResponse = null;
+    private static AuthorResponse authorResponse = null;
+
     // Static request URL the list of authors will be requested from. Putting it at the top like this allows easier modification of top level domain if required.
-    private static final String AUTHOR_REQUEST_URL = "https://stg-sz.net/wp-json/wp/v2/users?per_page=99";
+    private static final String AUTHOR_REQUEST_URL = "https://stg-sz.net/wp-json/wp/v2/users?per_page=100";
     private static final String BASE_REQUEST_URL = "stg-sz.net";
-    private static JSONArray authorsArray;
-    private static String categoryResponse = "";
 
     /**
      * Create a private Utils constructor to prevent creation of a Utils object. This class is only meant to hold static variables and methods, it should not be called as an object!
@@ -55,7 +64,7 @@ final class Utils {
     /**
      * Query the WordPress site and return a list of {@link Article} objects.
      */
-    static List<Article> fetchArticleData(String requestUrl) {
+    static List<Article> fetchArticles(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
 
@@ -67,6 +76,9 @@ final class Utils {
             Log.e(LOG_TAG, "Problem making the HTTP request: " + e.toString());
             e.printStackTrace();
         }
+
+        if(jsonResponse.isEmpty())
+            return null;
 
         // Extract relevant fields from the JSON response and create a list of {@link Article}s. Return it.
         return extractArticleFeaturesFromJson(jsonResponse);
@@ -75,7 +87,7 @@ final class Utils {
     /**
      * Query the WordPress site and return a list of {@link Comment} objects.
      */
-    static List<Comment> fetchCommentData(String requestUrl) {
+    static List<Comment> fetchComments(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
 
@@ -87,6 +99,9 @@ final class Utils {
             Log.e(LOG_TAG, "Problem making the HTTP request: " + e.toString());
             e.printStackTrace();
         }
+
+        if(jsonResponse.isEmpty())
+            return null;
 
         // Extract relevant fields from the JSON response and create a list of {@link Article}s. Return it.
         return extractCommentFeaturesFromJson(jsonResponse);
@@ -123,43 +138,34 @@ final class Utils {
      * parsing the given JSON response.
      */
     private static List<Article> extractArticleFeaturesFromJson(String articleJSON) {
-        // Check for empty JSON response
-        if (articleJSON.isEmpty()) {
-            return null;
-        }
-
         List<Article> articles = new ArrayList<>();
-        authorsArray = null;
 
         try {
-            JSONArray articleArray = new JSONArray(articleJSON);
-            /* This loop iterates over the articleArray to parse the JSONArray into an array of articles */
-            for (int i = 0; i < articleArray.length(); i++) {
+            JSONArray array = new JSONArray(articleJSON);
+            /* This loop iterates over the array to parse the JSONArray into an array of articles */
+            for (int i = 0; i < array.length(); i++) {
 
                 // Get current Article from Array
-                JSONObject currentArticle = articleArray.getJSONObject(i);
+                JSONObject article = array.getJSONObject(i);
 
                 // Get WordPress Article ID
-                int id = currentArticle.getInt("id");
+                int id = article.getInt("id");
 
                 // Get article URL
-                String urlString = currentArticle.getString("link");
+                String urlString = article.getString("link");
 
                 // Get article title
-                JSONObject title = currentArticle.getJSONObject("title");
-                String titleString = title.getString("rendered");
+                String titleString = article.getJSONObject("title").getString("rendered");
 
                 // Get article author
-                int authorID = currentArticle.getInt("author");
-                String authorString = getAuthorName(authorID);
+                String authorString = getAuthorName(article.getInt("author"));
 
                 // Get article date
-                String dateStringInput = currentArticle.getString("date");
-                ParsePosition p = new ParsePosition(0);
-                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMAN);
+                String dateStringInput = article.getString("date");
+
                 Date articleDate = null;
                 try {
-                    articleDate = inputFormat.parse(dateStringInput, p);
+                    articleDate = wpDateFormat.parse(dateStringInput, new ParsePosition(0));
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "Error parsing dateString into format: " + e.toString());
                     e.printStackTrace();
@@ -176,7 +182,7 @@ final class Utils {
                 String imageUrlString = "";
                 JSONObject imgObj = null;
                 try {
-                    JSONObject betterFeaturedImage = currentArticle.getJSONObject("better_featured_image");
+                    JSONObject betterFeaturedImage = article.getJSONObject("better_featured_image");
                     if (!isHighRes) {
                         JSONObject media_details = betterFeaturedImage.getJSONObject("media_details");
                         JSONObject sizes = media_details.getJSONObject("sizes");
@@ -212,33 +218,28 @@ final class Utils {
                     e.printStackTrace();
                 }
 
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-                JSONArray categoryJSONArray = new JSONArray(sharedPreferences.getString("categoryJSONString", "[{\"id\":1,\"count\":5,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/andere\\/\",\"name\":\"Andere\",\"slug\":\"andere\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/1\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=1\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":12,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/damals\\/\",\"name\":\"Damals\",\"slug\":\"damals\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/12\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=12\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":7,\"count\":3,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/interviews\\/\",\"name\":\"Interviews\",\"slug\":\"interviews\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/7\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=7\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":5,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/fahrten\\/\",\"name\":\"Klassenfahrten\",\"slug\":\"fahrten\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/5\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=5\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":4,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/kultur\\/\",\"name\":\"Kultur\",\"slug\":\"kultur\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/4\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=4\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":11,\"count\":2,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/lehrer\\/\",\"name\":\"Lehrerportraits\",\"slug\":\"lehrer\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/11\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=11\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":8,\"count\":1,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/meinung\\/\",\"name\":\"Nachgedacht - Ansichtssache\",\"slug\":\"meinung\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/8\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=8\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":6,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sv\\/\",\"name\":\"News der SV\",\"slug\":\"sv\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/6\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=6\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":3,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/sport\\/\",\"name\":\"Sport\",\"slug\":\"sport\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/3\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=3\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}},{\"id\":13,\"count\":0,\"description\":\"\",\"link\":\"https:\\/\\/stg-sz.net\\/posts\\/category\\/testcat1\\/\",\"name\":\"TestCat1\",\"slug\":\"testcat1\",\"taxonomy\":\"category\",\"parent\":0,\"meta\":[],\"_links\":{\"self\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\\/13\"}],\"collection\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/categories\"}],\"about\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/taxonomies\\/category\"}],\"wp:post_type\":[{\"href\":\"https:\\/\\/stg-sz.net\\/wp-json\\/wp\\/v2\\/posts?categories=13\"}],\"curies\":[{\"name\":\"wp\",\"href\":\"https:\\/\\/api.w.org\\/{rel}\",\"templated\":true}]}}]"));
-                JSONArray articleCategoryArray = currentArticle.getJSONArray("categories");
+                if(categoryResponse == null)
+                    updateCategories();
 
                 StringBuilder categoryString = new StringBuilder();
                 boolean isFirstCategory = true;
 
-                for (int q = 0; q < categoryJSONArray.length(); q++) {
-                    JSONObject currentCategory = categoryJSONArray.getJSONObject(q);
-                    int cat1 = currentCategory.getInt("id");
-                    for (int w = 0; w < articleCategoryArray.length(); w++) {
-                        int currentArticleCat = articleCategoryArray.getInt(w);
-                        if (cat1 == currentArticleCat) {
-                            if (isFirstCategory) {
-                                categoryString.append(currentCategory.getString("name"));
-                                isFirstCategory = false;
-                            } else {
-                                categoryString.append(", ").append(currentCategory.getString("name"));
-                            }
+                JSONArray articleCategoryArray = article.getJSONArray("categories");
+                for(int j = 0; j < articleCategoryArray.length(); j++) {
+                    int targetCategoryId = articleCategoryArray.getInt(j);
+                    CategoryResponse.Category category = categoryResponse.getCategoryById(targetCategoryId);
+                    if(category != null) {
+                        if(isFirstCategory) {
+                            categoryString.append(category.name);
+                            isFirstCategory = false;
+                        } else {
+                            categoryString.append(", ").append(category.name);
                         }
                     }
                 }
 
-
                 /* After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the array */
-                Article article = new Article(id, titleString, authorString, dateString, urlString, imageUrlString, categoryString.toString());
-                articles.add(article);
+                articles.add(new Article(id, titleString, authorString, dateString, urlString, imageUrlString, categoryString.toString()));
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "Problem parsing article JSON: " + e.toString());
@@ -248,21 +249,16 @@ final class Utils {
     }
 
     private static List<Comment> extractCommentFeaturesFromJson(String commentJSON) {
-
-        if (commentJSON.isEmpty()) {
-            return null;
-        }
-
         List<Comment> comments = new ArrayList<>();
 
         // Check for empty JSON response
         try {
-            JSONArray commentArray = new JSONArray(commentJSON);
-            /* This loop iterates over the commentArray to parse the JSONArray into an array of Comments */
-            for (int i = 0; i < commentArray.length(); i++) {
+            JSONArray rawComments = new JSONArray(commentJSON);
+            /* This loop iterates over the rawComments to parse the JSONArray into an rawComments of Comments */
+            for (int i = 0; i < rawComments.length(); i++) {
 
                 // Get current Comment from Array
-                JSONObject currentComment = commentArray.getJSONObject(i);
+                JSONObject currentComment = rawComments.getJSONObject(i);
 
                 // Get WordPress Comment ID
                 int id = currentComment.getInt("id");
@@ -272,11 +268,9 @@ final class Utils {
 
                 // Get article date
                 String dateStringInput = currentComment.getString("date");
-                ParsePosition p = new ParsePosition(0);
-                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMAN);
                 Date articleDate = null;
                 try {
-                    articleDate = inputFormat.parse(dateStringInput, p);
+                    articleDate = wpDateFormat.parse(dateStringInput, new ParsePosition(0));
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "Error parsing dateString into format: " + e.toString());
                     e.printStackTrace();
@@ -290,9 +284,8 @@ final class Utils {
                 String contentString = content.getString("rendered");
 
 
-                /* After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the array */
-                Comment comment = new Comment(id, authorString, dateString, timeString, contentString);
-                comments.add(comment);
+                /* After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the rawComments */
+                comments.add(new Comment(id, authorString, dateString, timeString, contentString));
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "Problem parsing comment JSON: " + e.toString());
@@ -304,43 +297,24 @@ final class Utils {
     /**
      * Since the WordPress API only provides author ID (not the complete name), the process to retrieve names is a little more intricate, which is why it's moved into a separate method.
      * <p>
-     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once per request (in getAuthorData())
+     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once per request (in updateAuthors())
      * The array is then stored as authorsArray. extractArticleFeaturesFromJson() then retrieves the author ID from currentArticle and iterates against authorsArray until a match is found.
      */
     private static String getAuthorName(int authorID) {
-        String authorName = "";
-
         // Fill authorsArray with author data (if it's empty)
-        if (authorsArray == null) {
-            getAuthorData();
+        if (authorResponse == null) {
+            updateAuthors();
         }
 
-        // Iterate over authorsArray until currentId (the author ID of currentArticle) matches authorID (the changing ID of the authors in authorsArray)
-        for (int i = 0; i < authorsArray.length(); i++) {
-            int currentId = 0;
-            JSONObject currentAuthor = null;
-            try {
-                currentAuthor = authorsArray.getJSONObject(i);
-                currentId = currentAuthor.getInt("id");
-            } catch (Exception e) {
-                // This can happen if the array of authors doesn't contain an author matching the ID of the author for a certain article.
-                // If that happens, ArticleAdapter will simply hide the author field
-                Log.e(LOG_TAG, "Finding matching author failed: " + e.toString());
-                e.printStackTrace();
-            }
-            if (currentId == authorID) {
-                try {
-                    if (currentAuthor != null) {
-                        authorName = currentAuthor.getString("name");
-                    }
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "Failed to get author name: " + e.toString());
-                    e.printStackTrace();
-                }
+        // Iterate over authorsResponse until the author ID of currentArticle matches the changing ID of the authors in authorsResponse
+        for (int i = 0; i < authorResponse.getAuthors().size(); i++) {
+            AuthorResponse.Author author = authorResponse.getAuthors().get(i);
+            if(author.id == authorID) {
+                return author.name;
             }
         }
 
-        return authorName;
+        return "";
     }
 
 
@@ -348,7 +322,7 @@ final class Utils {
      * Request an array of authors from AUTHOR_REQUEST_URL
      * Necessary to correctly display author name in article listview
      */
-    private static void getAuthorData() {
+    private static void updateAuthors() {
         URL url = createUrl(AUTHOR_REQUEST_URL);
         String jsonResponse = null;
         try {
@@ -358,7 +332,7 @@ final class Utils {
             e.printStackTrace();
         }
         try {
-            authorsArray = new JSONArray(jsonResponse);
+            authorResponse = new AuthorResponse(jsonResponse);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error parsing author info: " + e.toString());
             e.printStackTrace();
@@ -377,7 +351,7 @@ final class Utils {
         uriBuilder.appendQueryParameter("post", id)
                 .appendQueryParameter("author_name", authorName)
                 .appendQueryParameter("author_email", authorEmail)
-                .appendQueryParameter("content", content);
+                .appendQueryParameter("content", content); // hopefully this is url encoded
         URL url = createUrl(uriBuilder.toString());
         return makeHttpPostRequest(url);
     }
@@ -403,62 +377,48 @@ final class Utils {
         return responseCode;
     }
 
-
-    static String getCategories() {
+    static CategoryResponse updateCategories() {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder
-                .scheme("https")
+                .scheme("http") // use http here for less request time TODO should be overridable by some option called "force https"
                 .authority(BASE_REQUEST_URL)
                 .appendPath("wp-json")
                 .appendPath("wp")
                 .appendPath("v2")
                 .appendPath("categories")
-                .appendQueryParameter("per_page", "99");
+                .appendQueryParameter("per_page", "100");
         URL requestURL = createUrl(uriBuilder.toString());
         OkHttpClient client = new OkHttpClient();
         final Request request = new Request.Builder().url(requestURL).build();
         try {
-            categoryResponse = client.newCall(request).execute().body().string();
-        } catch (IOException e) {
+            Response response = client.newCall(request).execute();
+            categoryResponse = new CategoryResponse(response.body().string());
+            int count = Integer.parseInt(response.header("x-wp-total"));
+            if(count > 100) {
+                Log.e(LOG_TAG, "Could not get all categories (total of " + count + ")");
+            }
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Failed to get categories from server: " + e.toString());
             e.printStackTrace();
         }
-
         return categoryResponse;
     }
 
-    static void createMenu(String categoryString, Menu navigationMenu, NavigationView navigationView, DrawerLayout drawerLayout) throws JSONException {
-        JSONArray categoryArray = null;
-        try {
-            categoryArray = new JSONArray(categoryString);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "Failed to parse new categoryString: " + e.toString());
-            e.printStackTrace();
-        }
-        if (categoryArray != null) {
+    static void createCategoryMenu(Menu navigationMenu, NavigationView navigationView, DrawerLayout drawerLayout) {
+        if(categoryResponse != null) {
             navigationMenu.add(R.id.mainGroup, -2, 0, R.string.favorites_title);
             navigationMenu.add(R.id.mainGroup, -1, 1, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
-            for (int i = 0; i < categoryArray.length(); i++) {
-
-                // Get current category from Array
-                JSONObject currentCategory = categoryArray.getJSONObject(i);
-
-                // Get WordPress category ID
-                int id = currentCategory.getInt("id");
-
-                // Get category name
-                String name = currentCategory.getString("name");
-
-                navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/id, /*Order*/i + 2, /*name*/name);
-            }
-
-            for (int j = 0; j < navigationMenu.size(); j++) {
-                navigationMenu.getItem(j).setCheckable(true);
+            for(int i = 0; i < categoryResponse.getCategories().size(); i++) {
+                CategoryResponse.Category category = categoryResponse.getCategories().get(i);
+                navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/category.id, /*Order*/i + 2, /*name*/category.name);
+                navigationMenu.getItem(i).setCheckable(true);
             }
 
             navigationView.invalidate();
             drawerLayout.invalidate();
             drawerLayout.requestLayout();
+        } else {
+            Log.e(LOG_TAG, "Failed to create category menu: no category response");
         }
     }
 

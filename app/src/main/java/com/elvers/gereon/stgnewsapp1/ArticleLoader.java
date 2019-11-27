@@ -3,9 +3,9 @@ package com.elvers.gereon.stgnewsapp1;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import java.util.List;
+import com.elvers.gereon.stgnewsapp1.api.Article;
 
-import static com.elvers.gereon.stgnewsapp1.Utils.fetchArticleData;
+import java.util.List;
 
 /**
  * Loads a list of Article objects using an AsyncTask to perform the network request to the given URL.
@@ -42,6 +42,6 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
         if (mUrl == null) {
             return null;
         }
-        return fetchArticleData(mUrl);
+        return Utils.fetchArticles(mUrl);
     }
 }
