@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -23,13 +23,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.fragments.ArticleFragment;
+import com.elvers.gereon.stgnewsapp1.fragments.CommentsFragment;
+import com.elvers.gereon.stgnewsapp1.utils.ContextApp;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
-
-import static com.elvers.gereon.stgnewsapp1.ContextApp.getContext;
-
 
 /**
  * Activity that manages displaying the selected Article
@@ -43,17 +46,17 @@ public class ArticleActivity extends AppCompatActivity {
 
     /* There are a lot of items declared outside of individual methods here.
     This is done because they are required to be available across methods and it's more economical to simply initialize them onCreate()*/
-    int articleID;
-    boolean isComments;
-    FragmentManager fragmentManager;
-    FloatingActionButton fab;
-    String articleURI;
-    Drawable ic_chat;
-    Drawable ic_plus;
-    String titleString;
-    SharedPreferences sharedPreferences;
-    boolean isFavorite;
-    String articleIdString;
+    public int articleID;
+    public boolean isComments;
+    public FragmentManager fragmentManager;
+    public FloatingActionButton fab;
+    public String articleURI;
+    public Drawable ic_chat;
+    public Drawable ic_plus;
+    public String titleString;
+    public SharedPreferences sharedPreferences;
+    public boolean isFavorite;
+    public String articleIdString;
     private List<String> favoritesList;
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -220,7 +223,7 @@ public class ArticleActivity extends AppCompatActivity {
                     }
                     item.setTitle(getString(R.string.favorite_action));
                     checkFavorite(articleIdString, favoritesList);
-                    Toast.makeText(getContext(), getString(R.string.removed_from_favorites), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ContextApp.getContext(), getString(R.string.removed_from_favorites), Toast.LENGTH_SHORT).show();
                 } else {
                     favorite(articleIdString, favoritesList);
                     if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
@@ -230,7 +233,7 @@ public class ArticleActivity extends AppCompatActivity {
                     }
                     item.setTitle(getString(R.string.favorites_remove_action));
                     checkFavorite(articleIdString, favoritesList);
-                    Toast.makeText(getContext(), getString(R.string.added_to_favorites), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ContextApp.getContext(), getString(R.string.added_to_favorites), Toast.LENGTH_SHORT).show();
                 }
                 return true;
 

@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".ContextApp"
+        android:name=".utils.ContextApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,7 +16,7 @@
             android:name="android.app.default_searchable"
             android:value=".SearchActivity" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".SearchActivity" />
@@ -30,10 +30,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ArticleActivity">
+        <activity android:name=".activities.ArticleActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.MainActivity" />
+                android:value="com.elvers.gereon.stgnewsapp1.activities.MainActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -59,13 +59,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SearchActivity"
+            android:name=".activities.SearchActivity"
             android:label="@string/title_activity_search"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.MainActivity" />
+                android:value="com.elvers.gereon.stgnewsapp1.activities.MainActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -78,28 +78,28 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".AboutActivity"
+            android:name=".activities.AboutActivity"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.MainActivity" />
+                android:value="com.elvers.gereon.stgnewsapp1.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.MainActivity" />
+                android:value="com.elvers.gereon.stgnewsapp1.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".CreateCommentActivity"
+            android:name=".activities.CreateCommentActivity"
             android:label="@string/title_activity_create_comment"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.ArticleActivity" />
+                android:value="com.elvers.gereon.stgnewsapp1.activities.ArticleActivity" />
         </activity>
     </application>
 

@@ -1,9 +1,13 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.fragments.SettingsFragment;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 /**
  * Activity that manages the settings displayed within the App

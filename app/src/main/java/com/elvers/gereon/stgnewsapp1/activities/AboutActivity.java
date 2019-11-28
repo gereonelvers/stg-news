@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.activities;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.utils.ArticleWebViewClient;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 /**
  * Activity that shows "About" information like sources and feedback links
@@ -20,8 +23,8 @@ import android.webkit.WebView;
  */
 public class AboutActivity extends AppCompatActivity {
 
-    static final String ABOUT_URL = "https://stg-sz.net/ueber-uns/?inapp";
-    WebView webView;
+    public static final String ABOUT_URL = "https://stg-sz.net/ueber-uns/?inapp";
+    public WebView webView;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override

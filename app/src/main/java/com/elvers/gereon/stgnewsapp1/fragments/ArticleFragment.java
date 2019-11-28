@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.utils.ArticleWebViewClient;
 
 /**
  * Fragment that manages loading and displaying the requested article
@@ -19,8 +21,8 @@ import android.webkit.WebView;
  */
 public class ArticleFragment extends Fragment {
 
-    View loadingIndicator;
-    WebView webView;
+    public View loadingIndicator;
+    public WebView webView;
     private String articleURI;
 
     // Required empty public constructor

@@ -14,7 +14,7 @@ public class CategoryResponse {
     public CategoryResponse(String json) throws JSONException {
         JSONArray array = new JSONArray(json);
 
-        for(int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++) {
             JSONObject category = array.getJSONObject(i);
             categories.add(new Category(
                     category.getInt("id"),
@@ -31,8 +31,8 @@ public class CategoryResponse {
     }
 
     public Category getCategoryById(int id) {
-        for(Category category : categories) {
-            if(category.id == id)
+        for (Category category : categories) {
+            if (category.id == id)
                 return category;
         }
         return null;

@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.api.Comment;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
      *
      * @author Gereon Elvers
      */
-    CommentAdapter(Context context, List<Comment> comments) {
+    public CommentAdapter(Context context, List<Comment> comments) {
         super(context, 0, comments);
     }
 
@@ -47,7 +48,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
 
         // Get current Comment from the list
         Comment currentComment = getItem(position);
-        Log.i(LOG_TAG, "Reached getView for item "+ position);
+        Log.i(LOG_TAG, "Reached getView for item " + position);
 
         /* The code below applies the info from the Comment to the listItemView */
         if (currentComment != null) {

@@ -15,7 +15,7 @@ public class AuthorResponse {
 
     public AuthorResponse(String json) throws JSONException {
         JSONArray array = new JSONArray(json);
-        for(int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++) {
             JSONObject author = array.getJSONObject(i);
             authors.add(new Author(
                     author.getInt("id"),
@@ -28,8 +28,8 @@ public class AuthorResponse {
     }
 
     public Author getAuthorBySlug(String slug) {
-        for(Author author : authors) {
-            if(author.slug.equals(slug))
+        for (Author author : authors) {
+            if (author.slug.equals(slug))
                 return author;
         }
         return null;

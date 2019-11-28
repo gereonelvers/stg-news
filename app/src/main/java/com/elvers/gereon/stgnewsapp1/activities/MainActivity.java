@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.activities;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -35,8 +35,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.adapter.ArticleAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Article;
 import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
+import com.elvers.gereon.stgnewsapp1.tasks.ArticleLoader;
+import com.elvers.gereon.stgnewsapp1.tasks.CategoryLoader;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -171,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Start loading categories
         if (Utils.categoryResponse == null) // reduce loading time
             startCategoryUpdate();
-        else if(navigationView.getMenu().size() == 0)
+        else if (navigationView.getMenu().size() == 0)
             displayCachedCategories();
 
         // Implement page back-button

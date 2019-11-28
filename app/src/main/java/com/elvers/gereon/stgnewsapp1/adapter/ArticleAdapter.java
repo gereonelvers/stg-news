@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,13 +25,13 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.daimajia.swipe.SwipeLayout;
+import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.api.Article;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
-
 
 /**
  * Custom Adapter that adapts a List of Articles onto a given ListView
@@ -52,7 +52,7 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
      * {@param context} because it interacts with the layout and
      * {@param articles} a list of Articles  as a data source
      */
-    ArticleAdapter(Context context, List<Article> articles) {
+    public ArticleAdapter(Context context, List<Article> articles) {
         super(context, 0, articles);
     }
 
@@ -153,13 +153,13 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
 
             // Initialize drawables to save resources for repeated uses
             final Drawable star;
-            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                 star = getContext().getResources().getDrawable(R.drawable.ic_star_dark);
             } else {
                 star = getContext().getResources().getDrawable(R.drawable.ic_star_light);
             }
             final Drawable unstar;
-            if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
                 unstar = getContext().getResources().getDrawable(R.drawable.ic_star_border_dark);
             } else {
                 unstar = getContext().getResources().getDrawable(R.drawable.ic_star_border_light);

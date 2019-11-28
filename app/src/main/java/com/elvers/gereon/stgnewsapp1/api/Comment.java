@@ -11,10 +11,10 @@ public class Comment {
     /**
      * Constructs a new {@link Comment} object.
      *
-     * @param id         is the WordPress assigned comment ID of the comment
-     * @param author     is the author of the Comment
-     * @param date       is the publication date of the Comment
-     * @param content    is the content of the Comment as String
+     * @param id      is the WordPress assigned comment ID of the comment
+     * @param author  is the author of the Comment
+     * @param date    is the publication date of the Comment
+     * @param content is the content of the Comment as String
      */
     public Comment(int id, String author, String date, String time, String content) {
         mId = id;
@@ -40,11 +40,11 @@ public class Comment {
         return mDate;
     }
 
-    public String getTime(){
+    public String getTime() {
         return mTime;
     }
 
-    public String getContent(){
+    public String getContent() {
         return mContent;
     }
 

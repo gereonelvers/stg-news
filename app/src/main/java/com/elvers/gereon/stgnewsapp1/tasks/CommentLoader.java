@@ -1,9 +1,10 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.tasks;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.elvers.gereon.stgnewsapp1.api.Comment;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.List;
 
@@ -15,12 +16,11 @@ public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
      *
      * @param url     is the URL the data is loaded from
      * @param context is the context it is loaded to
-     *
-     * When troubleshooting the request URL, place Debugger here instead of the UriBuilder to easily get requestUrl
-     *
+     *                <p>
+     *                When troubleshooting the request URL, place Debugger here instead of the UriBuilder to easily get requestUrl
      * @author Gereon Elvers
      */
-    CommentLoader(Context context, String url) {
+    public CommentLoader(Context context, String url) {
         super(context);
         mUrl = url;
     }

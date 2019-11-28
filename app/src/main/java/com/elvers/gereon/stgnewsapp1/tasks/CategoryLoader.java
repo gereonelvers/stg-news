@@ -1,14 +1,15 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.tasks;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 public class CategoryLoader extends AsyncTaskLoader<CategoryResponse> {
 
-    CategoryLoader(Context context) {
+    public CategoryLoader(Context context) {
         super(context);
     }
 

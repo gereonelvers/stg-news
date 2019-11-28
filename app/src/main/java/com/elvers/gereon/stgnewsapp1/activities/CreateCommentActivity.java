@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -22,6 +22,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.tasks.CommentPoster;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 /**
  * Activity that manages creating and posting a comment

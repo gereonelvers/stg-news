@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.activities;
 
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
@@ -21,7 +21,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.adapter.ArticleAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.tasks.ArticleLoader;
+import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

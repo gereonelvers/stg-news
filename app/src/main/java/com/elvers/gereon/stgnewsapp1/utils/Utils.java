@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.Menu;
 
+import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.api.Article;
 import com.elvers.gereon.stgnewsapp1.api.AuthorResponse;
 import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
@@ -40,7 +41,7 @@ import java.util.Locale;
  *
  * @author Gereon Elvers
  */
-final class Utils {
+public final class Utils {
 
     // Tag for log messages
     private static final String LOG_TAG = Utils.class.getSimpleName();
@@ -64,7 +65,7 @@ final class Utils {
     /**
      * Query the WordPress site and return a list of {@link Article} objects.
      */
-    static List<Article> fetchArticles(String requestUrl) {
+    public static List<Article> fetchArticles(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
 
@@ -77,7 +78,7 @@ final class Utils {
             e.printStackTrace();
         }
 
-        if(jsonResponse.isEmpty())
+        if (jsonResponse.isEmpty())
             return null;
 
         // Extract relevant fields from the JSON response and create a list of {@link Article}s. Return it.
@@ -87,7 +88,7 @@ final class Utils {
     /**
      * Query the WordPress site and return a list of {@link Comment} objects.
      */
-    static List<Comment> fetchComments(String requestUrl) {
+    public static List<Comment> fetchComments(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
 
@@ -100,7 +101,7 @@ final class Utils {
             e.printStackTrace();
         }
 
-        if(jsonResponse.isEmpty())
+        if (jsonResponse.isEmpty())
             return null;
 
         // Extract relevant fields from the JSON response and create a list of {@link Article}s. Return it.
@@ -218,18 +219,18 @@ final class Utils {
                     e.printStackTrace();
                 }
 
-                if(categoryResponse == null)
+                if (categoryResponse == null)
                     updateCategories();
 
                 StringBuilder categoryString = new StringBuilder();
                 boolean isFirstCategory = true;
 
                 JSONArray articleCategoryArray = article.getJSONArray("categories");
-                for(int j = 0; j < articleCategoryArray.length(); j++) {
+                for (int j = 0; j < articleCategoryArray.length(); j++) {
                     int targetCategoryId = articleCategoryArray.getInt(j);
                     CategoryResponse.Category category = categoryResponse.getCategoryById(targetCategoryId);
-                    if(category != null) {
-                        if(isFirstCategory) {
+                    if (category != null) {
+                        if (isFirstCategory) {
                             categoryString.append(category.name);
                             isFirstCategory = false;
                         } else {
@@ -309,7 +310,7 @@ final class Utils {
         // Iterate over authorsResponse until the author ID of currentArticle matches the changing ID of the authors in authorsResponse
         for (int i = 0; i < authorResponse.getAuthors().size(); i++) {
             AuthorResponse.Author author = authorResponse.getAuthors().get(i);
-            if(author.id == authorID) {
+            if (author.id == authorID) {
                 return author.name;
             }
         }
@@ -343,7 +344,7 @@ final class Utils {
      * This is the method that gets called when a comment is submitted though CreateCommentActivity.
      * It handles posting said comment and returns a http status code.
      */
-    static int sendComment(String id, String authorName, String authorEmail, String content) throws IOException {
+    public static int sendComment(String id, String authorName, String authorEmail, String content) throws IOException {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(BASE_REQUEST_URL);
@@ -377,7 +378,7 @@ final class Utils {
         return responseCode;
     }
 
-    static CategoryResponse updateCategories() {
+    public static CategoryResponse updateCategories() {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder
                 .scheme("http") // use http here for less request time TODO should be overridable by some option called "force https"
@@ -394,7 +395,7 @@ final class Utils {
             Response response = client.newCall(request).execute();
             categoryResponse = new CategoryResponse(response.body().string());
             int count = Integer.parseInt(response.header("x-wp-total"));
-            if(count > 100) {
+            if (count > 100) {
                 Log.e(LOG_TAG, "Could not get all categories (total of " + count + ")");
             }
         } catch (Exception e) {
@@ -404,13 +405,13 @@ final class Utils {
         return categoryResponse;
     }
 
-    static void createCategoryMenu(Menu navigationMenu, NavigationView navigationView, DrawerLayout drawerLayout) {
-        if(categoryResponse != null) {
+    public static void createCategoryMenu(Menu navigationMenu, NavigationView navigationView, DrawerLayout drawerLayout) {
+        if (categoryResponse != null) {
             navigationMenu.add(R.id.mainGroup, -2, 0, R.string.favorites_title);
             navigationMenu.getItem(0).setCheckable(true);
             navigationMenu.add(R.id.mainGroup, -1, 1, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
             navigationMenu.getItem(1).setCheckable(true);
-            for(int i = 0; i < categoryResponse.getCategories().size(); i++) {
+            for (int i = 0; i < categoryResponse.getCategories().size(); i++) {
                 CategoryResponse.Category category = categoryResponse.getCategories().get(i);
                 navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/category.id, /*Order*/i + 2, /*name*/category.name);
                 navigationMenu.getItem(i + 2).setCheckable(true);
@@ -429,7 +430,7 @@ final class Utils {
      *
      * @param activity activity to update
      */
-    static void updateNightMode(Activity activity) {
+    public static void updateNightMode(Activity activity) {
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             activity.setTheme(R.style.AppThemeDark);
         } else {
@@ -440,7 +441,7 @@ final class Utils {
     /**
      * Sets night mode state which is used to determine which theme should be used for all activities
      */
-    static void updateGlobalNightMode(Activity activity) {
+    public static void updateGlobalNightMode(Activity activity) {
         AppCompatDelegate.setDefaultNightMode(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("dark_mode", false) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
     }
 

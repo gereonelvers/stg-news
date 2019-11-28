@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +28,7 @@ public class ArticleWebViewClient extends WebViewClient {
 
     private String darkThemeJs = "";
 
-    ArticleWebViewClient(AssetManager assetManager) {
+    public ArticleWebViewClient(AssetManager assetManager) {
         try {
             InputStream in = assetManager.open("dark_theme.js");
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -56,7 +56,7 @@ public class ArticleWebViewClient extends WebViewClient {
         URL url;
         try {
             url = new URL(urlStr);
-        } catch(MalformedURLException e) {
+        } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Tried to parse invalid URL: " + e.toString());
             e.printStackTrace();
             return false;
@@ -74,10 +74,10 @@ public class ArticleWebViewClient extends WebViewClient {
         // If the URL contains stg-sz.net it will be loaded inside the WebView
         else if (urlStr.contains("stg-sz.net")) {
             String[] parts = url.getPath().split("/");
-            if(parts[2].equalsIgnoreCase("author")) { // filter by author
+            if (parts[2].equalsIgnoreCase("author")) { // filter by author
                 int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).id;
                 //TODO display articles by author
-            } else if(parts[2].startsWith("20")) { // filter by date
+            } else if (parts[2].startsWith("20")) { // filter by date
                 //TODO display articles by date
             } else {
                 if (!urlStr.contains("inapp")) {

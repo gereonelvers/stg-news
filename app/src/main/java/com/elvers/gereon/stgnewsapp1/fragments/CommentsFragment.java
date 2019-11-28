@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -20,7 +20,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.elvers.gereon.stgnewsapp1.R;
+import com.elvers.gereon.stgnewsapp1.adapter.CommentAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Comment;
+import com.elvers.gereon.stgnewsapp1.tasks.CommentLoader;
 
 import java.util.ArrayList;
 import java.util.List;

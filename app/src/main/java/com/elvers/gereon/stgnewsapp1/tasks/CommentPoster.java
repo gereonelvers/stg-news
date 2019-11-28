@@ -1,4 +1,4 @@
-package com.elvers.gereon.stgnewsapp1;
+package com.elvers.gereon.stgnewsapp1.tasks;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
@@ -6,7 +6,7 @@ import android.util.Log;
 
 import java.io.IOException;
 
-import static com.elvers.gereon.stgnewsapp1.Utils.sendComment;
+import static com.elvers.gereon.stgnewsapp1.utils.Utils.sendComment;
 
 public class CommentPoster extends AsyncTaskLoader<Integer> {
 
@@ -29,7 +29,7 @@ public class CommentPoster extends AsyncTaskLoader<Integer> {
      *                    When troubleshooting the request URL, place Debugger here instead of the UriBuilder to easily get requestUrl
      * @author Gereon Elvers
      */
-    CommentPoster(Context context, String articleId, String authorName, String authorEmail, String content) {
+    public CommentPoster(Context context, String articleId, String authorName, String authorEmail, String content) {
         super(context);
         mArticleId = articleId;
         mAuthorName = authorName;
