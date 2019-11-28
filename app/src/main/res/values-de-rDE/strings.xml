@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">STG Schülerzeitung</string>
-    <string name="no_articles">Keine Artikel gefunden.\nÜberprüfe deine Netzwerkverbindung.</string>
+    <string name="no_articles">Keine Artikel gefunden.</string>
+    <string name="no_articles_network">Keine Artikel gefunden.\nÜberprüfe deine Netzwerkverbindung.</string>
     <string name="no_articles_search">Keine Artikel gefunden.\nVersuch einen anderen Suchbegriff!</string>
     <string name="no_articles_page">Keine weiteren Artikel gefunden.\nTippe hier, um zur Liste zurückzukehren.</string>
     <string name="no_articles_search_page">Keine weiteren Artikel gefunden.\nTippe hier, um zu den Suchergebnissen zurückzukehren.</string>
@@ -37,6 +38,7 @@
     <string name="img_settings_summary">Lade Originalbilder. Sieht besser aus, verlangsamt jedoch möglicherweise die App und verbraucht mehr Daten.</string>
     <string name="post_number_title">Anzahl an Beiträgen</string>
     <string name="post_number_summary">Beiträge, die auf der Startseite und in der Suche geladen werden.</string>
+    <string name="dark_mode_title">Dunkler Modus</string>
 
     <string name="comments_string">Kommentare:</string>
     <string name="comments_number_title">Anzahl an Kommentaren</string>

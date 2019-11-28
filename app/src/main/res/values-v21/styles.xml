@@ -1,12 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Base application theme -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+
+        <item name="listItemBackground">@android:drawable/dialog_holo_light_frame</item>
+
+        <item name="textColorArticleTitle">@android:color/white</item>
+        <item name="textColorArticleAuthor">@android:color/secondary_text_light</item>
+        <item name="textColorHint">@android:color/secondary_text_light_nodisable</item>
+
+        <item name="iconAutoFix">@drawable/ic_auto_fix</item>
+        <item name="iconSearch">@drawable/ic_search_light</item>
+        <item name="iconShare">@drawable/ic_share_light</item>
+        <item name="iconNavBackward">@drawable/ic_nav_backward_light</item>
+        <item name="iconNavForward">@drawable/ic_nav_forward_light</item>
+        <item name="iconQuestion">@drawable/ic_question_light</item>
+        <item name="iconStar">@drawable/ic_star_light</item>
+        <item name="iconStarBorder">@drawable/ic_star_border_light</item>
+        <item name="iconSubmit">@drawable/ic_submit_light</item>
+        <item name="iconArrow">@drawable/ic_arrow_light</item>
+        <item name="commentBubbleBackdrop">@drawable/comment_bubble_backdrop_light</item>
+
+        <item name="android:colorBackground">@android:color/background_light</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_light_nodisable</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light_nodisable</item>
     </style>
+
+    <!-- Dark mode application theme -->
+    <style name="AppThemeDark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimaryLight</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="listItemBackground">@android:drawable/dialog_holo_dark_frame</item>
+
+        <item name="textColorArticleTitle">@android:color/white</item>
+        <item name="textColorArticleAuthor">@android:color/secondary_text_dark</item>
+        <item name="textColorHint">@android:color/secondary_text_dark_nodisable</item>
+
+        <item name="iconAutoFix">@drawable/ic_auto_fix</item>
+        <item name="iconSearch">@drawable/ic_search_dark</item>
+        <item name="iconShare">@drawable/ic_share_dark</item>
+        <item name="iconNavBackward">@drawable/ic_nav_backward_dark</item>
+        <item name="iconNavForward">@drawable/ic_nav_forward_dark</item>
+        <item name="iconQuestion">@drawable/ic_question_dark</item>
+        <item name="iconStar">@drawable/ic_star_dark</item>
+        <item name="iconStarBorder">@drawable/ic_star_border_dark</item>
+        <item name="iconSubmit">@drawable/ic_submit_dark</item>
+        <item name="iconArrow">@drawable/ic_arrow_dark</item>
+        <item name="commentBubbleBackdrop">@drawable/comment_bubble_backdrop_dark</item>
+
+        <item name="android:colorBackground">@android:color/background_dark</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_dark_nodisable</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark_nodisable</item>
+
+        <item name="android:dialogPreferenceStyle">@style/AppThemeDark.DialogTheme</item>
+        <item name="dialogPreferenceStyle">@style/AppThemeDark.DialogTheme</item>
+        <item name="dialogTheme">@style/AppThemeDark.DialogTheme</item>
+        <item name="android:dialogTheme">@style/AppThemeDark.DialogTheme</item>
+        <item name="alertDialogTheme">@style/AppThemeDark.DialogTheme</item>
+        <item name="android:alertDialogTheme">@style/AppThemeDark.DialogTheme</item>
+
+        <item name="android:navigationBarColor">@android:color/background_dark</item>
+    </style>
+
+    <style name="AppThemeDark.DialogTheme" parent="Theme.AppCompat.Dialog">
+        <item name="android:textColor">@android:color/primary_text_dark_nodisable</item>
+        <item name="android:textColorPrimary">@android:color/primary_text_dark_nodisable</item>
+        <item name="android:background">@android:color/background_dark</item>
+        <item name="colorAccent">@color/colorPrimaryLight</item>
+    </style>
+
 
     <!--Shadow Preset-->
     <style name="ShadowedText">

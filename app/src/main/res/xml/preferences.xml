@@ -3,8 +3,8 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="high_resolution"
-        android:title="@string/img_settings_title"
-        android:summary="@string/img_settings_summary"/>
+        android:summary="@string/img_settings_summary"
+        android:title="@string/img_settings_title" />
 
     <ListPreference
         android:defaultValue="10"
@@ -12,7 +12,7 @@
         android:entryValues="@array/number_values_array"
         android:key="post_number"
         android:title="@string/post_number_title"
-        android:summary="@string/post_number_summary"/>
+        android:summary="@string/post_number_summary" />
 
     <ListPreference
         android:defaultValue="10"
@@ -20,5 +20,10 @@
         android:entryValues="@array/number_values_array"
         android:key="comments_number"
         android:title="@string/comments_number_title"
-        android:summary="@string/comments_number_summary"/>
+        android:summary="@string/comments_number_summary" />
+    <SwitchPreference
+        android:id="@+id/dark_mode_switch"
+        android:defaultValue="false"
+        android:key="dark_mode"
+        android:title="@string/dark_mode_title" />
 </PreferenceScreen>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ds">
+        <attr name="textColorArticleTitle" format="color" />
+        <attr name="textColorArticleAuthor" format="color" />
+        <attr name="textColorHint" format="color" />
+
+        <attr name="listItemBackground" format="reference" />
+        <attr name="commentBubbleBackdrop" format="reference" />
+
+        <attr name="iconAutoFix" format="reference" />
+        <attr name="iconSearch" format="reference" />
+        <attr name="iconShare" format="reference" />
+        <attr name="iconNavBackward" format="reference" />
+        <attr name="iconNavForward" format="reference" />
+        <attr name="iconQuestion" format="reference" />
+        <attr name="iconStar" format="reference" />
+        <attr name="iconStarBorder" format="reference" />
+        <attr name="iconSubmit" format="reference" />
+        <attr name="iconArrow" format="reference" />
+
+    </declare-styleable>
+</resources>

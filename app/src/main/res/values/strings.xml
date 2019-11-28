@@ -3,7 +3,8 @@
     <string name="app_name">STG News</string>
 
     <!-- MainActivity, SearchActivity and basic Strings -->
-    <string name="no_articles">No articles found.\nCheck your connection!</string>
+    <string name="no_articles">No articles found.</string>
+    <string name="no_articles_network">No articles found.\nCheck your connection!</string>
     <string name="no_articles_page">No more articles found.\nTap here to return to the article list.</string>
     <string name="no_articles_search">No articles found.\nTry a differerent query!</string>
     <string name="no_articles_search_page">No more articles found.\nTap here to return to results</string>
@@ -42,6 +43,7 @@
     <string name="title_activity_settings" translatable="false">SettingsActivity</string>
     <string name="post_number_title">Number of posts</string>
     <string name="post_number_summary">Number of posts that will be loaded by the App</string>
+    <string name="dark_mode_title">Dark Mode</string>
 
     <!-- ArticleActivity Strings -->
     <string name="comments_string">Comments:</string>

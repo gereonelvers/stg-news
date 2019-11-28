@@ -7,14 +7,14 @@
         android:id="@+id/share"
         android:title="@string/share_string"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_share"/>
+        android:icon="?attr/iconShare"/>
 
 
     <item
         android:id="@+id/favorite_menu_item"
         android:title="@string/favorites_title"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_star"/>
+        android:icon="?attr/iconStar"/>
 
     <item
         android:id="@+id/login"

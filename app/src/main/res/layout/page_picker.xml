@@ -12,7 +12,7 @@
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/page_number_tv"
         android:layout_toLeftOf="@id/page_number_tv"
-        android:src="@drawable/ic_nav_backward" />
+        android:src="?attr/iconNavBackward" />
 
     <TextView
         android:id="@+id/page_number_tv"
@@ -32,5 +32,5 @@
         android:layout_centerVertical="true"
         android:layout_toEndOf="@id/page_number_tv"
         android:layout_toRightOf="@id/page_number_tv"
-        android:src="@drawable/ic_nav_forward" />
+        android:src="?attr/iconNavForward" />
 </RelativeLayout>
