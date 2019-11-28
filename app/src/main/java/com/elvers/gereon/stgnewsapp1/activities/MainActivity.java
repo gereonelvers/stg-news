@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     }
                     forceResetArticlePos();
                     startCategoryUpdate();
-                    refreshListView();
+                    displayContentByMenuItem(navigationView.getCheckedItem());
                 }
             });
         } else {
