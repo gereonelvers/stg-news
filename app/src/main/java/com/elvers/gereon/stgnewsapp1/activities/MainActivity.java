@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Article>> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Article>> { //TODO if user refreshes content, categories should also be updated
 
     /**
      * Static request URL (modifiers will append to this)
@@ -313,7 +313,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             // Refresh button
             case R.id.refresh:
                 forceResetArticlePos();
-                startCategoryUpdate();
                 refreshListView();
                 return true;
 
@@ -418,8 +417,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         pageNumberTV.setText(pageNumber.toString());
                     }
                     forceResetArticlePos();
-                    startCategoryUpdate();
-                    displayContentByMenuItem(navigationView.getCheckedItem());
+                    refreshListView();
                 }
             });
         } else {
