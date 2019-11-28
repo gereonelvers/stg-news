@@ -1,5 +1,7 @@
 package com.elvers.gereon.stgnewsapp1.api;
 
+import android.support.annotation.NonNull;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,9 +21,18 @@ public class AuthorResponse {
                     author.getInt("id"),
                     author.getString("name"),
                     author.getString("description"),
-                    author.getString("link")
+                    author.getString("link"),
+                    author.getString("slug")
             ));
         }
+    }
+
+    public Author getAuthorBySlug(String slug) {
+        for(Author author : authors) {
+            if(author.slug.equals(slug))
+                return author;
+        }
+        return null;
     }
 
     public List<Author> getAuthors() {
@@ -33,12 +44,20 @@ public class AuthorResponse {
         public final String name;
         public final String description;
         public final String link;
+        public final String slug;
 
-        public Author(int id, String name, String description, String link) {
+        public Author(int id, String name, String description, String link, String slug) {
             this.id = id;
             this.name = name;
             this.description = description;
             this.link = link;
+            this.slug = slug;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return name + "@" + id;
         }
     }
 

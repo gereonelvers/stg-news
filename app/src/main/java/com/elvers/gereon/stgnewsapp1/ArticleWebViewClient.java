@@ -14,6 +14,8 @@ import android.webkit.WebViewClient;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Custom WebViewClient for loading article from URL
@@ -50,27 +52,44 @@ public class ArticleWebViewClient extends WebViewClient {
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    public boolean shouldOverrideUrlLoading(WebView view, String urlStr) {
+        URL url;
+        try {
+            url = new URL(urlStr);
+        } catch(MalformedURLException e) {
+            Log.e(LOG_TAG, "Tried to parse invalid URL: " + e.toString());
+            e.printStackTrace();
+            return false;
+        }
+
         // Get context for intents
         Context context = ContextApp.getContext();
         // If the URL starts with mailto:, it needs to be handled as a mail-intent
-        if (url.startsWith("mailto:")) {
-            MailTo mt = MailTo.parse(url);
+        if (urlStr.startsWith("mailto:")) {
+            MailTo mt = MailTo.parse(urlStr);
             Intent emailIntent = createEmailIntent(mt.getTo(), mt.getSubject(), mt.getBody(), mt.getCc());
             context.startActivity(emailIntent);
             view.reload();
-            return true;
         }
         // If the URL contains stg-sz.net it will be loaded inside the WebView
-        else if (url.contains("stg-sz.net")) {
-            if (!url.contains("inapp")) {
-                url += "?inapp";
+        else if (urlStr.contains("stg-sz.net")) {
+            String[] parts = url.getPath().split("/");
+            if(parts[2].equalsIgnoreCase("author")) { // filter by author
+                int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).id;
+                //TODO display articles by author
+            } else if(parts[2].startsWith("20")) { // filter by date
+                //TODO display articles by date
+            } else {
+                if (!urlStr.contains("inapp")) {
+                    view.loadUrl(urlStr + "?inapp");
+                } else {
+                    return false;
+                }
             }
-            view.loadUrl(url);
         }
         // Otherwise it will be handled in a regular browser instance
         else {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlStr));
             browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(browserIntent);
         }
