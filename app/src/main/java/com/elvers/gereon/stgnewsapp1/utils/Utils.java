@@ -153,7 +153,7 @@ public final class Utils {
         }
 
         try {
-            JSONArray array = new JSONArray(articleJSON); //TODO handle response "{"code":"rest_post_invalid_page_number","message":"Die angeforderte Seitennummer ist größer als die Anzahl der verfügbaren Seiten.","data":{"status":400}}"
+            JSONArray array = new JSONArray(articleJSON);
             // This loop iterates over the array to parse the JSONArray into an array of articles
             for (int i = 0; i < array.length(); i++) {
 
