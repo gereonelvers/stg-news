@@ -30,6 +30,7 @@ import java.net.URL;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -142,8 +143,17 @@ public final class Utils {
     private static List<Article> extractArticleFeaturesFromJson(String articleJSON) {
         List<Article> articles = new ArrayList<>();
 
+        // check if response has errors
         try {
-            JSONArray array = new JSONArray(articleJSON);
+            JSONObject obj = new JSONObject(articleJSON);
+            if (obj.getString("code") != null) {
+                return Collections.emptyList();
+            }
+        } catch (JSONException ignored) {
+        }
+
+        try {
+            JSONArray array = new JSONArray(articleJSON); //TODO handle response "{"code":"rest_post_invalid_page_number","message":"Die angeforderte Seitennummer ist größer als die Anzahl der verfügbaren Seiten.","data":{"status":400}}"
             // This loop iterates over the array to parse the JSONArray into an array of articles
             for (int i = 0; i < array.length(); i++) {
 
