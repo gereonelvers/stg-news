@@ -26,24 +26,27 @@ public class ArticleWebViewClient extends WebViewClient {
 
     private static final String LOG_TAG = ArticleWebViewClient.class.getSimpleName();
 
-    // Dark theme should be loaded once, so loading the activity is faster TODO make static
-    private String darkThemeJs = "";
+    // Dark theme should be loaded once, so loading the activity is faster
+    private static String darkThemeJs = "";
 
     public ArticleWebViewClient(AssetManager assetManager) {
-        try {
-            InputStream in = assetManager.open("dark_theme.js");
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[in.available()];
-            int size;
-            while ((size = in.read(buffer)) != -1) {
-                bos.write(buffer, 0, size);
+        if (darkThemeJs.isEmpty()) {
+            try {
+                Log.i(LOG_TAG, "Loading dark theme JavaScript file. This should only happen once");
+                InputStream in = assetManager.open("dark_theme.js");
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[in.available()];
+                int size;
+                while ((size = in.read(buffer)) != -1) {
+                    bos.write(buffer, 0, size);
+                }
+                bos.close();
+                in.close();
+                darkThemeJs = "(function(){ " + new String(bos.toByteArray()) + " })();";
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Failed to load dark theme js script: " + e.toString());
+                e.printStackTrace();
             }
-            bos.close();
-            in.close();
-            darkThemeJs = "(function(){ " + new String(bos.toByteArray()) + " })();";
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Failed to load dark theme js script: " + e.toString());
-            e.printStackTrace();
         }
     }
 
