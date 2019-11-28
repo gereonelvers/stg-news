@@ -8,6 +8,12 @@ import java.io.IOException;
 
 import static com.elvers.gereon.stgnewsapp1.utils.Utils.sendComment;
 
+/**
+ * Posts a comment
+ * (As data should not be loaded or sent from of-device in the UI-Thread, an AsyncTask is used to push it onto a secondary thread)
+ *
+ * @author Gereon Elvers
+ */
 public class CommentPoster extends AsyncTaskLoader<Integer> {
 
     private static final String LOG_TAG = CommentPoster.class.getSimpleName();

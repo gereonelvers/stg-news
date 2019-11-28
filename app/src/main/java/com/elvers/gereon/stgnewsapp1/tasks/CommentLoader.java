@@ -8,6 +8,12 @@ import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.List;
 
+/**
+ * Loads a list of Comment objects using an AsyncTask to perform the network request to the given URL.
+ * (As data should not be loaded from of-device in the UI-Thread, an AsyncTask is used to push it onto a secondary thread)
+ *
+ * @author Gereon Elvers
+ */
 public class CommentLoader extends AsyncTaskLoader<List<Comment>> {
     private String mUrl;
 

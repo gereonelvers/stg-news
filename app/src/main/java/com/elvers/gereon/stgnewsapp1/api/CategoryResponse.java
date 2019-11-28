@@ -7,10 +7,19 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The CategoryResponse contains a list of {@link Category} which is used f.e. to get the name behind a categoryId
+ */
 public class CategoryResponse {
 
     private List<Category> categories = new ArrayList<>();
 
+    /**
+     * Constructs CategoryResponse
+     *
+     * @param json response from server
+     * @throws JSONException if the json is not valid
+     */
     public CategoryResponse(String json) throws JSONException {
         JSONArray array = new JSONArray(json);
 

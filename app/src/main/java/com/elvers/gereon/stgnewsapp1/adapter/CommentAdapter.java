@@ -16,7 +16,12 @@ import com.elvers.gereon.stgnewsapp1.api.Comment;
 
 import java.util.List;
 
-
+/**
+ * Custom Adapter that adapts a List of Comments onto a given ListView
+ * each Comment item is projected onto an listItemView (layout is defined by comment_list_item.xml)
+ *
+ * @author Gereon Elvers
+ */
 public class CommentAdapter extends ArrayAdapter<Comment> {
 
     /**

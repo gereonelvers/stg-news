@@ -65,8 +65,9 @@ public class ArticleFragment extends Fragment {
         // Add "inapp"-URL parameter to notify site that it is being requested from within the App
         articleURI += "?inapp";
         /*
-         * Javascript is necessary for some dynamic components that might be implemented in the future,
+         * JavaScript is necessary for some dynamic components that might be implemented in the future,
          * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
+         * But the most important reason to enable JavaScript is the hacky dark theme ^^
          */
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);

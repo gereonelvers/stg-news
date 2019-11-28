@@ -61,18 +61,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * {@param filterParam} for category filtering
      * {@param numberOfArticlesParam} for changing the number of posts requested
      */
+    private static final String WP_REQUEST_URL = "www.stg-sz.net";
 
     // Tag for log messages
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-
-    // Static request URL the data will be requested from. Putting it at the top like this allow easier modification of top level domain if required
-    private static final String WP_REQUEST_URL = "www.stg-sz.net";
 
     // Assign loader static ID (enables easier implementation of possible future loaders)
     private static final int ARTICLE_LOADER_ID = 1;
     private static final int CATEGORY_LOADER_ID = 2;
 
-    // Every MainActivity instance should have one CategoryCallbackHandler
+    // Every MainActivity instance should have one CategoryCallbackHandler which handles (obviously) the callback after the requested categories arrive
     private CategoryCallbackHandler categoryCallbackHandler = new CategoryCallbackHandler();
 
     /* There are a lot of items declared outside of individual methods here.
@@ -109,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // set night mode state for app
         Utils.updateGlobalNightMode(this);
 
+        // update activity theme based on night mode option
         Utils.updateNightMode(this);
 
         super.onCreate(savedInstanceState);
@@ -222,12 +221,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * This method is called by the navigationView click listener and after categories loaded and a previous instance existed
+     * This method displays articles inside the article listview depending on the menu item (-> category)
      */
     private void displayContentByMenuItem(MenuItem menuItem) {
         navigationView.setCheckedItem(menuItem);
         int menuItemItemId = menuItem.getItemId();
-        if (menuItem.getItemId() == -1) {
+        if (menuItem.getItemId() == -1) { // All articles
             filterParam = "";
             if (actionBar != null) {
                 actionBar.setTitle(getString(R.string.app_name));
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 actionBar.setTitle(getString(R.string.favorites_title));
             }
 
-        } else {
+        } else { // A category
             filterParam = Integer.toString(menuItemItemId);
             isFavoriteSelected = false;
             if (actionBar != null) {
@@ -437,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
     /**
-     * This method is called when a menu is created (in this instance on the ActionBar
+     * This method is called when a menu is created (in this instance on the ActionBar)
      * It sets up the menu as well as other components that require setup (in this case just the searchView initialization)
      */
     @Override
@@ -508,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * Handles asynchronous update of categories (menu)
+     * Handles asynchronous update of categories (navigationView)
      */
     private class CategoryCallbackHandler implements LoaderManager.LoaderCallbacks<CategoryResponse> {
         @NonNull
@@ -518,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         /**
-         * Put received categories into the (left) category menu
+         * Put received categories into the category menu (navigationView)
          */
         @Override
         public void onLoadFinished(@NonNull Loader<CategoryResponse> loader, CategoryResponse categoryData) {

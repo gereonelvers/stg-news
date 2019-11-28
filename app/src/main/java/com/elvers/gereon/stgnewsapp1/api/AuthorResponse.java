@@ -9,10 +9,19 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The AuthorResponse contains a list of {@link Author} which is used f.e. to get the name behind an authorId
+ */
 public class AuthorResponse {
 
     private List<Author> authors = new ArrayList<>();
 
+    /**
+     * Constructs AuthorResponse
+     *
+     * @param json response from server
+     * @throws JSONException
+     */
     public AuthorResponse(String json) throws JSONException {
         JSONArray array = new JSONArray(json);
         for (int i = 0; i < array.length(); i++) {

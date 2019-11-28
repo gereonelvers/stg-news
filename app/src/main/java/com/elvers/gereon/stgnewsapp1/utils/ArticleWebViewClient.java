@@ -26,6 +26,7 @@ public class ArticleWebViewClient extends WebViewClient {
 
     private static final String LOG_TAG = ArticleWebViewClient.class.getSimpleName();
 
+    // Dark theme should be loaded once, so loading the activity is faster TODO make static
     private String darkThemeJs = "";
 
     public ArticleWebViewClient(AssetManager assetManager) {
@@ -112,7 +113,7 @@ public class ArticleWebViewClient extends WebViewClient {
         // Adds some padding below content so FAB doesn't interfere
         view.loadUrl("javascript:(function(){ document.body.style.paddingBottom = '56px'})();");
 
-        // Overwrite some of the website CSS, so the website becomes dark in dark mode. This is a rather hacky method and can lead to ugly text colors
+        // Overwrite some of the websites CSS, so the website becomes dark in dark mode. This is a rather hacky method and might lead to ugly color combinations
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES && !darkThemeJs.isEmpty()) {
             view.loadUrl("javascript:" + darkThemeJs);
         }

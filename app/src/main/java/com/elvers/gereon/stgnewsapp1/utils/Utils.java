@@ -36,7 +36,7 @@ import java.util.Locale;
 
 
 /**
- * Utils is a class responsible for holding static variables and methods used by multiples Activities that don't need to be contained within them.
+ * Utils is a class responsible for holding static variables and methods used by multiple Activities that don't need to be contained within them.
  * This makes future edits easier as it centralizes methods and maximizes code reusability
  *
  * @author Gereon Elvers
@@ -46,6 +46,7 @@ public final class Utils {
     // Tag for log messages
     private static final String LOG_TAG = Utils.class.getSimpleName();
 
+    // DateFormat used inside server responses
     private static final SimpleDateFormat wpDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.GERMAN);
 
     // Cached API responses
@@ -123,7 +124,7 @@ public final class Utils {
     }
 
     /**
-     * Make an HTTP request to the given URL and return a String as the response.
+     * Make an HTTP request to the given URL and return the response as a String.
      */
     private static String makeHttpGetRequest(URL url) throws IOException {
         String jsonResponse;
@@ -133,17 +134,17 @@ public final class Utils {
         return jsonResponse;
     }
 
-
     /**
      * Return a list of {@link Article} objects that has been built up from
      * parsing the given JSON response.
+     * This method should not be called from the ui thread, because it could perform a web request, which might block the ui thread
      */
     private static List<Article> extractArticleFeaturesFromJson(String articleJSON) {
         List<Article> articles = new ArrayList<>();
 
         try {
             JSONArray array = new JSONArray(articleJSON);
-            /* This loop iterates over the array to parse the JSONArray into an array of articles */
+            // This loop iterates over the array to parse the JSONArray into an array of articles
             for (int i = 0; i < array.length(); i++) {
 
                 // Get current Article from Array
@@ -239,7 +240,7 @@ public final class Utils {
                     }
                 }
 
-                /* After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the array */
+                // After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the array
                 articles.add(new Article(id, titleString, authorString, dateString, urlString, imageUrlString, categoryString.toString()));
             }
         } catch (Exception e) {
@@ -249,13 +250,17 @@ public final class Utils {
         return articles;
     }
 
+    /**
+     * Return a list of {@link Comment} objects that has been built up from
+     * parsing the given JSON response.
+     */
     private static List<Comment> extractCommentFeaturesFromJson(String commentJSON) {
         List<Comment> comments = new ArrayList<>();
 
         // Check for empty JSON response
         try {
             JSONArray rawComments = new JSONArray(commentJSON);
-            /* This loop iterates over the rawComments to parse the JSONArray into an rawComments of Comments */
+            // This loop iterates over the rawComments to parse the JSONArray into an rawComments of Comments
             for (int i = 0; i < rawComments.length(); i++) {
 
                 // Get current Comment from Array
@@ -285,7 +290,7 @@ public final class Utils {
                 String contentString = content.getString("rendered");
 
 
-                /* After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the rawComments */
+                // After the individual parts of the Article are retrieved individually, they are parsed into an Article object and added to the rawComments
                 comments.add(new Comment(id, authorString, dateString, timeString, contentString));
             }
         } catch (Exception e) {
@@ -298,8 +303,10 @@ public final class Utils {
     /**
      * Since the WordPress API only provides author ID (not the complete name), the process to retrieve names is a little more intricate, which is why it's moved into a separate method.
      * <p>
-     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once per request (in updateAuthors())
-     * The array is then stored as authorsArray. extractArticleFeaturesFromJson() then retrieves the author ID from currentArticle and iterates against authorsArray until a match is found.
+     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once (in updateAuthors())
+     * The array is then stored as AuthorResponse. extractArticleFeaturesFromJson() then retrieves the author ID from currentArticle and iterates against authorResponse until a match is found.
+     * <p>
+     * This method should not be called from the ui thread, because it could perform a web request, which might block the ui thread
      */
     private static String getAuthorName(int authorID) {
         // Fill authorsArray with author data (if it's empty)
@@ -318,9 +325,8 @@ public final class Utils {
         return "";
     }
 
-
     /**
-     * Request an array of authors from AUTHOR_REQUEST_URL
+     * Request an array of authors from AUTHOR_REQUEST_URL which will be cached inside authorResponse to achieve faster loading times
      * Necessary to correctly display author name in article listview
      */
     private static void updateAuthors() {
@@ -341,7 +347,7 @@ public final class Utils {
     }
 
     /**
-     * This is the method that gets called when a comment is submitted though CreateCommentActivity.
+     * This is the method that gets called when a comment is submitted through CreateCommentActivity.
      * It handles posting said comment and returns a http status code.
      */
     public static int sendComment(String id, String authorName, String authorEmail, String content) throws IOException {
@@ -358,7 +364,7 @@ public final class Utils {
     }
 
     /**
-     * Make an HTTP request to the given URL and return a String as the response.
+     * Make an HTTP request to the given URL and return the response as String.
      */
     private static int makeHttpPostRequest(URL url) throws IOException {
         int responseCode = 0;
@@ -378,6 +384,9 @@ public final class Utils {
         return responseCode;
     }
 
+    /**
+     * Request an array of categories which will be cached inside categoryResponse to achieve faster loading times
+     */
     public static CategoryResponse updateCategories() {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder
@@ -405,8 +414,11 @@ public final class Utils {
         return categoryResponse;
     }
 
+    /**
+     * Fills the navigationMenu with category filter items
+     */
     public static void createCategoryMenu(Menu navigationMenu, NavigationView navigationView, DrawerLayout drawerLayout) {
-        if (categoryResponse != null) {
+        if (categoryResponse != null) { // if there was no category request, don't fill in the items; DON'T perform the request, because of potentially blocking the ui thread
             navigationMenu.add(R.id.mainGroup, -2, 0, R.string.favorites_title);
             navigationMenu.getItem(0).setCheckable(true);
             navigationMenu.add(R.id.mainGroup, -1, 1, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));

@@ -49,6 +49,7 @@ public class AboutActivity extends AppCompatActivity {
         /*
          * Javascript is necessary for some dynamic components that might be implemented in the future,
          * creates parity between the custom WebView and regular browser and, more importantly, makes sure the "?inapp"-parameter works as expected
+         * But the most important reason to enable JavaScript is the hacky dark theme ^^
          */
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new ArticleWebViewClient(getAssets()));

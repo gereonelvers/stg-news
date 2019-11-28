@@ -1,6 +1,5 @@
 package com.elvers.gereon.stgnewsapp1.activities;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 /**
- * Activity that manages displaying the selected Article
+ * Activity that manages displaying the selected Article and it's comments
  *
  * @author Gereon Elvers
  */
@@ -59,7 +58,6 @@ public class ArticleActivity extends AppCompatActivity {
     public String articleIdString;
     private List<String> favoritesList;
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.updateGlobalNightMode(this); // If the app is started directly into this activity, the theme should also be set correctly
