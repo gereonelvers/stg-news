@@ -49,7 +49,7 @@ final class Utils {
 
     // Cached API responses
     public static CategoryResponse categoryResponse = null;
-    private static AuthorResponse authorResponse = null;
+    public static AuthorResponse authorResponse = null;
 
     // Static request URL the list of authors will be requested from. Putting it at the top like this allows easier modification of top level domain if required.
     private static final String AUTHOR_REQUEST_URL = "https://stg-sz.net/wp-json/wp/v2/users?per_page=100";
@@ -351,7 +351,7 @@ final class Utils {
         uriBuilder.appendQueryParameter("post", id)
                 .appendQueryParameter("author_name", authorName)
                 .appendQueryParameter("author_email", authorEmail)
-                .appendQueryParameter("content", content); // hopefully this is url encoded
+                .appendQueryParameter("content", content);
         URL url = createUrl(uriBuilder.toString());
         return makeHttpPostRequest(url);
     }
@@ -407,11 +407,13 @@ final class Utils {
     static void createCategoryMenu(Menu navigationMenu, NavigationView navigationView, DrawerLayout drawerLayout) {
         if(categoryResponse != null) {
             navigationMenu.add(R.id.mainGroup, -2, 0, R.string.favorites_title);
+            navigationMenu.getItem(0).setCheckable(true);
             navigationMenu.add(R.id.mainGroup, -1, 1, ContextApp.getApplication().getResources().getString(R.string.all_articles_cat));
+            navigationMenu.getItem(1).setCheckable(true);
             for(int i = 0; i < categoryResponse.getCategories().size(); i++) {
                 CategoryResponse.Category category = categoryResponse.getCategories().get(i);
                 navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/category.id, /*Order*/i + 2, /*name*/category.name);
-                navigationMenu.getItem(i).setCheckable(true);
+                navigationMenu.getItem(i + 2).setCheckable(true);
             }
 
             navigationView.invalidate();
