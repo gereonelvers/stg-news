@@ -11,7 +11,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -188,7 +187,7 @@ public class ArticleActivity extends AppCompatActivity {
             // Back button
             case android.R.id.home:
                 if (!isComments) {
-                    NavUtils.navigateUpFromSameTask(this);
+                    super.onBackPressed();
                 } else {
                     showArticle();
                 }
@@ -262,13 +261,15 @@ public class ArticleActivity extends AppCompatActivity {
         if (isComments) {
             showArticle();
         } else {
+            // redirect to webview
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.article_frame);
-            if(fragment instanceof ArticleFragment) {
-                if(((ArticleFragment) fragment).webView.canGoBack()) { // kotlin smart cast would be nice here...
+            if (fragment instanceof ArticleFragment) {
+                if (((ArticleFragment) fragment).webView.canGoBack()) { // kotlin smart cast would be nice here...
                     ((ArticleFragment) fragment).webView.goBack();
                     return;
                 }
             }
+
             super.onBackPressed();
         }
     }
