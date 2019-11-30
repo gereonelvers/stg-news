@@ -277,6 +277,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * Lastly it destroys (if necessary) and restarts the ArticleLoader responsible for filling the ArticleAdapter with content
      */
     public void initLoaderListView() {
+        // make sure categories will be loaded if they don't exist
+        if(Utils.categoryResponse == null)
+            startCategoryUpdate();
+        else if(navigationView.getMenu().size() == 0)
+            displayCachedCategories();
+
+        // init loader listview
         mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
         articleListView.setAdapter(mAdapter);
         articleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -519,15 +526,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          */
         @Override
         public void onLoadFinished(@NonNull Loader<CategoryResponse> loader, CategoryResponse categoryData) {
-            if (!categoryData.getCategories().isEmpty()) {
+            if (categoryData != null && !categoryData.getCategories().isEmpty()) {
                 try {
                     displayCachedCategories();
-                    loaderManager.destroyLoader(CATEGORY_LOADER_ID); // i don't want android to run this method without asking me
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "Failed to setup article category menu: " + e.toString());
                     e.printStackTrace();
                 }
             }
+            loaderManager.destroyLoader(CATEGORY_LOADER_ID); // i don't want android to run this method without asking me
         }
 
         @Override
