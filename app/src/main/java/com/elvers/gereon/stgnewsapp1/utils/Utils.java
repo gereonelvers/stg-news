@@ -128,11 +128,9 @@ public final class Utils {
      * Make an HTTP request to the given URL and return the response as a String.
      */
     private static String makeHttpGetRequest(URL url) throws IOException {
-        String jsonResponse;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
-        jsonResponse = client.newCall(request).execute().body().string();
-        return jsonResponse;
+        return client.newCall(request).execute().body().string();
     }
 
     /**
