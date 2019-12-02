@@ -3,7 +3,6 @@ package com.elvers.gereon.stgnewsapp1.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.graphics.Bitmap;
 import android.net.MailTo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatDelegate;
@@ -51,8 +50,12 @@ public class ArticleWebViewClient extends WebViewClient {
     }
 
     @Override
-    public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        super.onPageStarted(view, url, favicon);
+    public void onPageCommitVisible(WebView view, String url) {
+        super.onPageCommitVisible(view, url);
+        // Overwrite some of the websites CSS, so the website becomes dark in dark mode. This is a rather hacky method and might lead to ugly color combinations
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES && !darkThemeJs.isEmpty()) {
+            view.loadUrl("javascript:" + darkThemeJs);
+        }
     }
 
     @Override
@@ -115,11 +118,6 @@ public class ArticleWebViewClient extends WebViewClient {
     public void onPageFinished(WebView view, String url) {
         // Adds some padding below content so FAB doesn't interfere
         view.loadUrl("javascript:(function(){ document.body.style.paddingBottom = '56px'})();");
-
-        // Overwrite some of the websites CSS, so the website becomes dark in dark mode. This is a rather hacky method and might lead to ugly color combinations
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES && !darkThemeJs.isEmpty()) {
-            view.loadUrl("javascript:" + darkThemeJs);
-        }
     }
 
 }
