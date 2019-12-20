@@ -6,7 +6,7 @@ var figcaption_color = 'rgb(119, 127, 136)';
 var ol_color = 'rgb(176, 59, 59)';
 var h3_color = 'rgb(180, 48, 48)';
 var h4_color = 'rgb(140, 48, 48)';
-var h6_color = 'rgb(119, 63, 63)';
+var h6_color = 'rgb(130, 40, 40)';
 
 document.getElementsByTagName('body')[0].style.background = bg_color;
 document.getElementById('content').style.background = bg_color;
