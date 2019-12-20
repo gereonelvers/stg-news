@@ -44,7 +44,6 @@ import com.elvers.gereon.stgnewsapp1.tasks.CategoryLoader;
 import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -86,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     TextView pageNumberTV;
     Menu drawerMenu;
     NavigationView navigationView;
-    ArrayList<String> favoritesArray;
     boolean isFavoriteSelected;
     private ArticleAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
@@ -237,11 +235,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         else if (menuItem.getItemId() == -2) {
             isFavoriteSelected = true;
             filterParam = "";
-            String favoritesString = sharedPreferences.getString("favorites", "");
-            favoritesArray = null;
-            if (favoritesString != null) {
-                favoritesArray = new ArrayList<>(Arrays.asList(favoritesString.split(",")));
-            }
             if (actionBar != null) {
                 actionBar.setTitle(getString(R.string.favorites_title));
             }
@@ -384,8 +377,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             uriBuilder.appendQueryParameter("per_page", numberOfArticlesParam);
         }
         if (isFavoriteSelected) {
-            for (int j = 0; j < favoritesArray.size(); j++) {
-                uriBuilder.appendQueryParameter("include[]", favoritesArray.get(j));
+            for(String fav : sharedPreferences.getString("favorites", "").split(",")) {
+                uriBuilder.appendQueryParameter("include[]", fav);
             }
         }
         uriBuilder.appendQueryParameter("page", pageNumber.toString());
