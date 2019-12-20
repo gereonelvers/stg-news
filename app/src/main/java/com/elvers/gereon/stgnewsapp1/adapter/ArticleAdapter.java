@@ -113,7 +113,7 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
 
             // Display article title
             TextView titleTV = listItemView.findViewById(R.id.article_item_title_tv);
-            String title = currentArticle.getTitle();
+            String title = currentArticle.getTitleHtmlEscaped();
             Spanned spannedTitle = Html.fromHtml(title);
             titleTV.setText(spannedTitle);
 

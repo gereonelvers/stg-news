@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
                     if (currentArticle != null) {
                         articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
-                        articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitle());
+                        articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitleHtmlEscaped());
                         articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
                     }
                     startActivity(articleIntent);
