@@ -1,6 +1,8 @@
 package com.elvers.gereon.stgnewsapp1.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +16,7 @@ import com.elvers.gereon.stgnewsapp1.utils.Utils;
  *
  * @author Gereon Elvers
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     /**
      * Since it is best practice to manage settings through a SettingsFragment utilizing a preferences.xml file,
@@ -23,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.updateNightMode(this);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
@@ -34,8 +37,13 @@ public class SettingsActivity extends AppCompatActivity {
             actionbar.setTitle(R.string.settings_string);
         }
         SettingsFragment settingsFragment = new SettingsFragment();
-        settingsFragment.setRootActivity(this);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_ll, settingsFragment).commit();
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            recreate();
+        }
+    }
 }

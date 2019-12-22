@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
  *
  * @author Gereon Elvers
  */
-public class ArticleActivity extends AppCompatActivity {
+public class ArticleActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Tag for log messages
     private static final String LOG_TAG = ArticleActivity.class.getSimpleName();
@@ -62,6 +62,7 @@ public class ArticleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Utils.updateGlobalNightMode(this); // If the app is started directly into this activity, the theme should also be set correctly
         Utils.updateNightMode(this);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
         super.onCreate(savedInstanceState);
         // Setting XML base layout
@@ -161,13 +162,6 @@ public class ArticleActivity extends AppCompatActivity {
             }
         }
         return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    protected void onRestart() {
-        Utils.updateNightMode(this);
-        super.onRestart();
-        recreate();
     }
 
     /**
@@ -383,5 +377,12 @@ public class ArticleActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("isComments", isComments);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            recreate();
+        }
     }
 }

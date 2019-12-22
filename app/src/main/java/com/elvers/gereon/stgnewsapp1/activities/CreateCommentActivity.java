@@ -30,7 +30,7 @@ import com.elvers.gereon.stgnewsapp1.utils.Utils;
  *
  * @author Gereon Elvers
  */
-public class CreateCommentActivity extends AppCompatActivity implements ICommentPostedhandler {
+public class CreateCommentActivity extends AppCompatActivity implements ICommentPostedhandler, SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Tag for log messages
     private static final String LOG_TAG = CreateCommentActivity.class.getSimpleName();
@@ -98,6 +98,7 @@ public class CreateCommentActivity extends AppCompatActivity implements IComment
             emailET.clearFocus();
             contentET.requestFocus();
         }
+        preferences.registerOnSharedPreferenceChangeListener(this);
 
 
         alertDialogBuilder = new AlertDialog.Builder(getApplication());
@@ -198,13 +199,6 @@ public class CreateCommentActivity extends AppCompatActivity implements IComment
     }
 
     @Override
-    protected void onRestart() {
-        Utils.updateNightMode(this);
-        super.onRestart();
-        recreate();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
@@ -267,4 +261,10 @@ public class CreateCommentActivity extends AppCompatActivity implements IComment
         }
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            recreate();
+        }
+    }
 }
