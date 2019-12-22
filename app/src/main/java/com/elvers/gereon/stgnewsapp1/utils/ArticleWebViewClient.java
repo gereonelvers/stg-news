@@ -1,14 +1,16 @@
 package com.elvers.gereon.stgnewsapp1.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.net.MailTo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.elvers.gereon.stgnewsapp1.activities.SearchActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,12 +29,15 @@ public class ArticleWebViewClient extends WebViewClient {
 
     // Dark theme should be loaded once, so loading the activity is faster
     private static String darkThemeJs = "";
+    private Activity ownerActivity;
 
-    public ArticleWebViewClient(AssetManager assetManager) {
+    public ArticleWebViewClient(Activity ownerActivity) {
+        this.ownerActivity = ownerActivity;
+
         if (darkThemeJs.isEmpty()) {
             try {
                 Log.i(LOG_TAG, "Loading dark theme JavaScript file. This should only happen once");
-                InputStream in = assetManager.open("dark_theme.js");
+                InputStream in = ownerActivity.getAssets().open("dark_theme.js");
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 byte[] buffer = new byte[in.available()];
                 int size;
@@ -83,10 +88,11 @@ public class ArticleWebViewClient extends WebViewClient {
             String[] parts = url.getPath().split("/");
             if (parts[2].equalsIgnoreCase("author")) { // filter by author
                 int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).id;
-                //TODO display articles by author
-            } else if (parts[2].startsWith("20")) { // filter by date
-                //TODO display articles by date
-            } else {
+                Intent intent = new Intent();
+                intent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
+                intent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, authorId);
+                ownerActivity.startActivity(intent);
+            } else if (!parts[2].matches("[2-9][0-9]{3}")) { // i don't think the app will last until year 10000
                 if (!urlStr.contains("inapp")) {
                     view.loadUrl(urlStr + "?inapp");
                 } else {

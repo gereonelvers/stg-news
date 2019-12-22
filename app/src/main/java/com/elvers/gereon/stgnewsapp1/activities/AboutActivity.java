@@ -52,7 +52,7 @@ public class AboutActivity extends AppCompatActivity {
          * But the most important reason to enable JavaScript is the hacky dark theme ^^
          */
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new ArticleWebViewClient(getAssets()));
+        webView.setWebViewClient(new ArticleWebViewClient(this));
         webView.setVisibility(View.INVISIBLE);
         // Setting up loading indicator (spinning circle)
         webView.setWebChromeClient(new WebChromeClient() {

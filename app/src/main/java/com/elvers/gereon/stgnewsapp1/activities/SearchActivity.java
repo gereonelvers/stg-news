@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -38,6 +39,9 @@ import java.util.List;
  */
 public class SearchActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Article>> {
 
+    public static String ACTION_FILTER_AUTHOR = "FILTER_BY_AUTHOR";
+    public static String EXTRA_AUTHOR_ID = "EXTRA_AUTHOR_ID";
+
     // Static request URL the data will be requested from. Putting it at the top like this allow easier modification of top level domain if required
     private static final String WP_REQUEST_URL = "www.stg-sz.net";
 
@@ -48,8 +52,9 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     /* There are a lot of items declared outside of individual methods here.
         This is done because they are required to be available across methods */
     SwipeRefreshLayout mSwipeRefreshLayout;
-    String titleString;
-    String requestTerm;
+    String titleString = "";
+    String searchFilter = ""; // don't want to cause a NullPointerException
+    int authorFilter = -1;
     LoaderManager loaderManager;
     ListView mListView;
     View loadingIndicator;
@@ -76,7 +81,6 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
-        titleString = getString(R.string.search_title);
         handleIntent(getIntent());
         if (actionbar != null) {
             actionbar.setDisplayHomeAsUpEnabled(true);
@@ -200,7 +204,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
      * This method is called when creating a new ArticleLoader. It creates a modified query URL (by adding the filter parameters listed below) and initializes the ArticleLoader.
      * <p>
      * Parameters:
-     * {@param requestTerm} is a String containing the search term
+     * {@param searchFilter} is a String containing the search term
      * {@param numberOfArticlesParam} is a String containing the number of Article objects requested from the server
      * {@param pageNumber} is the page number loaded
      */
@@ -211,8 +215,10 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
         uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("posts");
-        if (!requestTerm.isEmpty()) {
-            uriBuilder.appendQueryParameter("search", requestTerm);
+        if (!searchFilter.isEmpty()) {
+            uriBuilder.appendQueryParameter("search", searchFilter);
+        } else if (authorFilter != -1) {
+            uriBuilder.appendQueryParameter("author", String.valueOf(authorFilter));
         }
 
         if (!numberOfArticlesParam.isEmpty()) {
@@ -276,14 +282,25 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
 
 
     /**
-     * This method is called whenever data that was pushed through an Intent needs to be retrieved. It gets the String and saves it as requestTerm.
+     * This method is called whenever data that was pushed through an Intent needs to be retrieved. It gets the String and saves it as searchFilter.
      * It also refreshes titleString to match the new search term.
      */
     public void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            requestTerm = intent.getStringExtra(SearchManager.QUERY);
-            titleString = titleString + requestTerm + "\"";
+            searchFilter = intent.getStringExtra(SearchManager.QUERY);
+            titleString = getString(R.string.search_title) + searchFilter + "\"";
+        } else if (ACTION_FILTER_AUTHOR.equals(intent.getAction())) {
+            authorFilter = intent.getIntExtra(EXTRA_AUTHOR_ID, -1);
+            titleString = getString(R.string.search_title_author) + Utils.getAuthorName(authorFilter);
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            super.onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

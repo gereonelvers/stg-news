@@ -73,7 +73,7 @@ public class ArticleFragment extends Fragment {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAppCacheEnabled(false);
 
-        webView.setWebViewClient(new ArticleWebViewClient(getActivity().getAssets()));
+        webView.setWebViewClient(new ArticleWebViewClient(getActivity()));
         webView.setVisibility(View.INVISIBLE);
         // Setting up loading indicator (spinning circle)
         webView.setWebChromeClient(new WebChromeClient() {

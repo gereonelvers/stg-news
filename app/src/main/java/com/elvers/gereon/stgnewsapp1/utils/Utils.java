@@ -316,7 +316,7 @@ public final class Utils {
      * <p>
      * This method should not be called from the ui thread, because it could perform a web request, which might block the ui thread
      */
-    private static String getAuthorName(int authorID) {
+    public static String getAuthorName(int authorID) {
         // Fill authorsArray with author data (if it's empty)
         if (authorResponse == null) {
             updateAuthors();
