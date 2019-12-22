@@ -22,13 +22,12 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -69,8 +68,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     View loadingIndicator;
     String filterParam;
     String numberOfArticlesParam;
-    Integer pageNumber;
-    TextView pageNumberTV;
+    int pageNumber = 1;
     Menu drawerMenu;
     NavigationView navigationView;
     boolean isFavoriteSelected;
@@ -78,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private DrawerLayout mDrawerLayout;
     private ActionBar actionBar;
     private SharedPreferences sharedPreferences;
+    private Button btnLoadMore;
 
     /**
      * onCreate() is called when the Activity is launched.
@@ -141,41 +140,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         articleListView = findViewById(R.id.article_list_view);
         articleListView.setEmptyView(emptyView);
 
-        // Inflate page picker and add below ListView
-        @SuppressLint("InflateParams")
-        View pagePicker = LayoutInflater.from(this).inflate(R.layout.page_picker, null, false);
-        articleListView.addFooterView(pagePicker);
-
-        // Initialize page number TextView and set initial value
-        pageNumber = 1;
-        pageNumberTV = findViewById(R.id.page_number_tv);
-        pageNumberTV.setText(pageNumber.toString());
+        btnLoadMore = new Button(this);
+        btnLoadMore.setText(R.string.load_more);
+        btnLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingIndicator.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingArticles();
+            }
+        });
 
         // Start loading categories
         new LoadCategoriesTask(this).execute();
 
-        // Implement page back-button
-        ImageView backIV = findViewById(R.id.back_iv);
-        backIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pageNumber > 1) {
-                    pageNumber--;
-                    pageNumberTV.setText(pageNumber.toString());
-                    displayContentByMenuItem(navigationView.getCheckedItem());
-                }
-            }
-        });
-        // Implement page forward-button
-        ImageView forwardIV = findViewById(R.id.forward_iv);
-        forwardIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber++;
-                pageNumberTV.setText(pageNumber.toString());
-                displayContentByMenuItem(navigationView.getCheckedItem());
-            }
-        });
+        articleListView.addFooterView(btnLoadMore);
 
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -220,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 actionBar.setTitle(menuItem.getTitle());
             }
         }
-        pageNumberTV.setText(String.valueOf(pageNumber));
         refreshListView();
         mDrawerLayout.closeDrawers();
     }
@@ -244,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * Lastly it destroys (if necessary)
      */
     public void initLoaderListView() {
+        pageNumber = 1;
+
         // init loader listview
         mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
         articleListView.setAdapter(mAdapter);
@@ -283,10 +263,41 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 uriBuilder.appendQueryParameter("include[]", fav);
             }
         }
-        uriBuilder.appendQueryParameter("page", pageNumber.toString());
+        uriBuilder.appendQueryParameter("page", String.valueOf(pageNumber));
         Log.e("Query URI: ", uriBuilder.toString());
 
         new LoadArticlesTask(this).execute(uriBuilder.toString());
+    }
+
+    @Override
+    public void onArticlesFetched(List<Article> articles) {
+        // Once the load process is finished, the loadingIndicator circle should disappear
+        loadingIndicator.setVisibility(View.GONE);
+        btnLoadMore.setVisibility(View.VISIBLE);
+
+        mAdapter.notifyDataSetChanged();
+        if (articles == null) {
+            emptyView.setText(R.string.no_articles_network);
+            emptyView.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onClick(View v) {
+                    pageNumber = 1;
+                    refreshListView();
+                }
+            });
+        } else if(articles.isEmpty()) {
+            emptyView.setText(R.string.no_articles);
+            btnLoadMore.setVisibility(View.INVISIBLE);
+        } else {
+            mAdapter.addAll(articles);
+            if(articles.size() != 10)
+                btnLoadMore.setVisibility(View.INVISIBLE);
+        }
+
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     /**
@@ -371,41 +382,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals("dark_mode")) {
             recreate();
-        }
-    }
-
-    @Override
-    public void onArticlesFetched(List<Article> articles) {
-        // Once the load process is finished, the loadingIndicator circle should disappear
-        loadingIndicator.setVisibility(View.GONE);
-
-        // EmptyView is only visible if mAdapter is empty
-        if (pageNumber == 1) {
-            emptyView.setText(R.string.no_articles);
-        } else {
-            emptyView.setText(R.string.no_articles_page);
-        }
-
-        mAdapter.clear();
-        if (articles == null || articles.isEmpty()) {
-            emptyView.setText(articles == null ? R.string.no_articles_network : R.string.no_articles);
-            emptyView.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View v) {
-                    if (pageNumber > 1) {
-                        pageNumber--;
-                        pageNumberTV.setText(pageNumber.toString());
-                    }
-                    refreshListView();
-                }
-            });
-        } else {
-            mAdapter.addAll(articles);
-        }
-
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 

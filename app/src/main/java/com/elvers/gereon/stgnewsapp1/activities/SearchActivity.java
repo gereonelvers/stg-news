@@ -11,11 +11,10 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -54,8 +53,8 @@ public class SearchActivity extends AppCompatActivity implements IArticlesLoaded
     TextView emptyView;
     String numberOfArticlesParam;
     Integer pageNumber;
-    TextView pageNumberTV;
     private ArticleAdapter mAdapter;
+    private Button btnLoadMore;
 
     /**
      * onCreate is called when this Activity is launched. It is therefore responsible for setting it up based on the query specified in the Intent used to launch it.
@@ -92,39 +91,20 @@ public class SearchActivity extends AppCompatActivity implements IArticlesLoaded
         mListView = findViewById(R.id.listView);
         mListView.setEmptyView(emptyView);
 
-        // Inflate page picker and add below ListView
-        View pagePicker = LayoutInflater.from(this).inflate(R.layout.page_picker, null, false);
-        mListView.addFooterView(pagePicker);
+        btnLoadMore = new Button(this);
+        btnLoadMore.setText(R.string.load_more);
+        btnLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingIndicator.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingArticles();
+            }
+        });
+        mListView.addFooterView(btnLoadMore);
 
         // When launching the Activity, the first page should be loaded
         pageNumber = 1;
-
-        // Initialize page number TextView and set initial value (at this point, always 1)
-        pageNumberTV = findViewById(R.id.page_number_tv);
-        pageNumberTV.setText(pageNumber.toString());
-
-        // Implement page back-button
-        ImageView backIV = findViewById(R.id.back_iv);
-        backIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pageNumber > 1) {
-                    pageNumber--;
-                    pageNumberTV.setText(pageNumber.toString());
-                    refreshListView();
-                }
-            }
-        });
-        // Implement page forward-button
-        ImageView forwardIV = findViewById(R.id.forward_iv);
-        forwardIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber++;
-                pageNumberTV.setText(pageNumber.toString());
-                refreshListView();
-            }
-        });
 
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -155,6 +135,8 @@ public class SearchActivity extends AppCompatActivity implements IArticlesLoaded
     }
 
     public void initLoaderListView() {
+        pageNumber = 1;
+
         mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -197,29 +179,21 @@ public class SearchActivity extends AppCompatActivity implements IArticlesLoaded
 
     @Override
     public void onArticlesFetched(List<Article> articles) {
+        btnLoadMore.setVisibility(View.VISIBLE);
+
         loadingIndicator.setVisibility(View.GONE);
-        TextView emptyView = findViewById(R.id.empty_view);
-        if (pageNumber == 1) {
-            emptyView.setText(R.string.no_articles_search);
-        } else {
-            emptyView.setText(R.string.no_articles_search_page);
-        }
-        mAdapter.clear();
+        emptyView.setText(R.string.no_articles_search);
+
+        mAdapter.notifyDataSetChanged();
         if (articles != null && !articles.isEmpty()) {
             mAdapter.addAll(articles);
+            if(articles.size() != 10)
+                btnLoadMore.setVisibility(View.INVISIBLE);
         } else {
-            emptyView.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View v) {
-                    if (pageNumber != 1) {
-                        pageNumber--;
-                        pageNumberTV.setText(pageNumber.toString());
-                        refreshListView();
-                    }
-                }
-            });
+            if(articles != null)
+                btnLoadMore.setVisibility(View.INVISIBLE);
         }
+
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }

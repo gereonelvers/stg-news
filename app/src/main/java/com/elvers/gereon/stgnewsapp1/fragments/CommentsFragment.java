@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -49,11 +50,10 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
     ListView listView;
     SwipeRefreshLayout mSwipeRefreshLayout;
     Integer pageNumber;
-    TextView pageNumberTV;
 
     // Parsed parameter
     private Integer articleID;
-
+    private Button btnLoadMore;
     private String numberOfCommentsParam;
 
     // Required empty public constructor
@@ -105,39 +105,20 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
         emptyView_quill_iv = view.findViewById(R.id.comments_empty_view_quill_iv);
         listView.setEmptyView(emptyView);
 
-        // Inflate page picker and add below ListView
-        View pagePicker = LayoutInflater.from(getActivity()).inflate(R.layout.page_picker, null, false);
-        listView.addFooterView(pagePicker);
+        btnLoadMore = new Button(getActivity());
+        btnLoadMore.setText(R.string.load_more);
+        btnLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingIndicator.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingComments();
+            }
+        });
+        listView.addFooterView(btnLoadMore);
 
         // When launching the Activity, the first page should be loaded
         pageNumber = 1;
-
-        // Initialize page number TextView and set initial value (at this point, always 1)
-        pageNumberTV = view.findViewById(R.id.page_number_tv);
-        pageNumberTV.setText(pageNumber.toString());
-
-        // Implement page back-button
-        ImageView backIV = view.findViewById(R.id.back_iv);
-        backIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pageNumber > 1) {
-                    pageNumber--;
-                    pageNumberTV.setText(pageNumber.toString());
-                    refreshListView();
-                }
-            }
-        });
-        // Implement page forward-button
-        ImageView forwardIV = view.findViewById(R.id.forward_iv);
-        forwardIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber++;
-                pageNumberTV.setText(pageNumber.toString());
-                refreshListView();
-            }
-        });
 
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
@@ -156,10 +137,22 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
     }
 
     public void refreshListView() {
-        commentAdapter.clear();
+        if (commentAdapter != null)
+            commentAdapter.clear();
         loadingIndicator.setVisibility(View.VISIBLE);
         initLoaderListView();
         emptyView.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * This is the method actually loading the data and projecting it onto the ListView. It creates a new Adapter and sets it on the ListView
+     */
+    public void initLoaderListView() {
+        pageNumber = 1;
+
+        commentAdapter = new CommentAdapter(getActivity(), new ArrayList<Comment>());
+        listView.setAdapter(commentAdapter);
+        startFetchingComments();
     }
 
     private void startFetchingComments() {
@@ -175,51 +168,31 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
         new LoadCommentsTask(this).execute(uriBuilder.toString());
     }
 
-
-    /**
-     * This is the method actually loading the data and projecting it onto the ListView. It creates a new Adapter and sets it on the ListView
-     * Also destroys (if necessary)
-     */
-    public void initLoaderListView() {
-        commentAdapter = new CommentAdapter(getActivity(), new ArrayList<Comment>());
-        listView.setAdapter(commentAdapter);
-        startFetchingComments();
-    }
-
     @Override
     public void onCommentsFetched(List<Comment> comments) {
+        pageNumber = 1;
+        btnLoadMore.setVisibility(View.VISIBLE);
+
         // Since we can't be sure the fragment will still be active when comments are fetched, this is done in a try-block
         try {
             loadingIndicator.setVisibility(View.GONE);
-            if (pageNumber == 1) {
-                emptyView_tv.setText(getString(R.string.comments_empty_view));
-                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                    emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_dark);
-                } else {
-                    emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_light);
-                }
-                emptyView_quill_iv.setImageResource(R.drawable.ic_quill);
-            } else {
-                emptyView_tv.setText(getString(R.string.comments_empty_view_page));
-            }
 
-            commentAdapter.clear();
+            emptyView_tv.setText(getString(R.string.comments_empty_view));
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_dark);
+            } else {
+                emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_light);
+            }
+            emptyView_quill_iv.setImageResource(R.drawable.ic_quill);
+
+            commentAdapter.notifyDataSetChanged();
             if (comments != null && !comments.isEmpty()) {
                 commentAdapter.addAll(comments);
+                if (comments.size() != 10)
+                    btnLoadMore.setVisibility(View.INVISIBLE);
             } else {
-                if (pageNumber != 1) {
-                    emptyView_quill_iv.setVisibility(View.INVISIBLE);
-                    emptyView_arrow_iv.setVisibility(View.INVISIBLE);
-                    emptyView_tv.setOnClickListener(new View.OnClickListener() {
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void onClick(View v) {
-                            pageNumber--;
-                            pageNumberTV.setText(pageNumber.toString());
-                            refreshListView();
-                        }
-                    });
-                }
+                if (comments != null)
+                    btnLoadMore.setVisibility(View.INVISIBLE);
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "Can't push comments to Adapter: " + e.toString());
