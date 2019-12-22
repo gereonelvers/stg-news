@@ -87,7 +87,7 @@ public class ArticleWebViewClient extends WebViewClient {
         else if (urlStr.contains("stg-sz.net")) {
             String[] parts = url.getPath().split("/");
             if (parts[2].equalsIgnoreCase("author")) { // filter by author
-                int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).id;
+                int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).getId();
                 Intent intent = new Intent();
                 intent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
                 intent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, authorId);

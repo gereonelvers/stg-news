@@ -7,7 +7,7 @@ import android.text.Html;
  *
  * @author Gereon Elvers
  */
-public class Article {
+public class Article extends ListEntry {
     private int mId;
     private String mTitle;
     private String mTitleHtmlEscaped;

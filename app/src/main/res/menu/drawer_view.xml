@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single"
-        android:id="@+id/mainGroup">
-    </group>
-    <group>
-        <!-- items will be added in Utils.createMenu() -->
-    </group>
+    <group
+        android:id="@+id/mainGroup"
+        android:checkableBehavior="single" />
+
+    <group
+        android:id="@+id/categoryGroup"
+        android:checkableBehavior="single" />
+
+    <group
+        android:id="@+id/authorGroup"
+        android:checkableBehavior="single" />
 </menu>

@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,8 +22,9 @@ import android.widget.TextView;
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.adapter.ArticleAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Article;
-import com.elvers.gereon.stgnewsapp1.handlers.IArticlesLoadedHandler;
-import com.elvers.gereon.stgnewsapp1.tasks.LoadArticlesTask;
+import com.elvers.gereon.stgnewsapp1.api.ListEntry;
+import com.elvers.gereon.stgnewsapp1.handlers.IListContentLoadedHandler;
+import com.elvers.gereon.stgnewsapp1.tasks.LoadListContentTask;
 import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class SearchActivity extends AppCompatActivity implements IArticlesLoadedHandler {
+public class SearchActivity extends AppCompatActivity implements IListContentLoadedHandler {
 
     public static String ACTION_FILTER_AUTHOR = "FILTER_BY_AUTHOR";
     public static String EXTRA_AUTHOR_ID = "EXTRA_AUTHOR_ID";
@@ -53,7 +55,7 @@ public class SearchActivity extends AppCompatActivity implements IArticlesLoaded
     TextView emptyView;
     String numberOfArticlesParam;
     Integer pageNumber;
-    private ArticleAdapter mAdapter;
+    private ArrayAdapter mAdapter;
     private Button btnLoadMore;
 
     /**
@@ -143,7 +145,7 @@ public class SearchActivity extends AppCompatActivity implements IArticlesLoaded
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (mAdapter.getCount() > i) {
-                    Article currentArticle = mAdapter.getItem(i);
+                    Article currentArticle = (Article) mAdapter.getItem(i);
                     Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
                     if (currentArticle != null) {
                         articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
@@ -174,11 +176,11 @@ public class SearchActivity extends AppCompatActivity implements IArticlesLoaded
         }
 
         uriBuilder.appendQueryParameter("page", pageNumber.toString());
-        new LoadArticlesTask(this).execute(uriBuilder.toString());
+        new LoadListContentTask(this).execute(uriBuilder.toString());
     }
 
     @Override
-    public void onArticlesFetched(List<Article> articles) {
+    public void onListContentFetched(List<ListEntry> articles) {
         btnLoadMore.setVisibility(View.VISIBLE);
 
         loadingIndicator.setVisibility(View.GONE);

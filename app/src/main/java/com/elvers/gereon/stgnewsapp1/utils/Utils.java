@@ -13,6 +13,7 @@ import android.view.Menu;
 
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.api.Author;
 import com.elvers.gereon.stgnewsapp1.api.AuthorResponse;
 import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
 import com.elvers.gereon.stgnewsapp1.api.Comment;
@@ -324,9 +325,9 @@ public final class Utils {
 
         // Iterate over authorsResponse until the author ID of currentArticle matches the changing ID of the authors in authorsResponse
         for (int i = 0; i < authorResponse.getAuthors().size(); i++) {
-            AuthorResponse.Author author = authorResponse.getAuthors().get(i);
-            if (author.id == authorID) {
-                return author.name;
+            Author author = authorResponse.getAuthors().get(i);
+            if (author.getId() == authorID) {
+                return author.getName();
             }
         }
 
@@ -433,9 +434,11 @@ public final class Utils {
             navigationMenu.getItem(1).setCheckable(true);
             for (int i = 0; i < categoryResponse.getCategories().size(); i++) {
                 CategoryResponse.Category category = categoryResponse.getCategories().get(i);
-                navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/category.id, /*Order*/i + 2, /*name*/category.name);
+                navigationMenu.add(/*Group ID*/R.id.categoryGroup, /*itemID*/category.id, /*Order*/i + 2, /*name*/category.name);
                 navigationMenu.getItem(i + 2).setCheckable(true);
             }
+            navigationMenu.add(R.id.authorGroup, -3, categoryResponse.getCategories().size() + 2, R.string.authors);
+            navigationMenu.getItem(navigationMenu.size() - 1).setCheckable(true);
 
             navigationView.invalidate();
             drawerLayout.invalidate();

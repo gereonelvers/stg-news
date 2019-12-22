@@ -134,7 +134,7 @@ public class ArticleActivity extends AppCompatActivity implements SharedPreferen
         });
         // if "#comments" is present in the URI, this means that the Article has been accessed though a deeplink meant to link directly to the comments or the activity has been restarted and the last instance showed the comments.
         // Therefore jump straight to CommentsFragment
-        if (articleURI.contains("#comments") || (savedInstanceState != null && savedInstanceState.containsKey("isComments") && savedInstanceState.getBoolean("isComments"))) {
+        if (articleURI.contains("#comments")) {
             showComments();
         } else {
             // If that isn't the case, start off by showing the article
@@ -366,17 +366,6 @@ public class ArticleActivity extends AppCompatActivity implements SharedPreferen
         if (!hasChanged) {
             isFavorite = false;
         }
-    }
-
-    /**
-     * Save data which will be given to new instance/recreated instance of this activity; this is needed to remember to show comments after visiting the settings
-     *
-     * @param outState will contain all information to pass to new instance
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("isComments", isComments);
     }
 
     @Override

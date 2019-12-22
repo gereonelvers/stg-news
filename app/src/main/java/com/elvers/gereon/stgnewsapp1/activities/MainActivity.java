@@ -27,17 +27,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.adapter.ArticleAdapter;
+import com.elvers.gereon.stgnewsapp1.adapter.AuthorAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.api.Author;
 import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
-import com.elvers.gereon.stgnewsapp1.handlers.IArticlesLoadedHandler;
+import com.elvers.gereon.stgnewsapp1.api.ListEntry;
+import com.elvers.gereon.stgnewsapp1.handlers.IListContentLoadedHandler;
 import com.elvers.gereon.stgnewsapp1.handlers.ICategoriesLoadedHandler;
-import com.elvers.gereon.stgnewsapp1.tasks.LoadArticlesTask;
+import com.elvers.gereon.stgnewsapp1.tasks.LoadListContentTask;
 import com.elvers.gereon.stgnewsapp1.tasks.LoadCategoriesTask;
 import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
@@ -50,7 +54,7 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, IArticlesLoadedHandler, ICategoriesLoadedHandler { //TODO if user refreshes content, categories should also be updated
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, IListContentLoadedHandler, ICategoriesLoadedHandler {
 
     /**
      * Static request URL (modifiers will append to this)
@@ -63,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     /* There are a lot of items declared outside of individual methods here.
     This is done because they are required to be available across methods and it's more economical to simply initialize them onCreate() */
     SwipeRefreshLayout mSwipeRefreshLayout;
-    ListView articleListView;
+    ListView contentListView;
     TextView emptyView;
     View loadingIndicator;
     String filterParam;
@@ -72,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     Menu drawerMenu;
     NavigationView navigationView;
     boolean isFavoriteSelected;
-    private ArticleAdapter mAdapter;
+    boolean isAuthorsSelected;
+    private ArrayAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
     private ActionBar actionBar;
     private SharedPreferences sharedPreferences;
@@ -137,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         // EmptyView (The message that is shown when ListView is empty) is initialized and set on ListView
         emptyView = findViewById(R.id.empty_view);
-        articleListView = findViewById(R.id.article_list_view);
-        articleListView.setEmptyView(emptyView);
+        contentListView = findViewById(R.id.article_list_view);
+        contentListView.setEmptyView(emptyView);
 
         btnLoadMore = new Button(this);
         btnLoadMore.setText(R.string.load_more);
@@ -147,14 +152,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             public void onClick(View v) {
                 loadingIndicator.setVisibility(View.VISIBLE);
                 pageNumber++;
-                startFetchingArticles();
+                startFetchingContent();
             }
         });
 
         // Start loading categories
         new LoadCategoriesTask(this).execute();
 
-        articleListView.addFooterView(btnLoadMore);
+        contentListView.addFooterView(btnLoadMore);
 
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -179,22 +184,36 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         int menuItemItemId = menuItem.getItemId();
         if (menuItem.getItemId() == -1) { // All articles
             filterParam = "";
+            isFavoriteSelected = false;
+            isAuthorsSelected = false;
+
             if (actionBar != null) {
                 actionBar.setTitle(getString(R.string.app_name));
             }
-            isFavoriteSelected = false;
         }
         // Favorite articles
         else if (menuItem.getItemId() == -2) {
-            isFavoriteSelected = true;
             filterParam = "";
+            isFavoriteSelected = true;
+            isAuthorsSelected = false;
+
             if (actionBar != null) {
                 actionBar.setTitle(getString(R.string.favorites_title));
             }
 
+        } else if(menuItem.getItemId() == -3) {
+            filterParam = "";
+            isFavoriteSelected = false;
+            isAuthorsSelected = true;
+
+            if (actionBar != null) {
+                actionBar.setTitle(menuItem.getTitle());
+            }
         } else { // A category
             filterParam = Integer.toString(menuItemItemId);
             isFavoriteSelected = false;
+            isAuthorsSelected = false;
+
             if (actionBar != null) {
                 actionBar.setTitle(menuItem.getTitle());
             }
@@ -225,28 +244,47 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         pageNumber = 1;
 
         // init loader listview
-        mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
-        articleListView.setAdapter(mAdapter);
-        articleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (mAdapter.getCount() > i) {
-                    Article currentArticle = mAdapter.getItem(i);
-                    Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
-                    if (currentArticle != null) {
-                        articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
-                        articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitleHtmlEscaped());
-                        articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+        if(isAuthorsSelected) {
+            mAdapter = new AuthorAdapter(this, new ArrayList<Author>());
+            contentListView.setAdapter(mAdapter);
+            contentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (mAdapter.getCount() > i) {
+                        Author currentAuthor = (Author) mAdapter.getItem(i);
+                        Intent authorIntent = new Intent(getApplicationContext(), SearchActivity.class);
+                        if (currentAuthor != null) {
+                            authorIntent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
+                            authorIntent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, currentAuthor.getId());
+                        }
+                        startActivity(authorIntent);
                     }
-                    startActivity(articleIntent);
                 }
-            }
-        });
+            });
+        } else {
+            mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
+            contentListView.setAdapter(mAdapter);
+            contentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (mAdapter.getCount() > i) {
+                        Article currentArticle = (Article) mAdapter.getItem(i);
+                        Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
+                        if (currentArticle != null) {
+                            articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
+                            articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitleHtmlEscaped());
+                            articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+                        }
+                        startActivity(articleIntent);
+                    }
+                }
+            });
+        }
 
-        startFetchingArticles();
+        startFetchingContent();
     }
 
-    private void startFetchingArticles() {
+    private void startFetchingContent() {
         // make sure categories are loaded (they are not if there was no internet connection during the startup of the app)
         if(Utils.categoryResponse == null)
             new LoadCategoriesTask(this).execute();
@@ -254,15 +292,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
-        uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("posts");
-
-        if (!filterParam.isEmpty()) {
-            uriBuilder.appendQueryParameter("categories", filterParam);
+        uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2");
+        if(isAuthorsSelected) {
+            uriBuilder.appendPath("users");
+        } else {
+            uriBuilder.appendPath("posts");
+            if (!filterParam.isEmpty()) {
+                uriBuilder.appendQueryParameter("categories", filterParam);
+            }
         }
+
         if (!numberOfArticlesParam.isEmpty()) {
             uriBuilder.appendQueryParameter("per_page", numberOfArticlesParam);
         }
-        if (isFavoriteSelected) {
+        if (isFavoriteSelected && !isAuthorsSelected) {
             for(String fav : sharedPreferences.getString("favorites", "").split(",")) {
                 uriBuilder.appendQueryParameter("include[]", fav);
             }
@@ -270,11 +313,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         uriBuilder.appendQueryParameter("page", String.valueOf(pageNumber));
         Log.e("Query URI: ", uriBuilder.toString());
 
-        new LoadArticlesTask(this).execute(uriBuilder.toString());
+        new LoadListContentTask(this).execute(uriBuilder.toString());
     }
 
     @Override
-    public void onArticlesFetched(List<Article> articles) {
+    public void onListContentFetched(List<ListEntry> articles) {
         // Once the load process is finished, the loadingIndicator circle should disappear
         loadingIndicator.setVisibility(View.GONE);
         btnLoadMore.setVisibility(View.VISIBLE);
