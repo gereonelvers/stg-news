@@ -25,6 +25,7 @@ public class LoadArticlesTask extends AsyncTask<String, Void, List<Article>> {
     @Override
     protected void onPostExecute(List<Article> articles) {
         super.onPostExecute(articles);
-        handler.onArticlesFetched(articles);
+        if(handler != null)
+            handler.onArticlesFetched(articles);
     }
 }

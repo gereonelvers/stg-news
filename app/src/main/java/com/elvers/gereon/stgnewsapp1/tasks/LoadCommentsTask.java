@@ -25,6 +25,7 @@ public class LoadCommentsTask extends AsyncTask<String, Void, List<Comment>> {
     @Override
     protected void onPostExecute(List<Comment> comments) {
         super.onPostExecute(comments);
-        handler.onCommentsFetched(comments);
+        if(handler != null)
+            handler.onCommentsFetched(comments);
     }
 }

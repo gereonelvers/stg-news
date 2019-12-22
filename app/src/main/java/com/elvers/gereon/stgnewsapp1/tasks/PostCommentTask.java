@@ -25,13 +25,14 @@ public class PostCommentTask extends AsyncTask<String, Void, Integer> {
             return Utils.sendComment(strings[0], strings[1], strings[2], strings[3]);
         } catch (IOException e) {
             e.printStackTrace();
-            return 0;
+            return -1;
         }
     }
 
     @Override
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
-        handler.onCommentPosted(integer);
+        if(handler != null)
+            handler.onCommentPosted(integer);
     }
 }

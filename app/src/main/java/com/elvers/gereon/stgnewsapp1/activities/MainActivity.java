@@ -247,6 +247,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void startFetchingArticles() {
+        // make sure categories are loaded (they are not if there was no internet connection during the startup of the app)
+        if(Utils.categoryResponse == null)
+            new LoadCategoriesTask(this).execute();
+
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);

@@ -20,12 +20,15 @@ public class LoadCategoriesTask extends AsyncTask<Void, Void, List<CategoryRespo
     protected List<CategoryResponse.Category> doInBackground(Void... unused) {
         if(Utils.categoryResponse == null)
             Utils.updateCategories();
+        if(Utils.categoryResponse == null)
+            return null;
         return Utils.categoryResponse.getCategories();
     }
 
     @Override
     protected void onPostExecute(List<CategoryResponse.Category> categories) {
         super.onPostExecute(categories);
-        handler.onCategoriesFetched(categories);
+        if(handler != null)
+            handler.onCategoriesFetched(categories);
     }
 }
