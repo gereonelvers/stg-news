@@ -452,6 +452,7 @@ public final class Utils {
      */
     public static void updateNightMode(Activity activity) {
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+
             activity.setTheme(R.style.AppThemeDark);
         } else {
             activity.setTheme(R.style.AppTheme);

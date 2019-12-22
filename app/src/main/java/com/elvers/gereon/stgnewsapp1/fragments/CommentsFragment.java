@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
@@ -23,7 +21,8 @@ import android.widget.TextView;
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.adapter.CommentAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Comment;
-import com.elvers.gereon.stgnewsapp1.tasks.CommentLoader;
+import com.elvers.gereon.stgnewsapp1.handlers.ICommentsLoadedHandler;
+import com.elvers.gereon.stgnewsapp1.tasks.LoadCommentsTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class CommentsFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Comment>> {
+public class CommentsFragment extends Fragment implements ICommentsLoadedHandler {
 
     // Tag for log messages
     private static final String LOG_TAG = CommentsFragment.class.getSimpleName();
@@ -41,8 +40,6 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     /* There are a lot of items declared outside of individual methods here.
     This is done because they are required to be available across methods and it's more economical to simply initialize them onCreateView() */
     private static final String COMMENTS_REQUEST_URL = "stg-sz.net";
-    private static final int COMMENT_LOADER_ID = 3;
-    LoaderManager loaderManager;
     View loadingIndicator;
     RelativeLayout emptyView;
     TextView emptyView_tv;
@@ -102,7 +99,6 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
         numberOfCommentsParam = sharedPreferences.getString("comments_number", "10");
         loadingIndicator = view.findViewById(R.id.comments_loading_circle);
         listView = view.findViewById(R.id.comment_listView);
-        loaderManager = getActivity().getSupportLoaderManager();
         emptyView = view.findViewById(R.id.comments_empty_view_rl);
         emptyView_tv = view.findViewById(R.id.comments_empty_view_tv);
         emptyView_arrow_iv = view.findViewById(R.id.comments_empty_view_arrow_iv);
@@ -166,17 +162,7 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
         emptyView.setVisibility(View.INVISIBLE);
     }
 
-    /**
-     * This method is called when creating a new CommentLoader. It creates a modified query URL (by adding the filter parameters listed below) and initializes the CommentLoader.
-     * <p>
-     * Parameters:
-     * {@param articleID} is the ID of the Article)
-     * {@param numberOfCommentsParam} is a String containing the number of Comment objects requested from the server
-     * {@param pageNumber} is the page number loaded
-     */
-    @Override
-    @NonNull
-    public Loader<List<Comment>> onCreateLoader(int i, Bundle bundle) {
+    private void startFetchingComments() {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(COMMENTS_REQUEST_URL);
@@ -186,11 +172,22 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
             uriBuilder.appendQueryParameter("per_page", numberOfCommentsParam);
             uriBuilder.appendQueryParameter("page", pageNumber.toString());
         }
-        return new CommentLoader(getContext(), uriBuilder.toString());
+        new LoadCommentsTask(this).execute(uriBuilder.toString());
+    }
+
+
+    /**
+     * This is the method actually loading the data and projecting it onto the ListView. It creates a new Adapter and sets it on the ListView
+     * Also destroys (if necessary)
+     */
+    public void initLoaderListView() {
+        commentAdapter = new CommentAdapter(getActivity(), new ArrayList<Comment>());
+        listView.setAdapter(commentAdapter);
+        startFetchingComments();
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<List<Comment>> loader, List<Comment> comments) {
+    public void onCommentsFetched(List<Comment> comments) {
         // Since we can't be sure the fragment will still be active when comments are fetched, this is done in a try-block
         try {
             loadingIndicator.setVisibility(View.GONE);
@@ -232,22 +229,4 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
             mSwipeRefreshLayout.setRefreshing(false);
         }
     }
-
-
-    /**
-     * This is the method actually loading the data and projecting it onto the ListView. It creates a new Adapter and sets it on the ListView
-     * Also destroys (if necessary) and restarts the ArticleLoader responsible for filling the CommentAdapter with content
-     */
-    public void initLoaderListView() {
-        commentAdapter = new CommentAdapter(getActivity(), new ArrayList<Comment>());
-        listView.setAdapter(commentAdapter);
-        loaderManager.destroyLoader(COMMENT_LOADER_ID);
-        loaderManager.initLoader(COMMENT_LOADER_ID, null, this);
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<List<Comment>> loader) {
-        commentAdapter.clear();
-    }
-
 }
