@@ -7,24 +7,27 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ImageView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.adapter.ArticleAdapter;
+import com.elvers.gereon.stgnewsapp1.adapter.AuthorAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Article;
-import com.elvers.gereon.stgnewsapp1.tasks.ArticleLoader;
+import com.elvers.gereon.stgnewsapp1.api.Author;
+import com.elvers.gereon.stgnewsapp1.api.ListEntry;
+import com.elvers.gereon.stgnewsapp1.handlers.IListContentLoadedHandler;
+import com.elvers.gereon.stgnewsapp1.tasks.LoadListContentTask;
 import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.ArrayList;
@@ -36,28 +39,32 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class SearchActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Article>> {
+public class SearchActivity extends AppCompatActivity implements IListContentLoadedHandler, SharedPreferences.OnSharedPreferenceChangeListener {
+
+    public static String ACTION_FILTER_AUTHOR = "FILTER_BY_AUTHOR";
+    public static String EXTRA_AUTHOR_ID = "EXTRA_AUTHOR_ID";
+    public static String EXTRA_CATEGORY_ID = "EXTRA_CATEGORY_ID";
 
     // Static request URL the data will be requested from. Putting it at the top like this allow easier modification of top level domain if required
     private static final String WP_REQUEST_URL = "www.stg-sz.net";
 
-    /* Assign loader static ID (enables easier implementation of possible future loaders).
-        This ID differs from the one used in MainActivity to avoid interference if the original loader is not destroyed before this one is launched */
-    private static final int ARTICLE_SEARCH_LOADER_ID = 2;
-
     /* There are a lot of items declared outside of individual methods here.
         This is done because they are required to be available across methods */
     SwipeRefreshLayout mSwipeRefreshLayout;
-    String titleString;
-    String requestTerm;
-    LoaderManager loaderManager;
+    String titleString = "";
+    String searchFilter = ""; // don't want to cause a NullPointerException
+    int authorFilter = -1;
+    int categoryId = -1;
     ListView mListView;
     View loadingIndicator;
     TextView emptyView;
     String numberOfArticlesParam;
     Integer pageNumber;
-    TextView pageNumberTV;
-    private ArticleAdapter mAdapter;
+    private ArrayAdapter mAdapter;
+
+    private ProgressBar loadingIndicatorBottom;
+    private boolean loadingContent = false;
+    private boolean canLoadMoreContent = true;
 
     /**
      * onCreate is called when this Activity is launched. It is therefore responsible for setting it up based on the query specified in the Intent used to launch it.
@@ -76,7 +83,6 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
-        titleString = getString(R.string.search_title);
         handleIntent(getIntent());
         if (actionbar != null) {
             actionbar.setDisplayHomeAsUpEnabled(true);
@@ -86,9 +92,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         // Getting numberOfArticlesParam from SharedPreferences (default: 10; modifiable through Preferences). This is the number of articles requested from the backend.
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         numberOfArticlesParam = sharedPreferences.getString("post_number", "10");
-
-        // Initializing loaderManager
-        loaderManager = getSupportLoaderManager();
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         // Finding loadingIndicator
         loadingIndicator = findViewById(R.id.loading_circle);
@@ -98,39 +102,14 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         mListView = findViewById(R.id.listView);
         mListView.setEmptyView(emptyView);
 
-        // Inflate page picker and add below ListView
-        View pagePicker = LayoutInflater.from(this).inflate(R.layout.page_picker, null, false);
-        mListView.addFooterView(pagePicker);
+        loadingIndicatorBottom = new ProgressBar(this);
+        loadingIndicatorBottom.setVisibility(View.GONE);
+        mListView.addFooterView(loadingIndicatorBottom);
+
+        mListView.setOnScrollListener(new InfinityScrollListener());
 
         // When launching the Activity, the first page should be loaded
         pageNumber = 1;
-
-        // Initialize page number TextView and set initial value (at this point, always 1)
-        pageNumberTV = findViewById(R.id.page_number_tv);
-        pageNumberTV.setText(pageNumber.toString());
-
-        // Implement page back-button
-        ImageView backIV = findViewById(R.id.back_iv);
-        backIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pageNumber > 1) {
-                    pageNumber--;
-                    pageNumberTV.setText(pageNumber.toString());
-                    refreshListView();
-                }
-            }
-        });
-        // Implement page forward-button
-        ImageView forwardIV = findViewById(R.id.forward_iv);
-        forwardIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber++;
-                pageNumberTV.setText(pageNumber.toString());
-                refreshListView();
-            }
-        });
 
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -153,66 +132,83 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
      * It dumps the old Adapter and makes corrects the visibility of loadingIndicator and emptyView so make the user aware that new data is about to appear
      */
     public void refreshListView() {
-        mAdapter.clear();
+        if (mAdapter != null)
+            mAdapter.clear();
         loadingIndicator.setVisibility(View.VISIBLE);
         initLoaderListView();
         emptyView.setVisibility(View.INVISIBLE);
     }
 
     public void initLoaderListView() {
-        mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (mAdapter.getCount() > i) {
-                    Article currentArticle = mAdapter.getItem(i);
-                    Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
-                    if (currentArticle != null) {
-                        articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
-                        articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitle());
-                        articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+        pageNumber = 1;
+
+        if (categoryId == -3) {
+            mAdapter = new AuthorAdapter(this, new ArrayList<Author>());
+            mListView.setAdapter(mAdapter);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (mAdapter.getCount() > i) {
+                        Author currentAuthor = (Author) mAdapter.getItem(i);
+                        Intent authorIntent = new Intent(getApplicationContext(), SearchActivity.class);
+                        if (currentAuthor != null) {
+                            authorIntent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
+                            authorIntent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, currentAuthor.getId());
+                        }
+                        finish(); // maybe the articles listed by author should have their own activity (this is just a dirty fix)
+                        startActivity(authorIntent);
                     }
-                    startActivity(articleIntent);
                 }
-            }
-        });
+            });
+        } else {
+            mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
+            mListView.setAdapter(mAdapter);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (mAdapter.getCount() > i) {
+                        Article currentArticle = (Article) mAdapter.getItem(i);
+                        Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
+                        if (currentArticle != null) {
+                            articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
+                            articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitleHtmlEscaped());
+                            articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+                        }
+                        startActivity(articleIntent);
+                    }
+                }
+            });
+        }
 
-        loaderManager.destroyLoader(ARTICLE_SEARCH_LOADER_ID);
-        loaderManager.initLoader(ARTICLE_SEARCH_LOADER_ID, null, this);
+        startFetchingContent();
     }
 
+    private void startFetchingContent() {
+        loadingContent = true;
 
-    /**
-     * Refreshing mListView when returning to SearchActivity to make sure results are up-to-date.
-     */
-    @Override
-    public void onRestart() { // there is no option to change the theme from this activity, so I don't have to recreate the activity
-        super.onRestart();
-        mAdapter.clear();
-        loadingIndicator.setVisibility(View.VISIBLE);
-        initLoaderListView();
-        emptyView.setVisibility(View.INVISIBLE);
-    }
-
-
-    /**
-     * This method is called when creating a new ArticleLoader. It creates a modified query URL (by adding the filter parameters listed below) and initializes the ArticleLoader.
-     * <p>
-     * Parameters:
-     * {@param requestTerm} is a String containing the search term
-     * {@param numberOfArticlesParam} is a String containing the number of Article objects requested from the server
-     * {@param pageNumber} is the page number loaded
-     */
-    @Override
-    @NonNull
-    public Loader<List<Article>> onCreateLoader(int i, Bundle bundle) {
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
-        uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("posts");
-        if (!requestTerm.isEmpty()) {
-            uriBuilder.appendQueryParameter("search", requestTerm);
+        uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2");
+        if (categoryId == -3) {
+            uriBuilder.appendPath("users");
+        } else {
+            uriBuilder.appendPath("posts");
+        }
+
+        if (!searchFilter.isEmpty()) {
+            uriBuilder.appendQueryParameter("search", searchFilter);
+        } else if (authorFilter != -1 && categoryId != -3) {
+            uriBuilder.appendQueryParameter("author", String.valueOf(authorFilter));
+        }
+        if (categoryId > 0) {
+            uriBuilder.appendQueryParameter("categories", String.valueOf(categoryId));
+        }
+
+        if (categoryId == -2) {
+            for (String fav : PreferenceManager.getDefaultSharedPreferences(this).getString("favorites", "").split(",")) {
+                uriBuilder.appendQueryParameter("include[]", fav);
+            }
         }
 
         if (!numberOfArticlesParam.isEmpty()) {
@@ -220,49 +216,34 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         uriBuilder.appendQueryParameter("page", pageNumber.toString());
-        return new ArticleLoader(this, uriBuilder.toString());
+        new LoadListContentTask(this).execute(uriBuilder.toString());
     }
 
-    /**
-     * Method called once the ArticleLoader has finished loading
-     * It manages visibility of loadingIndicator and emptyView and pushes the list of Article objects onto the ArticleAdapter
-     */
     @Override
-    public void onLoadFinished(@NonNull Loader<List<Article>> loader, List<Article> articles) {
+    public void onListContentFetched(List<ListEntry> entries) {
         loadingIndicator.setVisibility(View.GONE);
-        TextView emptyView = findViewById(R.id.empty_view);
-        if (pageNumber == 1) {
-            emptyView.setText(R.string.no_articles_search);
+        loadingIndicatorBottom.setVisibility(View.GONE);
+
+        canLoadMoreContent = true;
+
+        loadingIndicator.setVisibility(View.GONE);
+        emptyView.setText(R.string.no_result_search);
+
+        mAdapter.notifyDataSetChanged();
+        if (entries != null && !entries.isEmpty()) {
+            mAdapter.addAll(entries);
+            if (entries.size() != Integer.parseInt(numberOfArticlesParam))
+                canLoadMoreContent = false;
         } else {
-            emptyView.setText(R.string.no_articles_search_page);
+            if (entries != null)
+                canLoadMoreContent = false;
         }
-        mAdapter.clear();
-        if (articles != null && !articles.isEmpty()) {
-            mAdapter.addAll(articles);
-        } else {
-            emptyView.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onClick(View v) {
-                    if (pageNumber != 1) {
-                        pageNumber--;
-                        pageNumberTV.setText(pageNumber.toString());
-                        refreshListView();
-                    }
-                }
-            });
-        }
+
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
-    }
 
-    /**
-     * If the ArticleLoader is reset, so should the ArticleAdapter
-     */
-    @Override
-    public void onLoaderReset(@NonNull Loader<List<Article>> loader) {
-        mAdapter.clear();
+        loadingContent = false;
     }
 
     /**
@@ -274,15 +255,53 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         handleIntent(intent);
     }
 
-
     /**
-     * This method is called whenever data that was pushed through an Intent needs to be retrieved. It gets the String and saves it as requestTerm.
+     * This method is called whenever data that was pushed through an Intent needs to be retrieved. It gets the String and saves it as searchFilter.
      * It also refreshes titleString to match the new search term.
      */
     public void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            requestTerm = intent.getStringExtra(SearchManager.QUERY);
-            titleString = titleString + requestTerm + "\"";
+            searchFilter = intent.getStringExtra(SearchManager.QUERY);
+            if (intent.hasExtra(EXTRA_CATEGORY_ID)) {
+                categoryId = intent.getIntExtra(EXTRA_CATEGORY_ID, -1);
+            }
+            titleString = (categoryId == -3 ? getString(R.string.search_title_author) : getString(R.string.search_title)) + searchFilter + "\"";
+        } else if (ACTION_FILTER_AUTHOR.equals(intent.getAction())) {
+            authorFilter = intent.getIntExtra(EXTRA_AUTHOR_ID, -1);
+            titleString = getString(R.string.search_title_by_author) + Utils.getAuthorName(authorFilter);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            recreate();
+        } else if (key.equals("post_number")) {
+            recreate();
+        }
+    }
+
+    private class InfinityScrollListener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 1 && visibleItemCount > 1) {
+                loadingIndicatorBottom.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingContent();
+            }
         }
     }
 

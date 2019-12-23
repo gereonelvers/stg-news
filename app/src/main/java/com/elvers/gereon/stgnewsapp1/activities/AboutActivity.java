@@ -2,9 +2,9 @@ package com.elvers.gereon.stgnewsapp1.activities;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -52,7 +52,7 @@ public class AboutActivity extends AppCompatActivity {
          * But the most important reason to enable JavaScript is the hacky dark theme ^^
          */
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(new ArticleWebViewClient(getAssets()));
+        webView.setWebViewClient(new ArticleWebViewClient(this));
         webView.setVisibility(View.INVISIBLE);
         // Setting up loading indicator (spinning circle)
         webView.setWebChromeClient(new WebChromeClient() {

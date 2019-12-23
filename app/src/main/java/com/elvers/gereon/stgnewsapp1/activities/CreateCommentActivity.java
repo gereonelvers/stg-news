@@ -6,14 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
+import androidx.loader.app.LoaderManager;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +21,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.elvers.gereon.stgnewsapp1.R;
-import com.elvers.gereon.stgnewsapp1.tasks.CommentPoster;
+import com.elvers.gereon.stgnewsapp1.handlers.ICommentPostedhandler;
+import com.elvers.gereon.stgnewsapp1.tasks.PostCommentTask;
 import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 /**
@@ -32,7 +30,7 @@ import com.elvers.gereon.stgnewsapp1.utils.Utils;
  *
  * @author Gereon Elvers
  */
-public class CreateCommentActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Integer> {
+public class CreateCommentActivity extends AppCompatActivity implements ICommentPostedhandler, SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Tag for log messages
     private static final String LOG_TAG = CreateCommentActivity.class.getSimpleName();
@@ -45,7 +43,6 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
     String nameString;
     String emailString;
     String contentString;
-    int POSTER_ID = 5;
     LoaderManager loaderManager;
     ImageView name_help;
     ImageView email_help;
@@ -101,6 +98,7 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
             emailET.clearFocus();
             contentET.requestFocus();
         }
+        preferences.registerOnSharedPreferenceChangeListener(this);
 
 
         alertDialogBuilder = new AlertDialog.Builder(getApplication());
@@ -201,13 +199,6 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
     }
 
     @Override
-    protected void onRestart() {
-        Utils.updateNightMode(this);
-        super.onRestart();
-        recreate();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
@@ -233,8 +224,7 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
                 contentString = contentET.getText().toString();
                 if (articleId != null) {
                     // Check if lo-net address ending is present in email
-                    loaderManager.destroyLoader(POSTER_ID);
-                    loaderManager.initLoader(POSTER_ID, null, this);
+                    new PostCommentTask(this).execute(articleId, nameString, emailString, contentString);
                 } else {
                     Log.e(LOG_TAG, "Article ID empty, can't submit comment");
                 }
@@ -253,16 +243,10 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
         return super.onOptionsItemSelected(item);
     }
 
-    @NonNull
     @Override
-    public Loader<Integer> onCreateLoader(int i, @Nullable Bundle bundle) {
-        return new CommentPoster(this, articleId, nameString, emailString, contentString);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Integer> loader, Integer responseCode) {
+    public void onCommentPosted(int result) {
         // If submission was successful, status code will be 201. Return to previous activity to prevent duplicate submissions
-        if (responseCode == 201) {
+        if (result == 201) {
             Toast.makeText(this, getResources().getString(R.string.successful_post), Toast.LENGTH_LONG).show();
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("name_add", nameAdd);
@@ -273,17 +257,14 @@ public class CreateCommentActivity extends AppCompatActivity implements LoaderMa
         // If status code is anything but 201, submission was not successful.
         // Display error message while staying in activity.
         else {
-            Toast.makeText(this, getResources().getString(R.string.unsuccessful_post) + " " + responseCode.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.unsuccessful_post) + " " + result, Toast.LENGTH_LONG).show();
         }
-
     }
 
-    /**
-     * This method is only called when a more than one posting attempt is made sequentially.
-     * Since there is no data being loaded into the activity, it can be left empty (it needs to be included because it overrides a LoaderCallbacks<> method)
-     */
     @Override
-    public void onLoaderReset(@NonNull Loader<Integer> loader) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            recreate();
+        }
     }
-
 }

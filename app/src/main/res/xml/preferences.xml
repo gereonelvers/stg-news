@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="high_resolution"
         android:summary="@string/img_settings_summary"
         android:title="@string/img_settings_title" />
@@ -25,5 +25,6 @@
         android:id="@+id/dark_mode_switch"
         android:defaultValue="false"
         android:key="dark_mode"
-        android:title="@string/dark_mode_title" />
+        android:title="@string/dark_mode_title"
+        android:summary="@string/dark_mode_summary" />
 </PreferenceScreen>

@@ -31,10 +31,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ArticleActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.activities.MainActivity" />
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -63,12 +59,10 @@
             android:label="@string/title_activity_search"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.activities.MainActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
+                <action android:name="FILTER_BY_AUTHOR" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -89,9 +83,6 @@
             android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.elvers.gereon.stgnewsapp1.activities.MainActivity" />
         </activity>
         <activity
             android:name=".activities.CreateCommentActivity"

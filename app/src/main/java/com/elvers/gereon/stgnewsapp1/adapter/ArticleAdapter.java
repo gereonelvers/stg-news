@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
@@ -113,7 +113,7 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
 
             // Display article title
             TextView titleTV = listItemView.findViewById(R.id.article_item_title_tv);
-            String title = currentArticle.getTitle();
+            String title = currentArticle.getTitleHtmlEscaped();
             Spanned spannedTitle = Html.fromHtml(title);
             titleTV.setText(spannedTitle);
 

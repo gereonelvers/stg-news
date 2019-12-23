@@ -5,14 +5,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatDelegate;
+import com.google.android.material.navigation.NavigationView;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.Menu;
 
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.api.Author;
 import com.elvers.gereon.stgnewsapp1.api.AuthorResponse;
 import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
 import com.elvers.gereon.stgnewsapp1.api.Comment;
@@ -311,12 +312,12 @@ public final class Utils {
     /**
      * Since the WordPress API only provides author ID (not the complete name), the process to retrieve names is a little more intricate, which is why it's moved into a separate method.
      * <p>
-     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once (in updateAuthors())
+     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once (in fetchAuthors())
      * The array is then stored as AuthorResponse. extractArticleFeaturesFromJson() then retrieves the author ID from currentArticle and iterates against authorResponse until a match is found.
      * <p>
      * This method should not be called from the ui thread, because it could perform a web request, which might block the ui thread
      */
-    private static String getAuthorName(int authorID) {
+    public static String getAuthorName(int authorID) {
         // Fill authorsArray with author data (if it's empty)
         if (authorResponse == null) {
             updateAuthors();
@@ -324,9 +325,9 @@ public final class Utils {
 
         // Iterate over authorsResponse until the author ID of currentArticle matches the changing ID of the authors in authorsResponse
         for (int i = 0; i < authorResponse.getAuthors().size(); i++) {
-            AuthorResponse.Author author = authorResponse.getAuthors().get(i);
-            if (author.id == authorID) {
-                return author.name;
+            Author author = authorResponse.getAuthors().get(i);
+            if (author.getId() == authorID) {
+                return author.getName();
             }
         }
 
@@ -337,8 +338,8 @@ public final class Utils {
      * Request an array of authors from AUTHOR_REQUEST_URL which will be cached inside authorResponse to achieve faster loading times
      * Necessary to correctly display author name in article listview
      */
-    private static void updateAuthors() {
-        URL url = createUrl(AUTHOR_REQUEST_URL);
+    public static AuthorResponse fetchAuthors(String requestUrl) {
+        URL url = createUrl(requestUrl);
         String jsonResponse = null;
         try {
             jsonResponse = makeHttpGetRequest(url);
@@ -347,11 +348,16 @@ public final class Utils {
             e.printStackTrace();
         }
         try {
-            authorResponse = new AuthorResponse(jsonResponse);
+            return new AuthorResponse(jsonResponse);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error parsing author info: " + e.toString());
             e.printStackTrace();
         }
+        return null;
+    }
+
+    private static void updateAuthors() {
+        authorResponse = fetchAuthors(AUTHOR_REQUEST_URL);
     }
 
     /**
@@ -433,9 +439,11 @@ public final class Utils {
             navigationMenu.getItem(1).setCheckable(true);
             for (int i = 0; i < categoryResponse.getCategories().size(); i++) {
                 CategoryResponse.Category category = categoryResponse.getCategories().get(i);
-                navigationMenu.add(/*Group ID*/R.id.mainGroup, /*itemID*/category.id, /*Order*/i + 2, /*name*/category.name);
+                navigationMenu.add(/*Group ID*/R.id.categoryGroup, /*itemID*/category.id, /*Order*/i + 2, /*name*/category.name);
                 navigationMenu.getItem(i + 2).setCheckable(true);
             }
+            navigationMenu.add(R.id.authorGroup, -3, categoryResponse.getCategories().size() + 2, R.string.authors);
+            navigationMenu.getItem(navigationMenu.size() - 1).setCheckable(true);
 
             navigationView.invalidate();
             drawerLayout.invalidate();
@@ -452,6 +460,7 @@ public final class Utils {
      */
     public static void updateNightMode(Activity activity) {
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+
             activity.setTheme(R.style.AppThemeDark);
         } else {
             activity.setTheme(R.style.AppTheme);

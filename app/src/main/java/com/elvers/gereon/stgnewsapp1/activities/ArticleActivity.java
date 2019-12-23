@@ -6,14 +6,14 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
  *
  * @author Gereon Elvers
  */
-public class ArticleActivity extends AppCompatActivity {
+public class ArticleActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Tag for log messages
     private static final String LOG_TAG = ArticleActivity.class.getSimpleName();
@@ -62,6 +62,7 @@ public class ArticleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Utils.updateGlobalNightMode(this); // If the app is started directly into this activity, the theme should also be set correctly
         Utils.updateNightMode(this);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
         super.onCreate(savedInstanceState);
         // Setting XML base layout
@@ -133,7 +134,7 @@ public class ArticleActivity extends AppCompatActivity {
         });
         // if "#comments" is present in the URI, this means that the Article has been accessed though a deeplink meant to link directly to the comments or the activity has been restarted and the last instance showed the comments.
         // Therefore jump straight to CommentsFragment
-        if (articleURI.contains("#comments") || (savedInstanceState != null && savedInstanceState.containsKey("isComments") && savedInstanceState.getBoolean("isComments"))) {
+        if (articleURI.contains("#comments")) {
             showComments();
         } else {
             // If that isn't the case, start off by showing the article
@@ -163,13 +164,6 @@ public class ArticleActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    @Override
-    protected void onRestart() {
-        Utils.updateNightMode(this);
-        super.onRestart();
-        recreate();
-    }
-
     /**
      * Setting OptionsMenu on ActionBar
      */
@@ -187,11 +181,7 @@ public class ArticleActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Back button
             case android.R.id.home:
-                if (!isComments) {
-                    super.onBackPressed();
-                } else {
-                    showArticle();
-                }
+                super.onBackPressed(); // directly go back instead of checking if comments are shown
                 return true;
             // Share button
             case R.id.share:
@@ -374,14 +364,10 @@ public class ArticleActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Save data which will be given to new instance/recreated instance of this activity; this is needed to remember to show comments after visiting the settings
-     *
-     * @param outState will contain all information to pass to new instance
-     */
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("isComments", isComments);
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            recreate();
+        }
     }
 }

@@ -5,25 +5,26 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.adapter.CommentAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Comment;
-import com.elvers.gereon.stgnewsapp1.tasks.CommentLoader;
+import com.elvers.gereon.stgnewsapp1.handlers.ICommentsLoadedHandler;
+import com.elvers.gereon.stgnewsapp1.tasks.LoadCommentsTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class CommentsFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Comment>> {
+public class CommentsFragment extends Fragment implements ICommentsLoadedHandler, SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Tag for log messages
     private static final String LOG_TAG = CommentsFragment.class.getSimpleName();
@@ -41,8 +42,6 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     /* There are a lot of items declared outside of individual methods here.
     This is done because they are required to be available across methods and it's more economical to simply initialize them onCreateView() */
     private static final String COMMENTS_REQUEST_URL = "stg-sz.net";
-    private static final int COMMENT_LOADER_ID = 3;
-    LoaderManager loaderManager;
     View loadingIndicator;
     RelativeLayout emptyView;
     TextView emptyView_tv;
@@ -52,12 +51,14 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     ListView listView;
     SwipeRefreshLayout mSwipeRefreshLayout;
     Integer pageNumber;
-    TextView pageNumberTV;
 
     // Parsed parameter
     private Integer articleID;
-
     private String numberOfCommentsParam;
+
+    private ProgressBar loadingIndicatorBottom;
+    private boolean loadingContent = false;
+    private boolean canLoadMoreContent = true;
 
     // Required empty public constructor
     public CommentsFragment() {
@@ -100,48 +101,24 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
         // Get number of comments to be loaded
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         numberOfCommentsParam = sharedPreferences.getString("comments_number", "10");
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
         loadingIndicator = view.findViewById(R.id.comments_loading_circle);
         listView = view.findViewById(R.id.comment_listView);
-        loaderManager = getActivity().getSupportLoaderManager();
         emptyView = view.findViewById(R.id.comments_empty_view_rl);
         emptyView_tv = view.findViewById(R.id.comments_empty_view_tv);
         emptyView_arrow_iv = view.findViewById(R.id.comments_empty_view_arrow_iv);
         emptyView_quill_iv = view.findViewById(R.id.comments_empty_view_quill_iv);
         listView.setEmptyView(emptyView);
 
-        // Inflate page picker and add below ListView
-        View pagePicker = LayoutInflater.from(getActivity()).inflate(R.layout.page_picker, null, false);
-        listView.addFooterView(pagePicker);
+        loadingIndicatorBottom = new ProgressBar(getActivity());
+        loadingIndicatorBottom.setVisibility(View.GONE);
+        listView.addFooterView(loadingIndicatorBottom);
+
+        listView.setOnScrollListener(new InfinityScrollListener());
 
         // When launching the Activity, the first page should be loaded
         pageNumber = 1;
-
-        // Initialize page number TextView and set initial value (at this point, always 1)
-        pageNumberTV = view.findViewById(R.id.page_number_tv);
-        pageNumberTV.setText(pageNumber.toString());
-
-        // Implement page back-button
-        ImageView backIV = view.findViewById(R.id.back_iv);
-        backIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pageNumber > 1) {
-                    pageNumber--;
-                    pageNumberTV.setText(pageNumber.toString());
-                    refreshListView();
-                }
-            }
-        });
-        // Implement page forward-button
-        ImageView forwardIV = view.findViewById(R.id.forward_iv);
-        forwardIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pageNumber++;
-                pageNumberTV.setText(pageNumber.toString());
-                refreshListView();
-            }
-        });
 
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
@@ -160,23 +137,27 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public void refreshListView() {
-        commentAdapter.clear();
+        if (commentAdapter != null)
+            commentAdapter.clear();
         loadingIndicator.setVisibility(View.VISIBLE);
         initLoaderListView();
         emptyView.setVisibility(View.INVISIBLE);
     }
 
     /**
-     * This method is called when creating a new CommentLoader. It creates a modified query URL (by adding the filter parameters listed below) and initializes the CommentLoader.
-     * <p>
-     * Parameters:
-     * {@param articleID} is the ID of the Article)
-     * {@param numberOfCommentsParam} is a String containing the number of Comment objects requested from the server
-     * {@param pageNumber} is the page number loaded
+     * This is the method actually loading the data and projecting it onto the ListView. It creates a new Adapter and sets it on the ListView
      */
-    @Override
-    @NonNull
-    public Loader<List<Comment>> onCreateLoader(int i, Bundle bundle) {
+    public void initLoaderListView() {
+        pageNumber = 1;
+
+        commentAdapter = new CommentAdapter(getActivity(), new ArrayList<Comment>());
+        listView.setAdapter(commentAdapter);
+        startFetchingComments();
+    }
+
+    private void startFetchingComments() {
+        loadingContent = true;
+
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(COMMENTS_REQUEST_URL);
@@ -186,43 +167,35 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
             uriBuilder.appendQueryParameter("per_page", numberOfCommentsParam);
             uriBuilder.appendQueryParameter("page", pageNumber.toString());
         }
-        return new CommentLoader(getContext(), uriBuilder.toString());
+        new LoadCommentsTask(this).execute(uriBuilder.toString());
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<List<Comment>> loader, List<Comment> comments) {
+    public void onCommentsFetched(List<Comment> comments) {
+        pageNumber = 1;
+        canLoadMoreContent = true;
+
         // Since we can't be sure the fragment will still be active when comments are fetched, this is done in a try-block
         try {
             loadingIndicator.setVisibility(View.GONE);
-            if (pageNumber == 1) {
-                emptyView_tv.setText(getString(R.string.comments_empty_view));
-                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                    emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_dark);
-                } else {
-                    emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_light);
-                }
-                emptyView_quill_iv.setImageResource(R.drawable.ic_quill);
-            } else {
-                emptyView_tv.setText(getString(R.string.comments_empty_view_page));
-            }
+            loadingIndicatorBottom.setVisibility(View.GONE);
 
-            commentAdapter.clear();
+            emptyView_tv.setText(getString(R.string.comments_empty_view));
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_dark);
+            } else {
+                emptyView_arrow_iv.setImageResource(R.drawable.ic_arrow_light);
+            }
+            emptyView_quill_iv.setImageResource(R.drawable.ic_quill);
+
+            commentAdapter.notifyDataSetChanged();
             if (comments != null && !comments.isEmpty()) {
                 commentAdapter.addAll(comments);
+                if (comments.size() != PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("comments_number", 10))
+                    canLoadMoreContent = false;
             } else {
-                if (pageNumber != 1) {
-                    emptyView_quill_iv.setVisibility(View.INVISIBLE);
-                    emptyView_arrow_iv.setVisibility(View.INVISIBLE);
-                    emptyView_tv.setOnClickListener(new View.OnClickListener() {
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void onClick(View v) {
-                            pageNumber--;
-                            pageNumberTV.setText(pageNumber.toString());
-                            refreshListView();
-                        }
-                    });
-                }
+                if (comments != null)
+                    canLoadMoreContent = false;
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "Can't push comments to Adapter: " + e.toString());
@@ -231,23 +204,31 @@ public class CommentsFragment extends Fragment implements LoaderManager.LoaderCa
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
-    }
 
-
-    /**
-     * This is the method actually loading the data and projecting it onto the ListView. It creates a new Adapter and sets it on the ListView
-     * Also destroys (if necessary) and restarts the ArticleLoader responsible for filling the CommentAdapter with content
-     */
-    public void initLoaderListView() {
-        commentAdapter = new CommentAdapter(getActivity(), new ArrayList<Comment>());
-        listView.setAdapter(commentAdapter);
-        loaderManager.destroyLoader(COMMENT_LOADER_ID);
-        loaderManager.initLoader(COMMENT_LOADER_ID, null, this);
+        loadingContent = false;
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<List<Comment>> loader) {
-        commentAdapter.clear();
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("dark_mode")) {
+            getActivity().recreate();
+        } else if (key.equals("comments_number")) {
+            getActivity().recreate();
+        }
     }
 
+    private class InfinityScrollListener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 1 && visibleItemCount > 1) {
+                loadingIndicatorBottom.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingComments();
+            }
+        }
+    }
 }
