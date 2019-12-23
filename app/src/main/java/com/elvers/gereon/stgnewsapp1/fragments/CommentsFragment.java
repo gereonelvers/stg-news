@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class CommentsFragment extends Fragment implements ICommentsLoadedHandler {
+public class CommentsFragment extends Fragment implements ICommentsLoadedHandler, SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Tag for log messages
     private static final String LOG_TAG = CommentsFragment.class.getSimpleName();
@@ -97,6 +97,8 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
         // Get number of comments to be loaded
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         numberOfCommentsParam = sharedPreferences.getString("comments_number", "10");
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
         loadingIndicator = view.findViewById(R.id.comments_loading_circle);
         listView = view.findViewById(R.id.comment_listView);
         emptyView = view.findViewById(R.id.comments_empty_view_rl);
@@ -188,7 +190,7 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
             commentAdapter.notifyDataSetChanged();
             if (comments != null && !comments.isEmpty()) {
                 commentAdapter.addAll(comments);
-                if (comments.size() != 10)
+                if (comments.size() != PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("comments_number", 10))
                     btnLoadMore.setVisibility(View.INVISIBLE);
             } else {
                 if (comments != null)
@@ -200,6 +202,15 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
         }
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals("dark_mode")) {
+            getActivity().recreate();
+        } else if(key.equals("comments_number")) {
+            getActivity().recreate();
         }
     }
 }

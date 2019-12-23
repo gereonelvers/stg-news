@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author Gereon Elvers
  */
-public class SearchActivity extends AppCompatActivity implements IListContentLoadedHandler {
+public class SearchActivity extends AppCompatActivity implements IListContentLoadedHandler, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static String ACTION_FILTER_AUTHOR = "FILTER_BY_AUTHOR";
     public static String EXTRA_AUTHOR_ID = "EXTRA_AUTHOR_ID";
@@ -88,6 +88,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         // Getting numberOfArticlesParam from SharedPreferences (default: 10; modifiable through Preferences). This is the number of articles requested from the backend.
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         numberOfArticlesParam = sharedPreferences.getString("post_number", "10");
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         // Finding loadingIndicator
         loadingIndicator = findViewById(R.id.loading_circle);
@@ -228,7 +229,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         mAdapter.notifyDataSetChanged();
         if (entries != null && !entries.isEmpty()) {
             mAdapter.addAll(entries);
-            if(entries.size() != 10)
+            if(entries.size() != Integer.parseInt(numberOfArticlesParam))
                 btnLoadMore.setVisibility(View.INVISIBLE);
         } else {
             if(entries != null)
@@ -275,4 +276,12 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals("dark_mode")) {
+            recreate();
+        } else if (key.equals("post_number")) {
+            recreate();
+        }
+    }
 }

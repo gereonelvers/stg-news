@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             btnLoadMore.setVisibility(View.INVISIBLE);
         } else {
             mAdapter.addAll(articles);
-            if(articles.size() != 10)
+            if(articles.size() != Integer.parseInt(numberOfArticlesParam))
                 btnLoadMore.setVisibility(View.INVISIBLE);
         }
 
@@ -446,6 +446,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals("dark_mode")) {
+            recreate();
+        } else if(key.equals("post_number")) {
             recreate();
         }
     }
