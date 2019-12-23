@@ -1,9 +1,7 @@
 package com.elvers.gereon.stgnewsapp1.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.MailTo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
@@ -65,59 +63,58 @@ public class ArticleWebViewClient extends WebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String urlStr) {
+        // If the URL starts with mailto:, it needs to be handled as a mail-intent
+        if (urlStr.startsWith("mailto:")) {
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+            try {
+                emailIntent.setData(Uri.parse(urlStr));
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Failed to parse mailto link", e);
+                return true;
+            }
+            ownerActivity.startActivity(Intent.createChooser(emailIntent, ""));
+            return true;
+        }
+
         URL url;
         try {
             url = new URL(urlStr);
         } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Tried to parse invalid URL: " + e.toString());
-            e.printStackTrace();
-            return false;
+            Log.e(LOG_TAG, "Failed to parse invalid URL", e);
+            return true;
         }
 
-        // Get context for intents
-        Context context = ContextApp.getContext();
-        // If the URL starts with mailto:, it needs to be handled as a mail-intent
-        if (urlStr.startsWith("mailto:")) {
-            MailTo mt = MailTo.parse(urlStr);
-            Intent emailIntent = createEmailIntent(mt.getTo(), mt.getSubject(), mt.getBody(), mt.getCc());
-            context.startActivity(emailIntent);
-            view.reload();
-        }
-        // If the URL contains stg-sz.net it will be loaded inside the WebView
-        else if (urlStr.contains("stg-sz.net")) {
+        // If the URL contains stg-sz.net it will be loaded inside the current WebView
+        if (urlStr.contains("stg-sz.net")) {
             String[] parts = url.getPath().split("/");
-            if (parts[2].equalsIgnoreCase("author")) { // filter by author
+            if (parts.length > 2 && parts[2].equalsIgnoreCase("author")) { // filter by author
                 int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).getId();
                 Intent intent = new Intent();
                 intent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
                 intent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, authorId);
                 ownerActivity.startActivity(intent);
             } else if (!parts[2].matches("[2-9][0-9]{3}")) { // i don't think the app will last until year 10000
-                if (!urlStr.contains("inapp")) {
-                    view.loadUrl(urlStr + "?inapp");
+                if (!urlStr.contains("?inapp") && !urlStr.contains("&inapp")) {
+                    if (urlStr.contains("?")) {
+                        view.loadUrl(urlStr + "&inapp");
+                    } else {
+                        view.loadUrl(urlStr + "?inapp");
+                    }
                 } else {
-                    return false;
+                    view.loadUrl(urlStr);
                 }
             }
+            return true;
         }
+
         // Otherwise it will be handled in a regular browser instance
-        else {
+        try {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlStr));
-            browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(browserIntent);
+            ownerActivity.startActivity(browserIntent);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to open link inside browser", e);
         }
         return true;
-    }
-
-    // Create the actual email intent based on info from the mailto address
-    private Intent createEmailIntent(String address, String subject, String body, String cc) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{address});
-        intent.putExtra(Intent.EXTRA_TEXT, body);
-        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        intent.putExtra(Intent.EXTRA_CC, cc);
-        intent.setType("message/rfc822");
-        return intent;
     }
 
     @Override
