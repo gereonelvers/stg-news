@@ -87,8 +87,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private boolean loadingContent = false;
     private boolean canLoadMoreContent = true;
 
-    private AbsListView.OnScrollListener scrollListener = new InfinityScrollListener();
-
     /**
      * onCreate() is called when the Activity is launched.
      */
@@ -162,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         emptyView = findViewById(R.id.empty_view);
         contentListView = findViewById(R.id.article_list_view);
         contentListView.setEmptyView(emptyView);
-        contentListView.setOnScrollListener(scrollListener);
+        contentListView.setOnScrollListener(new InfinityScrollListener());
 
         loadingIndicatorBottom = new ProgressBar(this);
         contentListView.addFooterView(loadingIndicatorBottom);
@@ -189,8 +187,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * This method displays articles inside the article listview depending on the menu item (-> category)
      */
     private void displayContentByMenuItem(MenuItem menuItem) {
-        contentListView.setOnScrollListener(null);
-
         navigationView.setCheckedItem(menuItem);
         int menuItemItemId = menuItem.getItemId();
         if (menuItem.getItemId() == -1) { // All articles
@@ -231,8 +227,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         refreshListView();
         mDrawerLayout.closeDrawers();
-
-        contentListView.setOnScrollListener(scrollListener);
     }
 
     /**
@@ -483,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 0 && visibleItemCount > 0) {
+            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 1 && visibleItemCount > 1) {
                 loadingIndicatorBottom.setVisibility(View.VISIBLE);
                 pageNumber++;
                 startFetchingContent();

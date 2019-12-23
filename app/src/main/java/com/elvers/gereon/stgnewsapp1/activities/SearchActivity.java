@@ -297,7 +297,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
 
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 0 && visibleItemCount > 0) {
+            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 1 && visibleItemCount > 1) {
                 loadingIndicatorBottom.setVisibility(View.VISIBLE);
                 pageNumber++;
                 startFetchingContent();
