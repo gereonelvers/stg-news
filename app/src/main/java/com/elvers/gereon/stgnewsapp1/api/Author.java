@@ -1,6 +1,6 @@
 package com.elvers.gereon.stgnewsapp1.api;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class Author extends ListEntry {
 

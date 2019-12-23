@@ -1,7 +1,7 @@
 package com.elvers.gereon.stgnewsapp1.adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;

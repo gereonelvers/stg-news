@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.elvers.gereon.stgnewsapp1.activities.CreateCommentActivity">
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/create_comment_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"

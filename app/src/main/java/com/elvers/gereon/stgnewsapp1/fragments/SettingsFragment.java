@@ -1,9 +1,9 @@
 package com.elvers.gereon.stgnewsapp1.fragments;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 
 import com.elvers.gereon.stgnewsapp1.R;
 
