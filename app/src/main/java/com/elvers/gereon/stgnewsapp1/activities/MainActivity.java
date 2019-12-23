@@ -39,10 +39,10 @@ import com.elvers.gereon.stgnewsapp1.api.Article;
 import com.elvers.gereon.stgnewsapp1.api.Author;
 import com.elvers.gereon.stgnewsapp1.api.CategoryResponse;
 import com.elvers.gereon.stgnewsapp1.api.ListEntry;
-import com.elvers.gereon.stgnewsapp1.handlers.IListContentLoadedHandler;
 import com.elvers.gereon.stgnewsapp1.handlers.ICategoriesLoadedHandler;
-import com.elvers.gereon.stgnewsapp1.tasks.LoadListContentTask;
+import com.elvers.gereon.stgnewsapp1.handlers.IListContentLoadedHandler;
 import com.elvers.gereon.stgnewsapp1.tasks.LoadCategoriesTask;
+import com.elvers.gereon.stgnewsapp1.tasks.LoadListContentTask;
 import com.elvers.gereon.stgnewsapp1.utils.Utils;
 
 import java.util.ArrayList;
@@ -399,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_menu, menu);
+
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
@@ -409,6 +410,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         // Makes sure that search expands correctly when icon is clicked
         searchView.setIconifiedByDefault(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+                intent.setAction(Intent.ACTION_SEARCH);
+                intent.putExtra(SearchManager.QUERY, s);
+                if(navigationView.getCheckedItem() != null)
+                    intent.putExtra(SearchActivity.EXTRA_CATEGORY_ID, navigationView.getCheckedItem().getItemId());
+                startActivity(intent);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
         return true;
 
     }

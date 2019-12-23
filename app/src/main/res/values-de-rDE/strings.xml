@@ -3,7 +3,7 @@
     <string name="app_name">STG Schülerzeitung</string>
     <string name="no_articles">Keine Artikel gefunden.</string>
     <string name="no_articles_network">Keine Artikel gefunden\nÜberprüfe deine Netzwerkverbindung\nTippe hier zum Aktualisieren</string>
-    <string name="no_articles_search">Keine Artikel gefunden.\nVersuch einen anderen Suchbegriff!</string>
+    <string name="no_result_search">Keine Ergebnisse gefunden.\nVersuch einen anderen Suchbegriff!</string>
     <string name="no_articles_page">Keine weiteren Artikel gefunden.\nTippe hier, um zur Liste zurückzukehren.</string>
     <string name="no_articles_search_page">Keine weiteren Artikel gefunden.\nTippe hier, um zu den Suchergebnissen zurückzukehren.</string>
     <string name="author_display_add">von\u0020</string>
@@ -77,8 +77,9 @@
     <string name="removed_from_favorites">Aus Favoriten entfernt</string>
     <string name="favorite_action">Zu Favoriten hinzufügen</string>
     <string name="favorites_remove_action">Aus Favoriten entfernen</string>
-    <string name="search_title_author">"Artikel von "</string>
+    <string name="search_title_by_author">"Artikel von "</string>
     <string name="load_more">Mehr laden</string>
     <string name="no_description">Keine Beschreibung</string>
     <string name="authors">Autoren</string>
+    <string name="search_title_author">Autor mit \"</string>
 </resources>

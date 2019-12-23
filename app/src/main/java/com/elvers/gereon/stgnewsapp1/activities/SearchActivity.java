@@ -21,7 +21,9 @@ import android.widget.TextView;
 
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.adapter.ArticleAdapter;
+import com.elvers.gereon.stgnewsapp1.adapter.AuthorAdapter;
 import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.api.Author;
 import com.elvers.gereon.stgnewsapp1.api.ListEntry;
 import com.elvers.gereon.stgnewsapp1.handlers.IListContentLoadedHandler;
 import com.elvers.gereon.stgnewsapp1.tasks.LoadListContentTask;
@@ -40,6 +42,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
 
     public static String ACTION_FILTER_AUTHOR = "FILTER_BY_AUTHOR";
     public static String EXTRA_AUTHOR_ID = "EXTRA_AUTHOR_ID";
+    public static String EXTRA_CATEGORY_ID = "EXTRA_CATEGORY_ID";
 
     // Static request URL the data will be requested from. Putting it at the top like this allow easier modification of top level domain if required
     private static final String WP_REQUEST_URL = "www.stg-sz.net";
@@ -50,6 +53,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     String titleString = "";
     String searchFilter = ""; // don't want to cause a NullPointerException
     int authorFilter = -1;
+    int categoryId = -1;
     ListView mListView;
     View loadingIndicator;
     TextView emptyView;
@@ -139,23 +143,43 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     public void initLoaderListView() {
         pageNumber = 1;
 
-        mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (mAdapter.getCount() > i) {
-                    Article currentArticle = (Article) mAdapter.getItem(i);
-                    Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
-                    if (currentArticle != null) {
-                        articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
-                        articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitleHtmlEscaped());
-                        articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+        if(categoryId == -3) {
+            mAdapter = new AuthorAdapter(this, new ArrayList<Author>());
+            mListView.setAdapter(mAdapter);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (mAdapter.getCount() > i) {
+                        Author currentAuthor = (Author) mAdapter.getItem(i);
+                        Intent authorIntent = new Intent(getApplicationContext(), SearchActivity.class);
+                        if (currentAuthor != null) {
+                            authorIntent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
+                            authorIntent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, currentAuthor.getId());
+                        }
+                        finish(); // maybe the articles listed by author should have their own activity (this is just a dirty fix)
+                        startActivity(authorIntent);
                     }
-                    startActivity(articleIntent);
                 }
-            }
-        });
+            });
+        } else {
+            mAdapter = new ArticleAdapter(this, new ArrayList<Article>());
+            mListView.setAdapter(mAdapter);
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (mAdapter.getCount() > i) {
+                        Article currentArticle = (Article) mAdapter.getItem(i);
+                        Intent articleIntent = new Intent(getApplicationContext(), ArticleActivity.class);
+                        if (currentArticle != null) {
+                            articleIntent.putExtra("ARTICLE_URI", currentArticle.getUrl());
+                            articleIntent.putExtra("ARTICLE_TITLE", currentArticle.getTitleHtmlEscaped());
+                            articleIntent.putExtra("ARTICLE_ID", currentArticle.getId());
+                        }
+                        startActivity(articleIntent);
+                    }
+                }
+            });
+        }
 
         startFetchingArticles();
     }
@@ -164,11 +188,26 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
-        uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2").appendPath("posts");
+        uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2");
+        if(categoryId == -3) {
+            uriBuilder.appendPath("users");
+        } else {
+            uriBuilder.appendPath("posts");
+        }
+
         if (!searchFilter.isEmpty()) {
             uriBuilder.appendQueryParameter("search", searchFilter);
-        } else if (authorFilter != -1) {
+        } else if (authorFilter != -1 && categoryId != -3) {
             uriBuilder.appendQueryParameter("author", String.valueOf(authorFilter));
+        }
+        if(categoryId > 0) {
+            uriBuilder.appendQueryParameter("categories", String.valueOf(categoryId));
+        }
+
+        if (categoryId == -2) {
+            for(String fav : PreferenceManager.getDefaultSharedPreferences(this).getString("favorites", "").split(",")) {
+                uriBuilder.appendQueryParameter("include[]", fav);
+            }
         }
 
         if (!numberOfArticlesParam.isEmpty()) {
@@ -180,19 +219,19 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     }
 
     @Override
-    public void onListContentFetched(List<ListEntry> articles) {
+    public void onListContentFetched(List<ListEntry> entries) {
         btnLoadMore.setVisibility(View.VISIBLE);
 
         loadingIndicator.setVisibility(View.GONE);
-        emptyView.setText(R.string.no_articles_search);
+        emptyView.setText(R.string.no_result_search);
 
         mAdapter.notifyDataSetChanged();
-        if (articles != null && !articles.isEmpty()) {
-            mAdapter.addAll(articles);
-            if(articles.size() != 10)
+        if (entries != null && !entries.isEmpty()) {
+            mAdapter.addAll(entries);
+            if(entries.size() != 10)
                 btnLoadMore.setVisibility(View.INVISIBLE);
         } else {
-            if(articles != null)
+            if(entries != null)
                 btnLoadMore.setVisibility(View.INVISIBLE);
         }
 
@@ -217,10 +256,13 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     public void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             searchFilter = intent.getStringExtra(SearchManager.QUERY);
-            titleString = getString(R.string.search_title) + searchFilter + "\"";
+            if(intent.hasExtra(EXTRA_CATEGORY_ID)) {
+                categoryId = intent.getIntExtra(EXTRA_CATEGORY_ID, -1);
+            }
+            titleString = (categoryId == -3 ? getString(R.string.search_title_author) : getString(R.string.search_title)) + searchFilter + "\"";
         } else if (ACTION_FILTER_AUTHOR.equals(intent.getAction())) {
             authorFilter = intent.getIntExtra(EXTRA_AUTHOR_ID, -1);
-            titleString = getString(R.string.search_title_author) + Utils.getAuthorName(authorFilter);
+            titleString = getString(R.string.search_title_by_author) + Utils.getAuthorName(authorFilter);
         }
     }
 
@@ -232,4 +274,5 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

@@ -312,7 +312,7 @@ public final class Utils {
     /**
      * Since the WordPress API only provides author ID (not the complete name), the process to retrieve names is a little more intricate, which is why it's moved into a separate method.
      * <p>
-     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once (in updateAuthors())
+     * To get he author name, an array of authors and their respective IDs is requested from the backend. Since this process is resource intensive, it is only done once (in fetchAuthors())
      * The array is then stored as AuthorResponse. extractArticleFeaturesFromJson() then retrieves the author ID from currentArticle and iterates against authorResponse until a match is found.
      * <p>
      * This method should not be called from the ui thread, because it could perform a web request, which might block the ui thread
@@ -338,8 +338,8 @@ public final class Utils {
      * Request an array of authors from AUTHOR_REQUEST_URL which will be cached inside authorResponse to achieve faster loading times
      * Necessary to correctly display author name in article listview
      */
-    private static void updateAuthors() {
-        URL url = createUrl(AUTHOR_REQUEST_URL);
+    public static AuthorResponse fetchAuthors(String requestUrl) {
+        URL url = createUrl(requestUrl);
         String jsonResponse = null;
         try {
             jsonResponse = makeHttpGetRequest(url);
@@ -348,11 +348,16 @@ public final class Utils {
             e.printStackTrace();
         }
         try {
-            authorResponse = new AuthorResponse(jsonResponse);
+            return new AuthorResponse(jsonResponse);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error parsing author info: " + e.toString());
             e.printStackTrace();
         }
+        return null;
+    }
+
+    private static void updateAuthors() {
+        authorResponse = fetchAuthors(AUTHOR_REQUEST_URL);
     }
 
     /**

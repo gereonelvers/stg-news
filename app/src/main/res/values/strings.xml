@@ -6,7 +6,7 @@
     <string name="no_articles">No articles found.</string>
     <string name="no_articles_network">No articles found\nCheck your network connection\nTap here to refresh</string>
     <string name="no_articles_page">No more articles found.\nTap here to return to the article list.</string>
-    <string name="no_articles_search">No articles found.\nTry a differerent query!</string>
+    <string name="no_result_search">No results found.\nTry a different query!</string>
     <string name="no_articles_search_page">No more articles found.\nTap here to return to results</string>
     <string name="author_display_add">by\u0020</string>
     <string name="settings_string">Settings</string>
@@ -92,8 +92,9 @@
     <string name="removed_from_favorites">Removed from favorites</string>
     <string name="favorite_action">Add to favorites</string>
     <string name="favorites_remove_action">Remove from favorites</string>
-    <string name="search_title_author">"Articles by "</string>
+    <string name="search_title_by_author">"Articles by "</string>
     <string name="load_more">Load more</string>
     <string name="no_description">No description</string>
     <string name="authors">Authors</string>
+    <string name="search_title_author">Author with \"</string>
 </resources>

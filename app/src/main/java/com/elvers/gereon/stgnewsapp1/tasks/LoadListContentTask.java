@@ -3,6 +3,7 @@ package com.elvers.gereon.stgnewsapp1.tasks;
 import android.os.AsyncTask;
 
 import com.elvers.gereon.stgnewsapp1.api.Article;
+import com.elvers.gereon.stgnewsapp1.api.AuthorResponse;
 import com.elvers.gereon.stgnewsapp1.api.ListEntry;
 import com.elvers.gereon.stgnewsapp1.handlers.IListContentLoadedHandler;
 import com.elvers.gereon.stgnewsapp1.utils.Utils;
@@ -24,7 +25,10 @@ public class LoadListContentTask extends AsyncTask<String, Void, List<ListEntry>
 
         List<ListEntry> content = new ArrayList<>();
         if(urls[0].contains("wp-json/wp/v2/users")) {
-            content.addAll(Utils.authorResponse.getAuthors());
+            AuthorResponse response = Utils.fetchAuthors(urls[0]);
+            if(response == null)
+                return null;
+            content.addAll(response.getAuthors());
         } else {
             List<Article> articles = Utils.fetchArticles(urls[0]);
             if(articles == null)
