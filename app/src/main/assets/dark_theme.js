@@ -7,6 +7,7 @@ var ol_color = 'rgb(176, 59, 59)';
 var h3_color = 'rgb(180, 48, 48)';
 var h4_color = 'rgb(140, 48, 48)';
 var h6_color = 'rgb(130, 40, 40)';
+var csc_color = 'rgb(130, 40, 40)';
 
 document.getElementsByTagName('body')[0].style.background = bg_color;
 document.getElementById('content').style.background = bg_color;
@@ -51,4 +52,11 @@ for(i = 0; i < textElements.length; i++) {
     textElements[i].style.color = h6_color;
 }
 
+var textElements = document.getElementsByClassName('csc-content');
+for(i = 0; i < textElements.length; i++) {
+    textElements[i].style.color = csc_color;
+}
+
 document.getElementsByClassName('entry-title')[0].style.color = headline_color;
+
+document.getElementById('colophon').remove()
