@@ -26,10 +26,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.elvers.gereon.stgnewsapp1.R;
@@ -81,7 +82,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private DrawerLayout mDrawerLayout;
     private ActionBar actionBar;
     private SharedPreferences sharedPreferences;
-    private Button btnLoadMore;
+
+    private ProgressBar loadingIndicatorBottom;
+    private boolean loadingContent = false;
+    private boolean canLoadMoreContent = true;
+
+    private AbsListView.OnScrollListener scrollListener = new InfinityScrollListener();
 
     /**
      * onCreate() is called when the Activity is launched.
@@ -144,22 +150,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         emptyView = findViewById(R.id.empty_view);
         contentListView = findViewById(R.id.article_list_view);
         contentListView.setEmptyView(emptyView);
+        contentListView.setOnScrollListener(scrollListener);
 
-        btnLoadMore = new Button(this);
-        btnLoadMore.setText(R.string.load_more);
-        btnLoadMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingIndicator.setVisibility(View.VISIBLE);
-                pageNumber++;
-                startFetchingContent();
-            }
-        });
+        loadingIndicatorBottom = new ProgressBar(this);
+        contentListView.addFooterView(loadingIndicatorBottom);
 
         // Start loading categories
         new LoadCategoriesTask(this).execute();
-
-        contentListView.addFooterView(btnLoadMore);
 
         // SwipeRefreshLayout is initialized and refresh functionality is implemented
         mSwipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -180,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * This method displays articles inside the article listview depending on the menu item (-> category)
      */
     private void displayContentByMenuItem(MenuItem menuItem) {
+        contentListView.setOnScrollListener(null);
+
         navigationView.setCheckedItem(menuItem);
         int menuItemItemId = menuItem.getItemId();
         if (menuItem.getItemId() == -1) { // All articles
@@ -201,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 actionBar.setTitle(getString(R.string.favorites_title));
             }
 
-        } else if(menuItem.getItemId() == -3) {
+        } else if (menuItem.getItemId() == -3) {
             filterParam = "";
             isFavoriteSelected = false;
             isAuthorsSelected = true;
@@ -220,6 +219,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         refreshListView();
         mDrawerLayout.closeDrawers();
+
+        contentListView.setOnScrollListener(scrollListener);
     }
 
     /**
@@ -244,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         pageNumber = 1;
 
         // init loader listview
-        if(isAuthorsSelected) {
+        if (isAuthorsSelected) {
             mAdapter = new AuthorAdapter(this, new ArrayList<Author>());
             contentListView.setAdapter(mAdapter);
             contentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -285,15 +286,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void startFetchingContent() {
+        loadingContent = true;
+
         // make sure categories are loaded (they are not if there was no internet connection during the startup of the app)
-        if(Utils.categoryResponse == null)
+        if (Utils.categoryResponse == null)
             new LoadCategoriesTask(this).execute();
 
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
         uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2");
-        if(isAuthorsSelected) {
+        if (isAuthorsSelected) {
             uriBuilder.appendPath("users");
         } else {
             uriBuilder.appendPath("posts");
@@ -306,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             uriBuilder.appendQueryParameter("per_page", numberOfArticlesParam);
         }
         if (isFavoriteSelected && !isAuthorsSelected) {
-            for(String fav : sharedPreferences.getString("favorites", "").split(",")) {
+            for (String fav : sharedPreferences.getString("favorites", "").split(",")) {
                 uriBuilder.appendQueryParameter("include[]", fav);
             }
         }
@@ -320,7 +323,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onListContentFetched(List<ListEntry> articles) {
         // Once the load process is finished, the loadingIndicator circle should disappear
         loadingIndicator.setVisibility(View.GONE);
-        btnLoadMore.setVisibility(View.VISIBLE);
+        loadingIndicatorBottom.setVisibility(View.GONE);
+
+        canLoadMoreContent = true;
 
         mAdapter.notifyDataSetChanged();
         if (articles == null) {
@@ -333,18 +338,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     refreshListView();
                 }
             });
-        } else if(articles.isEmpty()) {
+        } else if (articles.isEmpty()) {
             emptyView.setText(R.string.no_articles);
-            btnLoadMore.setVisibility(View.INVISIBLE);
+            canLoadMoreContent = false;
         } else {
             mAdapter.addAll(articles);
-            if(articles.size() != Integer.parseInt(numberOfArticlesParam))
-                btnLoadMore.setVisibility(View.INVISIBLE);
+            if (articles.size() != Integer.parseInt(numberOfArticlesParam))
+                canLoadMoreContent = false;
         }
 
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
+
+        loadingContent = false;
     }
 
     /**
@@ -416,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
                 intent.setAction(Intent.ACTION_SEARCH);
                 intent.putExtra(SearchManager.QUERY, s);
-                if(navigationView.getCheckedItem() != null)
+                if (navigationView.getCheckedItem() != null)
                     intent.putExtra(SearchActivity.EXTRA_CATEGORY_ID, navigationView.getCheckedItem().getItemId());
                 startActivity(intent);
                 return true;
@@ -445,9 +452,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals("dark_mode")) {
+        if (key.equals("dark_mode")) {
             recreate();
-        } else if(key.equals("post_number")) {
+        } else if (key.equals("post_number")) {
             recreate();
         }
     }
@@ -455,6 +462,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onCategoriesFetched(List<CategoryResponse.Category> categories) {
         displayCachedCategories();
+    }
+
+    private class InfinityScrollListener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 0 && visibleItemCount > 0) {
+                loadingIndicatorBottom.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingContent();
+            }
+        }
     }
 
 }

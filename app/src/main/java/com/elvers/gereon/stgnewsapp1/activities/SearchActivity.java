@@ -13,10 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.elvers.gereon.stgnewsapp1.R;
@@ -60,7 +61,10 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     String numberOfArticlesParam;
     Integer pageNumber;
     private ArrayAdapter mAdapter;
-    private Button btnLoadMore;
+
+    private ProgressBar loadingIndicatorBottom;
+    private boolean loadingContent = false;
+    private boolean canLoadMoreContent = true;
 
     /**
      * onCreate is called when this Activity is launched. It is therefore responsible for setting it up based on the query specified in the Intent used to launch it.
@@ -98,17 +102,11 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         mListView = findViewById(R.id.listView);
         mListView.setEmptyView(emptyView);
 
-        btnLoadMore = new Button(this);
-        btnLoadMore.setText(R.string.load_more);
-        btnLoadMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingIndicator.setVisibility(View.VISIBLE);
-                pageNumber++;
-                startFetchingArticles();
-            }
-        });
-        mListView.addFooterView(btnLoadMore);
+        loadingIndicatorBottom = new ProgressBar(this);
+        loadingIndicatorBottom.setVisibility(View.GONE);
+        mListView.addFooterView(loadingIndicatorBottom);
+
+        mListView.setOnScrollListener(new InfinityScrollListener());
 
         // When launching the Activity, the first page should be loaded
         pageNumber = 1;
@@ -134,7 +132,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
      * It dumps the old Adapter and makes corrects the visibility of loadingIndicator and emptyView so make the user aware that new data is about to appear
      */
     public void refreshListView() {
-        if(mAdapter != null)
+        if (mAdapter != null)
             mAdapter.clear();
         loadingIndicator.setVisibility(View.VISIBLE);
         initLoaderListView();
@@ -144,7 +142,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     public void initLoaderListView() {
         pageNumber = 1;
 
-        if(categoryId == -3) {
+        if (categoryId == -3) {
             mAdapter = new AuthorAdapter(this, new ArrayList<Author>());
             mListView.setAdapter(mAdapter);
             mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -182,15 +180,17 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
             });
         }
 
-        startFetchingArticles();
+        startFetchingContent();
     }
 
-    private void startFetchingArticles() {
+    private void startFetchingContent() {
+        loadingContent = true;
+
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(WP_REQUEST_URL);
         uriBuilder.appendPath("wp-json").appendPath("wp").appendPath("v2");
-        if(categoryId == -3) {
+        if (categoryId == -3) {
             uriBuilder.appendPath("users");
         } else {
             uriBuilder.appendPath("posts");
@@ -201,12 +201,12 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         } else if (authorFilter != -1 && categoryId != -3) {
             uriBuilder.appendQueryParameter("author", String.valueOf(authorFilter));
         }
-        if(categoryId > 0) {
+        if (categoryId > 0) {
             uriBuilder.appendQueryParameter("categories", String.valueOf(categoryId));
         }
 
         if (categoryId == -2) {
-            for(String fav : PreferenceManager.getDefaultSharedPreferences(this).getString("favorites", "").split(",")) {
+            for (String fav : PreferenceManager.getDefaultSharedPreferences(this).getString("favorites", "").split(",")) {
                 uriBuilder.appendQueryParameter("include[]", fav);
             }
         }
@@ -221,7 +221,10 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
 
     @Override
     public void onListContentFetched(List<ListEntry> entries) {
-        btnLoadMore.setVisibility(View.VISIBLE);
+        loadingIndicator.setVisibility(View.GONE);
+        loadingIndicatorBottom.setVisibility(View.GONE);
+
+        canLoadMoreContent = true;
 
         loadingIndicator.setVisibility(View.GONE);
         emptyView.setText(R.string.no_result_search);
@@ -229,16 +232,18 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
         mAdapter.notifyDataSetChanged();
         if (entries != null && !entries.isEmpty()) {
             mAdapter.addAll(entries);
-            if(entries.size() != Integer.parseInt(numberOfArticlesParam))
-                btnLoadMore.setVisibility(View.INVISIBLE);
+            if (entries.size() != Integer.parseInt(numberOfArticlesParam))
+                canLoadMoreContent = false;
         } else {
-            if(entries != null)
-                btnLoadMore.setVisibility(View.INVISIBLE);
+            if (entries != null)
+                canLoadMoreContent = false;
         }
 
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
+
+        loadingContent = false;
     }
 
     /**
@@ -257,7 +262,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     public void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             searchFilter = intent.getStringExtra(SearchManager.QUERY);
-            if(intent.hasExtra(EXTRA_CATEGORY_ID)) {
+            if (intent.hasExtra(EXTRA_CATEGORY_ID)) {
                 categoryId = intent.getIntExtra(EXTRA_CATEGORY_ID, -1);
             }
             titleString = (categoryId == -3 ? getString(R.string.search_title_author) : getString(R.string.search_title)) + searchFilter + "\"";
@@ -278,10 +283,26 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals("dark_mode")) {
+        if (key.equals("dark_mode")) {
             recreate();
         } else if (key.equals("post_number")) {
             recreate();
         }
     }
+
+    private class InfinityScrollListener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 0 && visibleItemCount > 0) {
+                loadingIndicatorBottom.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingContent();
+            }
+        }
+    }
+
 }

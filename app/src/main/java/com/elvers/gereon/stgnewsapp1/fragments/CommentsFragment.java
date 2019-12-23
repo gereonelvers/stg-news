@@ -13,9 +13,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -53,8 +54,11 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
 
     // Parsed parameter
     private Integer articleID;
-    private Button btnLoadMore;
     private String numberOfCommentsParam;
+
+    private ProgressBar loadingIndicatorBottom;
+    private boolean loadingContent = false;
+    private boolean canLoadMoreContent = true;
 
     // Required empty public constructor
     public CommentsFragment() {
@@ -107,17 +111,11 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
         emptyView_quill_iv = view.findViewById(R.id.comments_empty_view_quill_iv);
         listView.setEmptyView(emptyView);
 
-        btnLoadMore = new Button(getActivity());
-        btnLoadMore.setText(R.string.load_more);
-        btnLoadMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingIndicator.setVisibility(View.VISIBLE);
-                pageNumber++;
-                startFetchingComments();
-            }
-        });
-        listView.addFooterView(btnLoadMore);
+        loadingIndicatorBottom = new ProgressBar(getActivity());
+        loadingIndicatorBottom.setVisibility(View.GONE);
+        listView.addFooterView(loadingIndicatorBottom);
+
+        listView.setOnScrollListener(new InfinityScrollListener());
 
         // When launching the Activity, the first page should be loaded
         pageNumber = 1;
@@ -158,6 +156,8 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
     }
 
     private void startFetchingComments() {
+        loadingContent = true;
+
         Uri.Builder uriBuilder = new Uri.Builder();
         uriBuilder.scheme("https");
         uriBuilder.authority(COMMENTS_REQUEST_URL);
@@ -173,11 +173,12 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
     @Override
     public void onCommentsFetched(List<Comment> comments) {
         pageNumber = 1;
-        btnLoadMore.setVisibility(View.VISIBLE);
+        canLoadMoreContent = true;
 
         // Since we can't be sure the fragment will still be active when comments are fetched, this is done in a try-block
         try {
             loadingIndicator.setVisibility(View.GONE);
+            loadingIndicatorBottom.setVisibility(View.GONE);
 
             emptyView_tv.setText(getString(R.string.comments_empty_view));
             if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
@@ -191,10 +192,10 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
             if (comments != null && !comments.isEmpty()) {
                 commentAdapter.addAll(comments);
                 if (comments.size() != PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("comments_number", 10))
-                    btnLoadMore.setVisibility(View.INVISIBLE);
+                    canLoadMoreContent = false;
             } else {
                 if (comments != null)
-                    btnLoadMore.setVisibility(View.INVISIBLE);
+                    canLoadMoreContent = false;
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "Can't push comments to Adapter: " + e.toString());
@@ -203,14 +204,31 @@ public class CommentsFragment extends Fragment implements ICommentsLoadedHandler
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
+
+        loadingContent = false;
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals("dark_mode")) {
+        if (key.equals("dark_mode")) {
             getActivity().recreate();
-        } else if(key.equals("comments_number")) {
+        } else if (key.equals("comments_number")) {
             getActivity().recreate();
+        }
+    }
+
+    private class InfinityScrollListener implements AbsListView.OnScrollListener {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            if (firstVisibleItem + visibleItemCount + 2 >= totalItemCount && !loadingContent && canLoadMoreContent && totalItemCount > 0 && visibleItemCount > 0) {
+                loadingIndicatorBottom.setVisibility(View.VISIBLE);
+                pageNumber++;
+                startFetchingComments();
+            }
         }
     }
 }
