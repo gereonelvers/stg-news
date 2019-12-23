@@ -118,6 +118,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // Getting numberOfArticlesParam from SharedPreferences (default: 10; modifiable through Preferences). This is the number of articles requested from the backend.
         numberOfArticlesParam = sharedPreferences.getString("post_number", "10");
 
+        // cleanup shared preferences from previous versions
+        if (sharedPreferences.contains("categoryJSONString")) {
+            sharedPreferences.edit().remove("categoryJSONString").apply();
+        }
+        if (numberOfArticlesParam.equals("5") || numberOfArticlesParam.equals("1")) {
+            sharedPreferences.edit().putString("post_number", "10").apply();
+        }
+        String commentsNumber = sharedPreferences.getString("comments_number", "10");
+        if (commentsNumber.equals("5") || commentsNumber.equals("1")) {
+            sharedPreferences.edit().putString("comments_number", "10").apply();
+        }
+
         // Setting up ActionBar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
