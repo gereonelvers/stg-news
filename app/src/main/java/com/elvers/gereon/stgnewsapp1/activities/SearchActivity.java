@@ -269,7 +269,7 @@ public class SearchActivity extends AppCompatActivity implements IListContentLoa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            super.onBackPressed();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

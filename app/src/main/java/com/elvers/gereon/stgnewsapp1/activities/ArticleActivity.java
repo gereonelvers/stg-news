@@ -181,11 +181,7 @@ public class ArticleActivity extends AppCompatActivity implements SharedPreferen
         switch (item.getItemId()) {
             // Back button
             case android.R.id.home:
-                if (!isComments) {
-                    super.onBackPressed();
-                } else {
-                    showArticle();
-                }
+                super.onBackPressed(); // directly go back instead of checking if comments are shown
                 return true;
             // Share button
             case R.id.share:
