@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatDelegate;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.activities.SearchActivity;
 
 import java.io.ByteArrayOutputStream;
@@ -87,24 +89,29 @@ public class ArticleWebViewClient extends WebViewClient {
         // If the URL contains stg-sz.net it will be loaded inside the current WebView
         if (urlStr.contains("stg-sz.net")) {
             String[] parts = url.getPath().split("/");
-            if (parts.length > 2 && parts[2].equalsIgnoreCase("author")) { // filter by author
-                int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).getId();
-                Intent intent = new Intent();
-                intent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
-                intent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, authorId);
-                ownerActivity.startActivity(intent);
-            } else if (!parts[2].matches("[2-9][0-9]{3}")) { // i don't think the app will last until year 10000
-                if (!urlStr.contains("?inapp") && !urlStr.contains("&inapp")) {
-                    if (urlStr.contains("?")) {
-                        view.loadUrl(urlStr + "&inapp");
+            if (parts.length >= 2) {
+                if (parts.length > 2 && parts[2].equalsIgnoreCase("author")) { // filter by author
+                    int authorId = Utils.authorResponse.getAuthorBySlug(url.getPath().split("/")[3]).getId();
+                    Intent intent = new Intent();
+                    intent.setAction(SearchActivity.ACTION_FILTER_AUTHOR);
+                    intent.putExtra(SearchActivity.EXTRA_AUTHOR_ID, authorId);
+                    ownerActivity.startActivity(intent);
+                } else if (!parts[2].matches("[2-9][0-9]{3}")) { // i don't think the app will last until year 10000
+                    if (!urlStr.contains("?inapp") && !urlStr.contains("&inapp")) {
+                        if (urlStr.contains("?")) {
+                            view.loadUrl(urlStr + "&inapp");
+                        } else {
+                            view.loadUrl(urlStr + "?inapp");
+                        }
                     } else {
-                        view.loadUrl(urlStr + "?inapp");
+                        view.loadUrl(urlStr);
                     }
-                } else {
-                    view.loadUrl(urlStr);
                 }
+                return true;
+            } else {
+                Toast.makeText(ownerActivity, R.string.error_invalid_url, Toast.LENGTH_LONG).show();
+                return false;
             }
-            return true;
         }
 
         // Otherwise it will be handled in a regular browser instance
