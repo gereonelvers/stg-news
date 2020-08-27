@@ -26,7 +26,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -472,6 +474,48 @@ public final class Utils {
      */
     public static void updateGlobalNightMode(Activity activity) {
         AppCompatDelegate.setDefaultNightMode(PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("dark_mode", false) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
+    /**
+     * @param name: Name of the file to load
+     * @param context: Current context
+     * @return File content
+     * @throws IOException If failed to load file
+     */
+    public static String loadTextAsset(String name, Context context) throws IOException {
+        Log.i(LOG_TAG, "Loading dark theme JavaScript file. This should only happen once");
+        InputStream in = context.getAssets().open(name);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[in.available()];
+        int size;
+        while ((size = in.read(buffer)) != -1) {
+            bos.write(buffer, 0, size);
+        }
+        bos.close();
+        in.close();
+        return new String(bos.toByteArray());
+    }
+
+    /**
+     * Load JavaScript asset, optimize size and remove (single line) comments
+     * @param name: Name of the javascript file to load
+     * @param context: Current context
+     * @return JavaScipt
+     * @throws IOException If failed to load file
+     */
+    public static String loadJavaScriptAsset(String name, Context context) throws IOException {
+        String src = loadTextAsset(name, context);
+        StringBuilder dst = new StringBuilder();
+        for (String ln : src.split("\n")) {
+            if (!ln.trim().startsWith("//") && !ln.isEmpty()) {
+                int index = ln.indexOf("//");
+                if (index != -1) {
+                    ln = ln.substring(0, index);
+                }
+                dst.append(ln).append("\n");
+            }
+        }
+        return dst.toString();
     }
 
 }

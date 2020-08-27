@@ -3,18 +3,17 @@ package com.elvers.gereon.stgnewsapp1.utils;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import androidx.appcompat.app.AppCompatDelegate;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.elvers.gereon.stgnewsapp1.R;
 import com.elvers.gereon.stgnewsapp1.activities.SearchActivity;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -36,17 +35,7 @@ public class ArticleWebViewClient extends WebViewClient {
 
         if (darkThemeJs.isEmpty()) {
             try {
-                Log.i(LOG_TAG, "Loading dark theme JavaScript file. This should only happen once");
-                InputStream in = ownerActivity.getAssets().open("dark_theme.js");
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[in.available()];
-                int size;
-                while ((size = in.read(buffer)) != -1) {
-                    bos.write(buffer, 0, size);
-                }
-                bos.close();
-                in.close();
-                darkThemeJs = "(function(){ " + new String(bos.toByteArray()) + " })();";
+                darkThemeJs += "(function(){ " + Utils.loadJavaScriptAsset("dark_theme.js", ownerActivity) + " })();";
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Failed to load dark theme js script: " + e.toString());
                 e.printStackTrace();
