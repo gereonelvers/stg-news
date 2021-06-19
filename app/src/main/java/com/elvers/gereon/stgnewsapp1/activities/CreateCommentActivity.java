@@ -72,7 +72,7 @@ public class CreateCommentActivity extends AppCompatActivity implements IComment
             actionbar.setTitle(R.string.app_name);
         }
 
-        lonetString = getString(R.string.lonet_string);
+        lonetString = getString(R.string.email_string);
         loaderManager = getSupportLoaderManager();
         Intent createCommentIntent = getIntent();
         int articleId = createCommentIntent.getIntExtra("ARTICLE_ID", -1);

@@ -64,12 +64,12 @@
     <string name="create_comment_email">fir.lastname</string>
     <string name="successful_post">Comment submited successfully, please check your Email to confirm it!</string>
     <string name="unsuccessful_post">Comment not submited successfully, please try again.\nError code:</string>
-    <string name="lonet_string" translatable="false">\@stg-se.sh.lo-net2.de</string>
-    <string name="email_invalid">Please enter a valid \"lo-net\"-Email</string>
+    <string name="email_string" translatable="false">\@stg-segeberg.de</string>
+    <string name="email_invalid">Please enter a valid school email</string>
     <string name="first_last_name_identical">Please enter a separate last name for Email generation to work correctly</string>
     <string name="create_comments_hint_title">Hint</string>
     <string name="create_comments_hint_name">The name you want to appear above your comment. Please use your real name. If you have to use a pseudonym, make sure it is inoffensive as it will be visible to everyone.</string>
-    <string name="create_comment_hint_email">Your lo-net address. We will send a confirmation link there. Hint: You can tap the wand icon to automatically generate this from your name.</string>
+    <string name="create_comment_hint_email">Your school email address. We will send a confirmation link there. Hint: You can tap the wand icon to automatically generate this from your name.</string>
     <string name="create_comment_hint_content">Write your comment here. Make sure to remain civil so as to not offend anyone. If we feel like your comment is inappropriate, we will delete it.</string>
     <string name="okay">Okay</string>
 
@@ -77,7 +77,7 @@
     <string name="cover_image_description">Cover image of the article</string>
     <string name="logo_content_description">Our logo. It reads "Schüler texten Gedanken" in a fancy font</string>
     <string name="about_question_description">Question mark in a circle. Provides information on name, email and content fields when tapped.</string>
-    <string name="about_wand_description">A small magic wand. Automatically generates your lo-net Email address based on your name when tapped</string>
+    <string name="about_wand_description">A small magic wand. Automatically generates your school email address based on your name when tapped</string>
     <string name="quill_description">Quill and inkwell, why not create something with it?</string>
     <string name="arrow_description">Arrow pointing to the Add-comment button</string>
     <string name="refresh_string">Refresh</string>

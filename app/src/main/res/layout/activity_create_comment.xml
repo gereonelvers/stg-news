@@ -85,7 +85,7 @@
                         android:paddingBottom="12dp"
                         android:paddingEnd="8dp"
                         android:paddingRight="8dp"
-                        android:text="@string/lonet_string"
+                        android:text="@string/email_string"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="20sp"
                         tools:ignore="RtlSymmetry" />
