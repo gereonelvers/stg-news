@@ -6,8 +6,8 @@ android {
         applicationId "com.elvers.gereon.stgnewsapp"
         minSdkVersion 15
         targetSdkVersion 30
-        versionCode 23
-        versionName "1.5"
+        versionCode 24
+        versionName "1.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
