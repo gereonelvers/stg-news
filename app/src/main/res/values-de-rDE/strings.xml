@@ -53,7 +53,7 @@
     <string name="name_input_string">Name</string>
     <string name="successful_post">Kommentar erfolgreich gesendet, bitte bestätige ihn per Mail!</string>
     <string name="unsuccessful_post">Kommentar nicht erfolgreich, bitte versuche es erneut.\nFehlercode:</string>
-    <string name="email_invalid">Bitte gib eine gültige lo-net E-Mail an</string>
+    <string name="email_invalid">Bitte gib eine gültige Schul-Email an</string>
     <string name="first_last_name_identical">Bitte gib deinen Nachnamen ein, damit die Adressgenerierung korrekt funktioniert</string>
     <string name="create_comments_hint_title">Hinweis</string>
     <string name="create_comments_hint_name">Der Name, der über deinem Kommentar angezeigt wird. Bitte nutze deinen echten Namen. Wenn du ein Pseudonym nutzen musst, stelle sicher, dass es niemanden beleidigen könnte, weil es für jeden sichtbar sein wird.</string>
@@ -64,7 +64,7 @@
     <string name="cover_image_description">Titelbild des Artikels</string>
     <string name="logo_content_description">Unser Logo. Es zeigt den Text "Schüler texten Gedanken" in einer netten Schriftart</string>
     <string name="about_question_description">Fragezeichen in einem Kreis. Zeigt Informationen über Namen, E-Mail und Inhalt an, wenn du es antippst.</string>
-    <string name="about_wand_description">Ein kleiner Zauberstab. Generiert deine lo-net E-Mail Adresse aus deinem Namen, wenn du es antippst.</string>
+    <string name="about_wand_description">Ein kleiner Zauberstab. Generiert deine Schul-Email Adresse aus deinem Namen, wenn du es antippst.</string>
     <string name="quill_description">Feder und Tintenfass, warum schreibst du nicht etwas?</string>
     <string name="arrow_description">Pfeil, der auf den Plus-Knopf zeigt</string>
     <string name="refresh_string">Aktualisieren</string>
@@ -83,4 +83,5 @@
     <string name="authors">Autoren</string>
     <string name="search_title_author">Autor mit \"</string>
     <string name="dark_mode_summary">Experimentell</string>
+    <string name="error_invalid_url">Ungültiger Link!</string>
 </resources>
