@@ -87,6 +87,8 @@ function Navigation() {
             presentation: Platform.OS === 'ios' ? 'formSheet' : 'card',
             sheetAllowedDetents: [0.75, 1],
             sheetGrabberVisible: true,
+            sheetExpandsWhenScrolledToEdge: true,
+            contentStyle: { backgroundColor: colors.bg },
             headerShown: Platform.OS === 'android',
             animation: Platform.OS === 'android' ? 'slide_from_bottom' : undefined,
           }}

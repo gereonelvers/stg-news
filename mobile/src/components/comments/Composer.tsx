@@ -1,124 +1,95 @@
-import { useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { type RefObject } from 'react';
+import { ActivityIndicator, Platform, StyleSheet, TextInput, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 import type { CommentNode } from '@/api/types';
-import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { Tap } from '@/components/ui/Tap';
 import { Txt } from '@/components/ui/Txt';
-import { haptic } from '@/lib/haptics';
-import { schoolEmailFor } from '@/lib/text';
-import { useSettings } from '@/store/settings';
 import { useTheme } from '@/theme/ThemeProvider';
-import { radius, space, systemFont } from '@/theme/tokens';
+import { space, systemFont } from '@/theme/tokens';
+import { IdentityRow, type Identity } from './Identity';
 
 type Props = {
+  value: string;
+  onChange: (text: string) => void;
+  onSend: () => void;
+  sending: boolean;
   replyTo: CommentNode | null;
   onCancelReply: () => void;
-  onSubmit: (input: { name: string; email: string; text: string }) => Promise<void>;
-  submitting: boolean;
-  emailDomain: string;
-  moderated: boolean;
+  identity: Identity | null;
+  onEditIdentity: () => void;
+  inputRef: RefObject<TextInput | null>;
+  /** Inline error from the last attempt, if any. */
+  error: string | null;
+  hint: string;
+  /** Slot above the input: identity form, "sent" card, … */
+  children?: React.ReactNode;
 };
 
-export function Composer({ replyTo, onCancelReply, onSubmit, submitting, emailDomain, moderated }: Props) {
+const MAX_LENGTH = 2000;
+
+/** Messages-style composer: one growing field with the send button inside. */
+export function Composer({ value, onChange, onSend, sending, replyTo, onCancelReply, identity, onEditIdentity, inputRef, error, hint, children }: Props) {
   const { colors } = useTheme();
-  const commenter = useSettings((s) => s.commenter);
-  const setCommenter = useSettings((s) => s.setCommenter);
-  const [name, setName] = useState(commenter.name);
-  const [email, setEmail] = useState(commenter.email);
-  const [text, setText] = useState('');
-  const [error, setError] = useState<string | null>(null);
-
-  const valid = name.trim().length >= 2 && /.+@.+\..+/.test(email.trim()) && text.trim().length >= 3;
-
-  const submit = async () => {
-    if (!valid || submitting) return;
-    setError(null);
-    try {
-      setCommenter({ name: name.trim(), email: email.trim() });
-      await onSubmit({ name: name.trim(), email: email.trim(), text: text.trim() });
-      setText('');
-      haptic.success();
-    } catch (e) {
-      haptic.warning();
-      setError(e instanceof Error ? e.message : 'Senden fehlgeschlagen.');
-    }
-  };
-
-  const inputStyle = [styles.input, systemFont, { backgroundColor: colors.surface, color: colors.text }];
+  const canSend = value.trim().length >= 2 && !sending;
 
   return (
-    <View style={[styles.wrap, { borderTopColor: colors.separator, backgroundColor: colors.bgElevated }]}>
+    <View style={styles.wrap}>
+      {children}
       {replyTo ? (
-        <View style={[styles.replyBar, { backgroundColor: colors.tintSoft }]}>
-          <Icon name="reply" size={14} color="tint" />
+        <Animated.View entering={FadeIn.duration(160)} exiting={FadeOut.duration(120)} style={[styles.replyBar, { backgroundColor: colors.tintSoft }]}>
+          <Icon name="reply" size={14} color="tint" weight="semibold" />
           <Txt variant="caption" color="tint" style={{ flex: 1 }} numberOfLines={1}>
-            Antwort an {replyTo.authorName}
+            Antwort an{' '}
+            <Txt variant="caption" color="tint" weight="700">
+              {replyTo.authorName}
+            </Txt>
+            {' · '}
+            <Txt variant="caption" color="tint" style={{ opacity: 0.8 }}>
+              „{replyTo.text.replace(/\s+/g, ' ').slice(0, 60)}“
+            </Txt>
           </Txt>
-          <Tap onPress={onCancelReply} hitSlop={8} accessibilityRole="button" accessibilityLabel="Antwort abbrechen">
+          <Tap onPress={onCancelReply} hitSlop={10} accessibilityRole="button" accessibilityLabel="Antwort abbrechen">
             <Icon name="close" size={14} color="tint" weight="bold" />
           </Tap>
-        </View>
+        </Animated.View>
       ) : null}
-      <View style={styles.row}>
+      {identity ? <IdentityRow identity={identity} onEdit={onEditIdentity} /> : null}
+      <View style={[styles.pill, { backgroundColor: colors.surface }]}>
         <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="Dein Name"
-          placeholderTextColor={colors.textTertiary}
-          style={[inputStyle, { flex: 1 }]}
-          autoCapitalize="words"
-          textContentType="name"
-          returnKeyType="next"
-        />
-        <View style={{ flex: 1.3, flexDirection: 'row', alignItems: 'center' }}>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="E-Mail"
-            placeholderTextColor={colors.textTertiary}
-            style={[inputStyle, { flex: 1 }]}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoCorrect={false}
-            returnKeyType="next"
-          />
-          <Tap
-            onPress={() => {
-              const guess = schoolEmailFor(name, emailDomain);
-              if (guess) {
-                setEmail(guess);
-                haptic.selection();
-              }
-            }}
-            hitSlop={6}
-            style={[styles.wand, { backgroundColor: colors.tintSoft }]}
-            accessibilityRole="button"
-            accessibilityLabel="Schul-E-Mail aus dem Namen erzeugen">
-            <Icon name="sparkle" size={16} color="tint" />
-          </Tap>
-        </View>
-      </View>
-      <View style={styles.row}>
-        <TextInput
-          value={text}
-          onChangeText={setText}
+          ref={inputRef}
+          value={value}
+          onChangeText={onChange}
           placeholder={replyTo ? 'Deine Antwort …' : 'Was denkst du?'}
           placeholderTextColor={colors.textTertiary}
-          style={[inputStyle, { flex: 1, minHeight: 44, maxHeight: 140, paddingTop: 11 }]}
+          style={[styles.input, systemFont, { color: colors.text }]}
           multiline
+          maxLength={MAX_LENGTH}
+          textAlignVertical="center"
+          accessibilityLabel="Kommentar"
         />
-        <Button label="" icon="send" onPress={submit} disabled={!valid || submitting} style={styles.send} />
+        <Tap
+          onPress={onSend}
+          disabled={!canSend}
+          haptics={canSend ? 'light' : 'none'}
+          scaleTo={0.9}
+          style={[styles.send, { backgroundColor: canSend || sending ? colors.tint : colors.surface2 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Kommentar senden">
+          {sending ? <ActivityIndicator size="small" color={colors.textOnTint} /> : <Icon name="send" size={15} color={canSend ? colors.textOnTint : colors.textTertiary} weight="semibold" />}
+        </Tap>
       </View>
       {error ? (
-        <Txt variant="caption" color="danger">
-          {error}
-        </Txt>
+        <Animated.View entering={FadeIn.duration(160)} style={styles.status}>
+          <Icon name="error" size={13} color="danger" />
+          <Txt variant="caption" color="danger" style={{ flex: 1 }}>
+            {error}
+          </Txt>
+        </Animated.View>
       ) : (
-        <Txt variant="caption" color="textTertiary">
-          {moderated ? 'Du bekommst eine E-Mail zum Bestätigen. Danach schaut die Redaktion kurz drüber.' : 'Bitte nutze deinen echten Namen und bleib freundlich.'}
+        <Txt variant="caption" color="textTertiary" numberOfLines={2}>
+          {hint}
         </Txt>
       )}
     </View>
@@ -126,10 +97,18 @@ export function Composer({ replyTo, onCancelReply, onSubmit, submitting, emailDo
 }
 
 const styles = StyleSheet.create({
-  wrap: { padding: space.md, gap: space.sm, borderTopWidth: StyleSheet.hairlineWidth },
-  row: { flexDirection: 'row', gap: space.sm, alignItems: 'flex-end' },
-  input: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.md, fontSize: 15, lineHeight: 20 },
-  wand: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginLeft: space.xs },
-  replyBar: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: 8, borderRadius: radius.sm },
-  send: { width: 44, height: 44, paddingHorizontal: 0, paddingVertical: 0, alignItems: 'center', justifyContent: 'center' },
+  wrap: { gap: space.sm },
+  replyBar: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: 8, borderRadius: 12 },
+  pill: { flexDirection: 'row', alignItems: 'flex-end', borderRadius: 24, paddingLeft: 16, paddingRight: 5, paddingVertical: 5, minHeight: 46 },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    lineHeight: 21,
+    maxHeight: 132,
+    paddingTop: Platform.OS === 'ios' ? 8 : 6,
+    paddingBottom: Platform.OS === 'ios' ? 8 : 6,
+    paddingRight: space.sm,
+  },
+  send: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  status: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 });

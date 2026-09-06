@@ -176,6 +176,8 @@ export type CommentNode = {
   text: string;
   children: CommentNode[];
   depth: number;
+  /** Written on this device and not yet confirmed/approved on the server. */
+  pending?: boolean;
 };
 
 export type PostsQuery = {

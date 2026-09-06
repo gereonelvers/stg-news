@@ -6,14 +6,14 @@ import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { Extrapolation, interpolate, useAnimatedRef, useAnimatedStyle, useScrollOffset } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useComments } from '@/api/comments';
+import { useThread } from '@/api/comments';
 import { reportView, usePost } from '@/api/queries';
 import type { PostCard, PostFull } from '@/api/types';
 import { ArticleBody } from '@/components/article/ArticleBody';
 import { BookmarkButton } from '@/components/cards/BookmarkButton';
 import { Meta } from '@/components/cards/Meta';
 import { PostRow } from '@/components/cards/PostRow';
-import { CommentItem } from '@/components/comments/CommentItem';
+import { CommentsPreview } from '@/components/comments/CommentsPreview';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
@@ -48,7 +48,7 @@ export default function ArticleScreen() {
   const initial = getCard(id);
   const query = usePost(id, initial);
   const post = query.data;
-  const comments = useComments(id);
+  const { thread } = useThread(id);
   const saved = useIsBookmarked(id);
   const toggle = useBookmarks((s) => s.toggle);
   const markRead = useRecents((s) => s.markRead);
@@ -85,7 +85,7 @@ export default function ArticleScreen() {
   const cardForActions: PostCard | undefined = post ?? initial;
   const loaded = !!post && post.content !== '';
 
-  const totalComments = useMemo(() => (comments.data ? countComments(comments.data) : post?.comment_count ?? 0), [comments.data, post?.comment_count]);
+  const totalComments = useMemo(() => (thread ? countComments(thread) : post?.comment_count ?? 0), [thread, post?.comment_count]);
 
   if (query.isError && !post) {
     return (
@@ -183,23 +183,7 @@ export default function ArticleScreen() {
           ) : null}
 
           {/* Comments */}
-          {loaded ? (
-            <View>
-              <SectionHeader title="Kommentare" subtitle={totalComments ? `${totalComments} bisher` : 'Sei die erste Stimme'} onAction={totalComments ? () => router.push({ pathname: '/kommentare/[id]', params: { id: String(id) } }) : undefined} actionLabel="Alle" />
-              <View style={{ paddingHorizontal: gutter, gap: space.lg }}>
-                {comments.data?.slice(0, 2).map((c) => (
-                  <CommentItem key={c.id} comment={{ ...c, children: [] }} />
-                ))}
-                {post!.comments_open ? (
-                  <Button label={totalComments ? 'Mitdiskutieren' : 'Kommentar schreiben'} icon="comment" variant={totalComments ? 'secondary' : 'primary'} onPress={() => router.push({ pathname: '/kommentare/[id]', params: { id: String(id), compose: '1' } })} />
-                ) : (
-                  <Txt variant="caption" color="textTertiary">
-                    Kommentare sind für diesen Artikel geschlossen.
-                  </Txt>
-                )}
-              </View>
-            </View>
-          ) : null}
+          {loaded ? <CommentsPreview postId={id} thread={thread} total={totalComments} open={post!.comments_open} /> : null}
 
           {/* Related */}
           {loaded && post!.related.length ? (
