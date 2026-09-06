@@ -13,6 +13,7 @@ import { withAlpha } from '@/lib/colors';
 import { haptic } from '@/lib/haptics';
 import { PushUnavailableError, disablePush, enablePush, updatePushCategories } from '@/lib/notifications';
 import { TEXT_SCALES, useSettings, type Appearance } from '@/store/settings';
+import { Container } from '@/components/ui/Container';
 import { useTheme } from '@/theme/ThemeProvider';
 import { brand, gutter, radius, space } from '@/theme/tokens';
 
@@ -33,16 +34,17 @@ export default function EinstellungenScreen() {
 
   const scaleIndex = Math.max(0, TEXT_SCALES.findIndex((s) => Math.abs(s - settings.textScale) < 0.01));
 
+  // The switch flips immediately; permission, token and server registration run afterwards.
   const togglePush = async (on: boolean) => {
+    settings.setNotificationsEnabled(on);
+    haptic.selection();
     setBusy(true);
     try {
       if (on) {
         await enablePush(settings.notificationCategories);
-        settings.setNotificationsEnabled(true);
         haptic.success();
       } else {
         await disablePush();
-        settings.setNotificationsEnabled(false);
       }
     } catch (e) {
       settings.setNotificationsEnabled(false);
@@ -77,6 +79,7 @@ export default function EinstellungenScreen() {
         }}
       />
       <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ paddingBottom: space.xxxl }} contentInsetAdjustmentBehavior="automatic">
+       <Container reading flush>
         <Group title="Darstellung">
           <View style={styles.segment}>
             {APPEARANCES.map((a) => {
@@ -132,10 +135,10 @@ export default function EinstellungenScreen() {
         <Group title="Mitteilungen">
           <Row
             title="Neue Artikel"
-            subtitle={settings.notificationsEnabled ? 'Du bekommst eine Mitteilung, wenn ein Artikel erscheint.' : 'Erfahre sofort, wenn etwas Neues erscheint.'}
+            subtitle={busy ? (settings.notificationsEnabled ? 'Wird eingerichtet …' : 'Wird abgemeldet …') : settings.notificationsEnabled ? 'Du bekommst eine Mitteilung, wenn ein Artikel erscheint.' : 'Erfahre sofort, wenn etwas Neues erscheint.'}
             icon="bell"
             iconColor={brand.crimson}
-            right={<Switch value={settings.notificationsEnabled} onValueChange={togglePush} disabled={busy} trackColor={{ true: colors.tint }} />}
+            right={<Switch value={settings.notificationsEnabled} onValueChange={togglePush} trackColor={{ true: colors.tint }} />}
           />
           {settings.notificationsEnabled && categories.data ? (
             <>
@@ -184,6 +187,7 @@ export default function EinstellungenScreen() {
         <Txt variant="caption" color="textTertiary" align="center" style={{ marginTop: space.xl, paddingHorizontal: gutter }}>
           Gemacht von Schüler:innen, für Schüler:innen. Mit ❤️ aus Bad Segeberg.
         </Txt>
+       </Container>
       </ScrollView>
     </>
   );

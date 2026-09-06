@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, space } from '@/theme/tokens';
 import { Icon } from './Icon';
@@ -13,12 +14,15 @@ type Props = {
   actionLabel?: string;
   onAction?: () => void;
   subtitle?: string;
+  /** Inside a card: less vertical spacing, card padding. */
+  compact?: boolean;
 };
 
-export function SectionHeader({ title, emoji, accent, actionLabel = 'Alle', onAction, subtitle }: Props) {
+export function SectionHeader({ title, emoji, accent, actionLabel = 'Alle', onAction, subtitle, compact }: Props) {
   const { colors } = useTheme();
+  const { isWide, gutter: g, containerWidth } = useLayout();
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, compact ? { marginTop: space.lg, marginBottom: space.xs, paddingHorizontal: space.lg } : isWide ? { paddingHorizontal: g, width: containerWidth + g * 2, alignSelf: 'center' } : null]}>
       <View style={{ flex: 1 }}>
         <View style={styles.titleRow}>
           {accent ? <View style={[styles.bar, { backgroundColor: accent }]} /> : null}

@@ -15,6 +15,7 @@ import { Tap } from '@/components/ui/Tap';
 import { Txt } from '@/components/ui/Txt';
 import { rememberCards } from '@/lib/cardCache';
 import { useRecents } from '@/store/recents';
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, radius, space } from '@/theme/tokens';
 
@@ -26,6 +27,8 @@ export default function SucheScreen() {
   const categories = useCategories();
   const recents = useRecents();
   const active = query.trim().length >= 2;
+  const layout = useLayout();
+  const centred = layout.isWide ? { width: layout.readingWidth + layout.gutter * 2, alignSelf: 'center' as const } : undefined;
 
   rememberCards(search.data?.posts);
 
@@ -47,7 +50,7 @@ export default function SucheScreen() {
         }}
       />
       {!active ? (
-        <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ backgroundColor: colors.bg }} keyboardDismissMode="on-drag" contentContainerStyle={{ paddingBottom: space.xxxl }}>
+        <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ backgroundColor: colors.bg }} keyboardDismissMode="on-drag" contentContainerStyle={[{ paddingBottom: space.xxxl }, centred]}>
           {recents.searches.length ? (
             <View style={styles.section}>
               <View style={styles.sectionHead}>
@@ -102,7 +105,7 @@ export default function SucheScreen() {
           keyboardDismissMode="on-drag"
           contentInsetAdjustmentBehavior="automatic"
           style={{ backgroundColor: colors.bg }}
-          contentContainerStyle={{ paddingBottom: space.xxxl }}
+          contentContainerStyle={[{ paddingBottom: space.xxxl }, centred]}
           ListHeaderComponent={
             <View>
               {search.data?.authors.length ? (

@@ -32,6 +32,7 @@ import { sharePost } from '@/lib/share';
 import { formatViews, pluralize } from '@/lib/text';
 import { useBookmarks, useIsBookmarked } from '@/store/bookmarks';
 import { useRecents } from '@/store/recents';
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, maxContentWidth, radius, space } from '@/theme/tokens';
 
@@ -66,8 +67,9 @@ export default function ArticleScreen() {
     rememberCards(post?.related);
   }, [post?.related]);
 
-  const heroWidth = Math.min(width, maxContentWidth);
-  const heroHeight = Math.round(width * (Platform.OS === 'ios' ? HERO_RATIO : 0.62));
+  const layout = useLayout();
+  const heroWidth = layout.isWide ? layout.readingWidth + layout.gutter * 2 : Math.min(width, maxContentWidth);
+  const heroHeight = layout.isWide ? Math.round(heroWidth * 0.56) : Math.round(width * (Platform.OS === 'ios' ? HERO_RATIO : 0.62));
   const image = post?.image?.sizes?.large?.src ?? post?.image?.src;
 
   const heroStyle = useAnimatedStyle(() => ({
@@ -109,16 +111,16 @@ export default function ArticleScreen() {
       ) : null}
       <Animated.ScrollView ref={scrollRef} style={{ backgroundColor: colors.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + space.xxxl }} scrollEventThrottle={16} contentInsetAdjustmentBehavior="never">
         {/* Hero */}
-        <View style={{ height: image ? heroHeight : Platform.OS === 'ios' ? insets.top + 64 : space.sm, backgroundColor: colors.surface, overflow: 'hidden' }}>
+        <View style={[{ height: image ? heroHeight : Platform.OS === 'ios' ? insets.top + 64 : space.sm, backgroundColor: colors.surface, overflow: 'hidden' }, layout.isWide && { width: heroWidth, alignSelf: 'center', marginTop: (Platform.OS === 'ios' ? insets.top + 56 : 0) + space.lg, borderRadius: radius.xl }]}>
           {image ? (
             <Animated.View style={[StyleSheet.absoluteFill, heroStyle]}>
               <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" transition={300} cachePolicy="disk" priority="high" accessibilityLabel={post?.image?.alt} />
-              {Platform.OS === 'ios' ? <LinearGradient colors={['rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']} locations={[0, 0.5]} style={StyleSheet.absoluteFill} /> : null}
+              {Platform.OS === 'ios' && !layout.isWide ? <LinearGradient colors={['rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']} locations={[0, 0.5]} style={StyleSheet.absoluteFill} /> : null}
             </Animated.View>
           ) : null}
         </View>
 
-        <View style={[styles.sheet, { backgroundColor: colors.bg, width: heroWidth, alignSelf: 'center', marginTop: image ? -radius.xl : 0 }]}>
+        <View style={[styles.sheet, { backgroundColor: colors.bg, width: heroWidth, alignSelf: 'center', marginTop: image && !layout.isWide ? -radius.xl : 0 }]}>
           {/* Title block */}
           <View style={styles.head}>
             <View style={styles.chips}>

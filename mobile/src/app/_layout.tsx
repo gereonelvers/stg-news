@@ -99,18 +99,23 @@ function Navigation() {
 }
 
 /** Open the article a notification points to, both from cold start and while running. */
+const handledNotifications = new Set<string>();
+
 function useNotificationRouting() {
   const router = useRouter();
-  const last = Notifications.useLastNotificationResponse();
   useEffect(() => {
-    const id = postIdFromResponse(last);
-    if (id) router.push({ pathname: '/artikel/[id]', params: { id: String(id) } });
-  }, [last, router]);
-  useEffect(() => {
-    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+    const open = (response: Notifications.NotificationResponse | null | undefined) => {
+      if (!response) return;
+      const key = response.notification.request.identifier || `${response.notification.date}`;
+      if (handledNotifications.has(key)) return;
+      handledNotifications.add(key);
       const id = postIdFromResponse(response);
       if (id) router.push({ pathname: '/artikel/[id]', params: { id: String(id) } });
-    });
+    };
+    // Cold start: the tap that launched the app.
+    Notifications.getLastNotificationResponseAsync().then(open).catch(() => undefined);
+    // Warm: taps while the app is running or in the background.
+    const sub = Notifications.addNotificationResponseReceivedListener(open);
     return () => sub.remove();
   }, [router]);
 }

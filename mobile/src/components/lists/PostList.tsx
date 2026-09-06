@@ -8,6 +8,7 @@ import { ErrorView } from '@/components/ui/ErrorView';
 import { SkeletonList } from '@/components/ui/Skeleton';
 import { Separator } from '@/components/ui/Row';
 import { rememberCards } from '@/lib/cardCache';
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, space } from '@/theme/tokens';
 
@@ -49,6 +50,8 @@ export function PostList({
   ...rest
 }: Props) {
   const { colors } = useTheme();
+  const { isWide, gutter: g, containerWidth } = useLayout();
+  const columns = isWide ? 2 : 1;
   rememberCards(posts);
 
   if (loading && !posts?.length) {
@@ -70,10 +73,21 @@ export function PostList({
 
   return (
     <FlatList
+      key={columns}
       data={posts ?? []}
       keyExtractor={(p) => String(p.id)}
-      renderItem={({ item }) => <PostRow post={item} showCategory={showCategory} showAuthor={showAuthor} />}
-      ItemSeparatorComponent={() => <Separator inset={gutter} />}
+      numColumns={columns}
+      renderItem={({ item }) =>
+        isWide ? (
+          <View style={{ flex: 1, padding: space.sm / 2 }}>
+            <PostRow post={item} showCategory={showCategory} showAuthor={showAuthor} card />
+          </View>
+        ) : (
+          <PostRow post={item} showCategory={showCategory} showAuthor={showAuthor} />
+        )
+      }
+      ItemSeparatorComponent={isWide ? undefined : () => <Separator inset={gutter} />}
+      contentContainerStyle={isWide ? { width: containerWidth + g * 2, alignSelf: 'center', paddingHorizontal: g - space.sm / 2 } : undefined}
       ListHeaderComponent={header}
       ListEmptyComponent={<EmptyState emoji={emptyEmoji} title={emptyTitle} message={emptyMessage} />}
       ListFooterComponent={

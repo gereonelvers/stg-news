@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Txt } from '@/components/ui/Txt';
 import { haptic } from '@/lib/haptics';
 import { useOpenPost } from '@/lib/navigation';
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, maxContentWidth, space } from '@/theme/tokens';
 
@@ -21,9 +22,11 @@ export default function RessortsScreen() {
   const random = useRandomPost();
   const open = useOpenPost();
 
-  const contentWidth = Math.min(width, maxContentWidth) - gutter * 2;
-  const columns = width > 600 ? 3 : 2;
+  const layout = useLayout();
+  const contentWidth = layout.isWide ? layout.containerWidth : Math.min(width, maxContentWidth) - gutter * 2;
+  const columns = layout.isXWide ? 4 : layout.isWide ? 3 : 2;
   const tileWidth = (contentWidth - space.md * (columns - 1)) / columns;
+  const tileHeight = layout.isWide ? 190 : 150;
 
   const header = (
     <View style={styles.header}>
@@ -57,9 +60,9 @@ export default function RessortsScreen() {
           data={categories.data ?? []}
           numColumns={columns}
           keyExtractor={(c) => String(c.id)}
-          renderItem={({ item }) => <CategoryTile category={item} width={tileWidth} />}
+          renderItem={({ item }) => <CategoryTile category={item} width={tileWidth} height={tileHeight} />}
           columnWrapperStyle={{ gap: space.md }}
-          contentContainerStyle={[styles.grid, { width: Math.min(width, maxContentWidth), alignSelf: 'center' }]}
+          contentContainerStyle={[styles.grid, { width: contentWidth + (layout.isWide ? layout.gutter : gutter) * 2, alignSelf: 'center', paddingHorizontal: layout.isWide ? layout.gutter : gutter }]}
           ListHeaderComponent={header}
           ListEmptyComponent={
             <View style={{ gap: space.md }}>

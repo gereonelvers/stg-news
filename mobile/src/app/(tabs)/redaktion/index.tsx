@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorView } from '@/components/ui/ErrorView';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Txt } from '@/components/ui/Txt';
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, maxContentWidth, space } from '@/theme/tokens';
 
@@ -21,8 +22,9 @@ export default function RedaktionScreen() {
   const config = useConfig();
   const openLink = useLinkHandler();
 
-  const contentWidth = Math.min(width, maxContentWidth) - gutter * 2;
-  const columns = width > 600 ? 4 : 3;
+  const layout = useLayout();
+  const contentWidth = layout.isWide ? layout.containerWidth : Math.min(width, maxContentWidth) - gutter * 2;
+  const columns = layout.isXWide ? 6 : layout.isWide ? 5 : 3;
   const tileWidth = (contentWidth - space.sm * (columns - 1)) / columns;
 
   const people = (authors.data ?? []).slice().sort((a, b) => Number(PSEUDO.has(a.slug)) - Number(PSEUDO.has(b.slug)) || b.post_count - a.post_count);
@@ -57,7 +59,7 @@ export default function RedaktionScreen() {
           keyExtractor={(a) => String(a.id)}
           renderItem={({ item }) => <AuthorTile author={item} width={tileWidth} />}
           columnWrapperStyle={{ gap: space.sm }}
-          contentContainerStyle={[styles.grid, { width: Math.min(width, maxContentWidth), alignSelf: 'center' }]}
+          contentContainerStyle={[styles.grid, { width: contentWidth + (layout.isWide ? layout.gutter : gutter) * 2, alignSelf: 'center', paddingHorizontal: layout.isWide ? layout.gutter : gutter }]}
           ListHeaderComponent={header}
           ListEmptyComponent={
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>

@@ -13,12 +13,12 @@ import { BookmarkButton } from './BookmarkButton';
 import { Meta } from './Meta';
 
 /** Front-page lead story: full-bleed photo with the title set over a gradient. */
-export function HeroCard({ post, label }: { post: PostCard; label?: string }) {
+export function HeroCard({ post, label, width: fixedWidth, height: fixedHeight }: { post: PostCard; label?: string; width?: number; height?: number }) {
   const { colors } = useTheme();
   const { width } = useWindowDimensions();
   const open = useOpenPost();
-  const w = Math.min(width, maxContentWidth) - gutter * 2;
-  const h = Math.round(w * 1.15);
+  const w = fixedWidth ?? Math.min(width, maxContentWidth) - gutter * 2;
+  const h = fixedHeight ?? Math.round(w * 1.15);
   const image = post.image?.sizes?.large?.src ?? post.image?.src;
 
   return (

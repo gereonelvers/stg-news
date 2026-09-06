@@ -20,8 +20,9 @@ import { StatusBarScrim } from '@/components/ui/StatusBarScrim';
 import { Txt } from '@/components/ui/Txt';
 import { rememberCards } from '@/lib/cardCache';
 import { haptic } from '@/lib/haptics';
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
-import { gutter, space } from '@/theme/tokens';
+import { gutter, radius, space } from '@/theme/tokens';
 
 export default function StartScreen() {
   const { colors } = useTheme();
@@ -30,6 +31,7 @@ export default function StartScreen() {
   const home = useHome();
   const config = useConfig();
   const [refreshing, setRefreshing] = useState(false);
+  const layout = useLayout();
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -63,34 +65,59 @@ export default function StartScreen() {
         ) : data ? (
           <Animated.View entering={FadeIn.duration(250)}>
             {data.breaking ? <BreakingBanner post={data.breaking} /> : null}
-            {data.hero ? (
-              <View style={{ paddingHorizontal: gutter, marginTop: space.xs }}>
-                <HeroCard post={data.hero} label={data.hero.sticky ? 'Top-Story' : 'Neueste Story'} />
+            {layout.isWide ? (
+              /* Magazine front page: lead story left, the newest list right. */
+              <View style={{ width: layout.containerWidth, alignSelf: 'center', flexDirection: 'row', gap: space.xl, marginTop: space.sm }}>
+                {data.hero ? (
+                  <HeroCard post={data.hero} label={data.hero.sticky ? 'Top-Story' : 'Neueste Story'} width={Math.round(layout.containerWidth * 0.58)} height={Math.round(layout.containerWidth * 0.58 * 0.95)} />
+                ) : null}
+                <View style={[styles.sideList, { backgroundColor: colors.surface, flex: 1 }]}>
+                  <SectionHeader title="Neu" subtitle="Frisch aus der Redaktion" onAction={() => router.push({ pathname: '/ressort/[id]', params: { id: 'alle', name: 'Alle Artikel' } })} compact />
+                  {data.latest.slice(0, 5).map((post, i) => (
+                    <View key={post.id}>
+                      {i > 0 ? <Separator inset={space.lg} /> : null}
+                      <PostRow post={post} showCategory={false} />
+                    </View>
+                  ))}
+                </View>
               </View>
-            ) : null}
-
-            <SectionHeader title="Neu" subtitle="Frisch aus der Redaktion" onAction={() => router.push({ pathname: '/ressort/[id]', params: { id: 'alle', name: 'Alle Artikel' } })} />
-            {data.latest.slice(0, 5).map((post, i) => (
-              <View key={post.id}>
-                {i > 0 ? <Separator inset={gutter} /> : null}
-                <PostRow post={post} />
-              </View>
-            ))}
+            ) : (
+              <>
+                {data.hero ? (
+                  <View style={{ paddingHorizontal: gutter, marginTop: space.xs }}>
+                    <HeroCard post={data.hero} label={data.hero.sticky ? 'Top-Story' : 'Neueste Story'} />
+                  </View>
+                ) : null}
+                <SectionHeader title="Neu" subtitle="Frisch aus der Redaktion" onAction={() => router.push({ pathname: '/ressort/[id]', params: { id: 'alle', name: 'Alle Artikel' } })} />
+                {data.latest.slice(0, 5).map((post, i) => (
+                  <View key={post.id}>
+                    {i > 0 ? <Separator inset={gutter} /> : null}
+                    <PostRow post={post} />
+                  </View>
+                ))}
+              </>
+            )}
 
             {data.sections.map((section) => (
               <SectionRail key={section.category.id} category={section.category} posts={section.posts} />
             ))}
 
             {data.popular.length ? (
-              <>
+              <View style={layout.isWide ? { width: layout.containerWidth + layout.gutter * 2, alignSelf: 'center' } : undefined}>
                 <SectionHeader title="Meistgelesen" emoji="🔥" subtitle="Was gerade alle lesen" />
-                {data.popular.map((post, i) => (
-                  <PopularRow key={post.id} post={post} rank={i + 1} />
-                ))}
-              </>
+                <View style={layout.isWide ? { flexDirection: 'row', flexWrap: 'wrap' } : undefined}>
+                  {data.popular.map((post, i) => (
+                    <View key={post.id} style={layout.isWide ? { width: '50%' } : undefined}>
+                      <PopularRow post={post} rank={i + 1} />
+                    </View>
+                  ))}
+                </View>
+              </View>
             ) : null}
 
-            <JoinCard instagram={config.data?.site.instagram} />
+            <View style={layout.isWide ? { width: layout.readingWidth + layout.gutter * 2, alignSelf: 'center' } : undefined}>
+              <JoinCard instagram={config.data?.site.instagram} />
+            </View>
 
             <View style={styles.footer}>
               <Txt variant="overline" color="textTertiary" align="center">
@@ -109,4 +136,5 @@ export default function StartScreen() {
 
 const styles = StyleSheet.create({
   footer: { alignItems: 'center', gap: space.xs, paddingHorizontal: gutter, paddingTop: space.xxxl },
+  sideList: { borderRadius: radius.xl, paddingBottom: space.sm, overflow: 'hidden' },
 });

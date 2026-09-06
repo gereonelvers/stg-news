@@ -10,15 +10,15 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, radius, space } from '@/theme/tokens';
 import { Meta } from './Meta';
 
-type Props = { post: PostCard; showCategory?: boolean; showAuthor?: boolean; right?: React.ReactNode };
+type Props = { post: PostCard; showCategory?: boolean; showAuthor?: boolean; right?: React.ReactNode; /** Card-like presentation used in grids on wide screens. */ card?: boolean };
 
 /** Compact list row: text left, square thumbnail right. */
-export function PostRow({ post, showCategory = true, showAuthor = true, right }: Props) {
+export function PostRow({ post, showCategory = true, showAuthor = true, right, card = false }: Props) {
   const { colors } = useTheme();
   const open = useOpenPost();
   const thumb = post.image?.sizes?.medium?.src ?? post.image?.src;
   return (
-    <Tap onPress={() => open(post)} dim scaleTo={1} style={styles.row} accessibilityRole="button" accessibilityLabel={post.title}>
+    <Tap onPress={() => open(post)} dim={!card} scaleTo={card ? 0.985 : 1} style={[styles.row, card && [styles.card, { backgroundColor: colors.surface }]]} accessibilityRole="button" accessibilityLabel={post.title}>
       <View style={styles.text}>
         {showCategory && post.primary_category ? <Chip category={post.primary_category} navigable={false} /> : null}
         <Txt variant="title" numberOfLines={3}>
@@ -27,7 +27,7 @@ export function PostRow({ post, showCategory = true, showAuthor = true, right }:
         <Meta post={post} showAuthor={showAuthor} compact />
       </View>
       {thumb ? (
-        <Image source={{ uri: thumb }} style={[styles.thumb, { backgroundColor: colors.skeleton }]} contentFit="cover" transition={200} cachePolicy="disk" />
+        <Image source={{ uri: thumb }} style={[styles.thumb, card && styles.thumbCard, { backgroundColor: colors.skeleton }]} contentFit="cover" transition={200} cachePolicy="disk" />
       ) : (
         <View style={[styles.thumb, { backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }]}>
           <Txt style={{ fontSize: 28 }}>{post.primary_category?.emoji ?? '📰'}</Txt>
@@ -42,4 +42,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.lg, paddingHorizontal: gutter, paddingVertical: space.md },
   text: { flex: 1, gap: 6 },
   thumb: { width: 92, height: 92, borderRadius: radius.md },
+  thumbCard: { width: 116, height: 116 },
+  card: { borderRadius: radius.lg, paddingHorizontal: space.lg, paddingVertical: space.lg, flex: 1 },
 });

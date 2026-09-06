@@ -6,12 +6,14 @@ import { PostTile } from '@/components/cards/PostTile';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { rememberCards } from '@/lib/cardCache';
 import { accentFor } from '@/lib/colors';
+import { useLayout } from '@/theme/layout';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, space } from '@/theme/tokens';
 
 export function SectionRail({ category, posts }: { category: CategoryFull; posts: PostCard[] }) {
   const router = useRouter();
   const { isDark } = useTheme();
+  const layout = useLayout();
   rememberCards(posts);
   const accent = accentFor(category.color, isDark);
   return (
@@ -29,7 +31,8 @@ export function SectionRail({ category, posts }: { category: CategoryFull; posts
         keyExtractor={(p) => String(p.id)}
         renderItem={({ item }) => <PostTile post={item} accent={accent} />}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.rail}
+        style={layout.isWide ? { width: Math.min(layout.width, layout.containerWidth + layout.gutter * 2), alignSelf: 'center' } : undefined}
+        contentContainerStyle={[styles.rail, layout.isWide && { paddingHorizontal: layout.gutter, width: Math.max(layout.width, layout.containerWidth + layout.gutter * 2) }]}
         snapToAlignment="start"
         decelerationRate="fast"
         snapToInterval={236 + space.md}
