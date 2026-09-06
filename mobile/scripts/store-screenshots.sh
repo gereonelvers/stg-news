@@ -2,19 +2,18 @@
 # Store screenshots from iOS simulators.
 #
 # Prerequisites:
-#   1. A Release simulator build made with the UI driver compiled in:
-#        cd ios && EXPO_PUBLIC_UI_DRIVER=1 xcodebuild -workspace STGSchlerzeitung.xcworkspace \
-#          -scheme STGSchlerzeitung -configuration Release -sdk iphonesimulator \
-#          -destination "generic/platform=iOS Simulator" -derivedDataPath build-release \
-#          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO build
+#   1. A Debug simulator build (ios/build, e.g. from `npx expo run:ios`) – it loads
+#      JS from Metro, so start Metro with the driver flag first:
+#        EXPO_PUBLIC_UI_DRIVER=1 npx expo start
 #   2. Booted simulators (defaults: iPhone 17 Pro Max for 6.9", iPad Pro 13-inch).
+#   3. jq installed (brew install jq).
 #
 # Usage: scripts/store-screenshots.sh [out-dir]
 set -euo pipefail
 export DEVELOPER_DIR=${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 OUT=${1:-$ROOT/dist/screenshots}
-APP=$(ls -d "$ROOT"/ios/build-release/Build/Products/Release-iphonesimulator/*.app | head -1)
+APP=$(ls -d "$ROOT"/ios/build/Build/Products/Debug-iphonesimulator/*.app | head -1)
 BUNDLE=net.stg-sz.app
 DRIVER_DIR=$(mktemp -d)
 echo "" > "$DRIVER_DIR/route.txt"
