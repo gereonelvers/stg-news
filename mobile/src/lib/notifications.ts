@@ -36,8 +36,9 @@ function projectId(): string | undefined {
 
 /** Ask for permission, fetch an Expo push token and register it with the site. */
 export async function enablePush(categories: number[] | null): Promise<ApiDevice> {
-  if (!Device.isDevice) {
-    throw new PushUnavailableError('Push-Mitteilungen funktionieren nur auf einem echten Gerät.');
+  // iOS simulators cannot receive APNs pushes; Android emulators with Google Play services can.
+  if (!Device.isDevice && Platform.OS === 'ios') {
+    throw new PushUnavailableError('Push-Mitteilungen funktionieren im iOS-Simulator nicht, nur auf einem echten iPhone.');
   }
   const id = projectId();
   if (!id) {
