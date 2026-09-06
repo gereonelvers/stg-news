@@ -1,15 +1,18 @@
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
+import { LogBox } from 'react-native';
 
 /**
- * Development-only UI driver: when EXPO_PUBLIC_UI_DRIVER=1, poll a local file
- * server for a route and navigate there. Lets screenshots be scripted on the
- * iOS simulator where synthetic taps are not available. No-op in production.
+ * Screenshot/UI driver: only compiled in when the bundle is built with
+ * EXPO_PUBLIC_UI_DRIVER=1 (never set for store builds). Polls a local file
+ * server for a route and navigates there, so screenshots can be scripted on
+ * the iOS simulator where synthetic taps are not available.
  */
 export function useDevDriver() {
   const router = useRouter();
   useEffect(() => {
-    if (!__DEV__ || process.env.EXPO_PUBLIC_UI_DRIVER !== '1') return;
+    if (process.env.EXPO_PUBLIC_UI_DRIVER !== '1') return;
+    LogBox.ignoreAllLogs(true);
     let last = '';
     const timer = setInterval(async () => {
       try {
