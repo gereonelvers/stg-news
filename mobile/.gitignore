@@ -46,3 +46,4 @@ example
 # Firebase client config (add your own, see README)
 google-services.json
 *-firebase-adminsdk-*.json
+stg-firebase-adminsdk-*.json

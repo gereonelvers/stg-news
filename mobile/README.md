@@ -58,7 +58,7 @@ assets/                  fonts, icons (incl. iOS Icon Composer bundle for Liquid
 Expo's push service is free (no cost, 600 notifications/s per project). The project is linked to EAS as `@gereonelvers/stg-schuelerzeitung` (`extra.eas.projectId` in `app.json`), which is all the app needs to mint tokens. Since SDK 53 **Expo Go cannot receive push notifications**, so testing needs a development build.
 
 **Android (free, Firebase):**
-1. Firebase Console → create project → add an Android app with package `com.elvers.gereon.stgnewsapp` → download `google-services.json` into `mobile/` (git-ignored).
+1. Firebase Console → create project → add an Android app with package `net.stgsz.app` → download `google-services.json` into `mobile/` (git-ignored).
 2. `app.json` → `"android": { "googleServicesFile": "./google-services.json", ... }`.
 3. Firebase Console → Project settings → Service accounts → *Generate new private key* (JSON, git-ignored).
 4. `npx eas-cli credentials -p android` → *production* → *Google Service Account* → *Manage your Google Service Account Key for Push Notifications (FCM V1)* → upload that JSON. (Or expo.dev → project → Credentials → Android → FCM V1 service account key.)
