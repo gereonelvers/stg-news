@@ -29,7 +29,14 @@ npx eas-cli submit -p ios --latest      # Apple ID login or an App Store Connect
 npx eas-cli submit -p android --latest  # needs play-service-account.json (see below) and the app created once manually in Play Console
 ```
 
-Google Play service account: Play Console → Setup → API access → link a Google Cloud project (use `stg-schuelerzeitung`) → create a service account with "Release manager" role → download its JSON key to `mobile/play-service-account.json` (git-ignored). The very first Android upload has to be done by hand in the Play Console (Google requires it); after that `eas submit` works.
+Google Play service account (already created on the Cloud side, 2026-09-06): `play-publisher@stg-schuelerzeitung.iam.gserviceaccount.com`, key saved as `mobile/play-service-account.json` (git-ignored), Android Publisher API enabled. The Play developer account `gereonelvers@gmail.com` has the Editor role on the Cloud project so it can be linked under Play Console → Setup → API access if wanted; linking is optional. What must be done in the Play Console UI:
+
+1. Create the app (name "STG Schülerzeitung", German, App, Free).
+2. Users and permissions → Invite new users → e-mail `play-publisher@stg-schuelerzeitung.iam.gserviceaccount.com` → app permissions: "Release to testing tracks", "Manage testing tracks and edit tester lists", "Manage production releases", "View app information".
+3. Testing → Internal testing → Create new release → upload `mobile/dist/stg-schuelerzeitung-release.aab` by hand (Google requires the first upload to be manual). Later releases: `npx eas-cli submit -p android --latest`.
+4. Fill in the store listing, Data safety, content rating, target audience (13+ is the safe choice: no child-directed content), News app declaration.
+
+New personal Play accounts must run a closed test with ≥12 testers for 14 days before production access can be requested; the internal/closed track is where the school can test in the meantime.
 
 ## 4. Store listing (German)
 
