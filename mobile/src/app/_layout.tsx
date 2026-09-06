@@ -12,6 +12,8 @@ import { postIdFromResponse, setupNotifications } from '@/lib/notifications';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 import { brand } from '@/theme/tokens';
 
+export const unstable_settings = { anchor: '(tabs)' };
+
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 SplashScreen.setOptions({ fade: true, duration: 350 });
 setupNotifications();

@@ -24,6 +24,7 @@ export function Lightbox({ images, index, onClose }: Props) {
   const list = useRef<FlatList<BlockImage>>(null);
   const [current, setCurrent] = useState(index ?? 0);
   const [chromeVisible, setChromeVisible] = useState(true);
+  const [zoomed, setZoomed] = useState(false);
   const visible = index !== null;
 
   useEffect(() => {
@@ -53,9 +54,10 @@ export function Lightbox({ images, index, onClose }: Props) {
           getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
           keyExtractor={(img, i) => `${img.full}-${i}`}
           showsHorizontalScrollIndicator={false}
+          scrollEnabled={!zoomed}
           onMomentumScrollEnd={onScrollEnd}
           renderItem={({ item }) => (
-            <ZoomableImage image={item} width={width} height={height} onToggleChrome={() => setChromeVisible((v) => !v)} onDismiss={onClose} />
+            <ZoomableImage image={item} width={width} height={height} onToggleChrome={() => setChromeVisible((v) => !v)} onDismiss={onClose} onZoomChange={setZoomed} />
           )}
         />
         {chromeVisible && (
@@ -82,7 +84,12 @@ export function Lightbox({ images, index, onClose }: Props) {
   );
 }
 
-function ZoomableImage({ image, width, height, onToggleChrome, onDismiss }: { image: BlockImage; width: number; height: number; onToggleChrome: () => void; onDismiss: () => void }) {
+function ZoomableImage({ image, width, height, onToggleChrome, onDismiss, onZoomChange }: { image: BlockImage; width: number; height: number; onToggleChrome: () => void; onDismiss: () => void; onZoomChange: (zoomed: boolean) => void }) {
+  const [zoomed, setZoomed] = useState(false);
+  const setZoom = (z: boolean) => {
+    setZoomed(z);
+    onZoomChange(z);
+  };
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const tx = useSharedValue(0);
@@ -98,6 +105,7 @@ function ZoomableImage({ image, width, height, onToggleChrome, onDismiss }: { im
     ty.value = withSpring(0);
     savedTx.value = 0;
     savedTy.value = 0;
+    runOnJS(setZoom)(false);
   };
 
   const pinch = Gesture.Pinch()
@@ -107,9 +115,10 @@ function ZoomableImage({ image, width, height, onToggleChrome, onDismiss }: { im
     .onEnd(() => {
       savedScale.value = scale.value;
       if (scale.value <= 1.02) reset();
+      else runOnJS(setZoom)(true);
     });
 
-  const pan = Gesture.Pan()
+  const basePan = Gesture.Pan()
     .minPointers(1)
     .maxPointers(2)
     .onUpdate((e) => {
@@ -134,9 +143,9 @@ function ZoomableImage({ image, width, height, onToggleChrome, onDismiss }: { im
         ty.value = withSpring(0);
       }
     })
-    .activeOffsetY([-12, 12])
-    .activeOffsetX([-12, 12])
-    .simultaneousWithExternalGesture();
+;
+  // Not zoomed: only vertical drags (dismiss) – horizontal swipes go to the pager.
+  const pan = zoomed ? basePan.activeOffsetX([-4, 4]).activeOffsetY([-4, 4]) : basePan.activeOffsetY([-14, 14]).failOffsetX([-14, 14]);
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
@@ -150,6 +159,7 @@ function ZoomableImage({ image, width, height, onToggleChrome, onDismiss }: { im
         ty.value = withSpring((height / 2 - e.y) * 1.5);
         savedTx.value = (width / 2 - e.x) * 1.5;
         savedTy.value = (height / 2 - e.y) * 1.5;
+        runOnJS(setZoom)(true);
       }
     });
 
