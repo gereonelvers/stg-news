@@ -11,7 +11,6 @@ import { reportView, usePost } from '@/api/queries';
 import type { PostCard, PostFull } from '@/api/types';
 import { ArticleBody } from '@/components/article/ArticleBody';
 import { BookmarkButton } from '@/components/cards/BookmarkButton';
-import { Meta } from '@/components/cards/Meta';
 import { PostRow } from '@/components/cards/PostRow';
 import { CommentsPreview } from '@/components/comments/CommentsPreview';
 import { Avatar } from '@/components/ui/Avatar';
