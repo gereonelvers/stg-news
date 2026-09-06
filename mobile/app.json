@@ -10,7 +10,6 @@
     "primaryColor": "#99183F",
     "ios": {
       "bundleIdentifier": "net.stg-sz.app",
-      "buildNumber": "1",
       "icon": "./assets/expo.icon",
       "supportsTablet": true,
       "infoPlist": {
@@ -34,7 +33,6 @@
     },
     "android": {
       "package": "net.stgsz.app",
-      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#99183F",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

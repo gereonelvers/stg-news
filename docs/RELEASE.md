@@ -38,6 +38,14 @@ Google Play service account (already created on the Cloud side, 2026-09-06): `pl
 
 New personal Play accounts must run a closed test with ≥12 testers for 14 days before production access can be requested; the internal/closed track is where the school can test in the meantime.
 
+## 3b. Shipping an update
+
+1. Bump `expo.version` in `mobile/app.json` (2.0.1 shipped the comment/keyboard fixes on 2026-09-06) and commit.
+2. Build both platforms in the cloud (EAS assigns the next build number / versionCode itself):
+   `npx eas-cli build -p ios --profile production --non-interactive` and the same with `-p android`.
+3. Submit: `npx eas-cli submit -p ios --latest` (uses the cached Apple session of gereonelvers99@gmail.com, otherwise asks to log in) and `npx eas-cli submit -p android --latest` (internal track via play-service-account.json; promote in Play Console).
+4. TestFlight processes the build within ~10 minutes; Play's internal track is immediate for testers already on the list.
+
 ## 4. Store listing (German)
 
 **Name:** STG Schülerzeitung
