@@ -42,3 +42,6 @@ example
 /ios
 /android
 .ptest/
+
+# Firebase client config (add your own, see README)
+google-services.json

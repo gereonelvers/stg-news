@@ -16,12 +16,21 @@
       "infoPlist": {
         "CFBundleDisplayName": "Schülerzeitung",
         "CFBundleDevelopmentRegion": "de",
-        "CFBundleLocalizations": ["de"],
+        "CFBundleLocalizations": [
+          "de"
+        ],
         "ITSAppUsesNonExemptEncryption": false,
-        "NSAppTransportSecurity": { "NSAllowsArbitraryLoadsInWebContent": true }
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoadsInWebContent": true
+        }
       },
-      "associatedDomains": ["applinks:stg-sz.net", "applinks:www.stg-sz.net"],
-      "config": { "usesNonExemptEncryption": false }
+      "associatedDomains": [
+        "applinks:stg-sz.net",
+        "applinks:www.stg-sz.net"
+      ],
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.elvers.gereon.stgnewsapp",
@@ -38,13 +47,38 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "stg-sz.net", "pathPrefix": "/posts" },
-            { "scheme": "https", "host": "www.stg-sz.net", "pathPrefix": "/posts" },
-            { "scheme": "https", "host": "stg-sz.net", "pathPrefix": "/category" },
-            { "scheme": "https", "host": "stg-sz.net", "pathPrefix": "/author" }
+            {
+              "scheme": "https",
+              "host": "stg-sz.net",
+              "pathPrefix": "/posts"
+            },
+            {
+              "scheme": "https",
+              "host": "www.stg-sz.net",
+              "pathPrefix": "/posts"
+            },
+            {
+              "scheme": "https",
+              "host": "stg-sz.net",
+              "pathPrefix": "/category"
+            },
+            {
+              "scheme": "https",
+              "host": "stg-sz.net",
+              "pathPrefix": "/author"
+            }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ]
     },
     "web": {
@@ -59,7 +93,9 @@
           "backgroundColor": "#99183F",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 140,
-          "dark": { "backgroundColor": "#99183F" }
+          "dark": {
+            "backgroundColor": "#99183F"
+          }
         }
       ],
       [
@@ -77,11 +113,27 @@
               {
                 "fontFamily": "BarlowCondensed",
                 "fontDefinitions": [
-                  { "path": "./assets/fonts/BarlowCondensed-Medium.ttf", "weight": 500 },
-                  { "path": "./assets/fonts/BarlowCondensed-SemiBold.ttf", "weight": 600 },
-                  { "path": "./assets/fonts/BarlowCondensed-Bold.ttf", "weight": 700 },
-                  { "path": "./assets/fonts/BarlowCondensed-ExtraBold.ttf", "weight": 800 },
-                  { "path": "./assets/fonts/BarlowCondensed-BoldItalic.ttf", "weight": 700, "style": "italic" }
+                  {
+                    "path": "./assets/fonts/BarlowCondensed-Medium.ttf",
+                    "weight": 500
+                  },
+                  {
+                    "path": "./assets/fonts/BarlowCondensed-SemiBold.ttf",
+                    "weight": 600
+                  },
+                  {
+                    "path": "./assets/fonts/BarlowCondensed-Bold.ttf",
+                    "weight": 700
+                  },
+                  {
+                    "path": "./assets/fonts/BarlowCondensed-ExtraBold.ttf",
+                    "weight": 800
+                  },
+                  {
+                    "path": "./assets/fonts/BarlowCondensed-BoldItalic.ttf",
+                    "weight": 700,
+                    "style": "italic"
+                  }
                 ]
               }
             ]
@@ -107,7 +159,12 @@
       "reactCompiler": true
     },
     "extra": {
-      "apiBase": "https://stg-sz.net/wp-json"
-    }
+      "apiBase": "https://stg-sz.net/wp-json",
+      "router": {},
+      "eas": {
+        "projectId": "d778d5be-3713-420f-8e4b-ad022a827d5e"
+      }
+    },
+    "owner": "gereonelvers"
   }
 }
