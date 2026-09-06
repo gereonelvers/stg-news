@@ -12,6 +12,7 @@ import { DotLoader } from '@/components/ui/Dots';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorView } from '@/components/ui/ErrorView';
 import { Txt } from '@/components/ui/Txt';
+import { pluralize } from '@/lib/text';
 import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, space } from '@/theme/tokens';
 
@@ -37,39 +38,60 @@ export default function KommentareScreen() {
     );
   };
 
-  return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}>
-      <Stack.Screen options={{ title: total ? `${total} Kommentare` : 'Kommentare' }} />
-      <ScrollView contentContainerStyle={[styles.list, { paddingBottom: space.xl }]} keyboardDismissMode="interactive" keyboardShouldPersistTaps="handled">
-        {Platform.OS === 'ios' ? (
+  const list = comments.isPending ? (
+    <DotLoader />
+  ) : comments.isError ? (
+    <ErrorView error={comments.error} onRetry={() => comments.refetch()} />
+  ) : comments.data?.length ? (
+    <View style={{ gap: space.xl }}>
+      {comments.data.map((c) => (
+        <CommentItem key={c.id} comment={c} onReply={setReplyTo} />
+      ))}
+    </View>
+  ) : (
+    <EmptyState emoji="💬" title="Noch keine Kommentare" message="Du kannst der oder die Erste sein. Schreib, was du denkst – freundlich und mit echtem Namen." />
+  );
+
+  const composer = (
+    <Composer
+      replyTo={replyTo}
+      onCancelReply={() => setReplyTo(null)}
+      onSubmit={submit}
+      submitting={post.isPending}
+      emailDomain={config.data?.site.email_domain ?? 'stg-segeberg.de'}
+      moderated={config.data?.comments.moderated ?? true}
+    />
+  );
+
+  // iOS form sheets want exactly one scroll view as content, so the composer
+  // lives at the end of the list there. Android is a full screen with a sticky composer.
+  if (Platform.OS === 'ios') {
+    return (
+      <ScrollView
+        style={{ flex: 1, backgroundColor: colors.bg }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + space.xl }}
+        keyboardDismissMode="interactive"
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets>
+        <Stack.Screen options={{ title: total ? pluralize(total, 'Kommentar', 'Kommentare') : 'Kommentare' }} />
+        <View style={styles.list}>
           <Txt variant="sectionTitle" style={{ marginBottom: space.md }}>
-            {total ? `${total} Kommentare` : 'Kommentare'}
+            {total ? pluralize(total, 'Kommentar', 'Kommentare') : 'Kommentare'}
           </Txt>
-        ) : null}
-        {comments.isPending ? (
-          <DotLoader />
-        ) : comments.isError ? (
-          <ErrorView error={comments.error} onRetry={() => comments.refetch()} />
-        ) : comments.data?.length ? (
-          <View style={{ gap: space.xl }}>
-            {comments.data.map((c) => (
-              <CommentItem key={c.id} comment={c} onReply={setReplyTo} />
-            ))}
-          </View>
-        ) : (
-          <EmptyState emoji="💬" title="Noch keine Kommentare" message="Du kannst der oder die Erste sein. Schreib, was du denkst – freundlich und mit echtem Namen." />
-        )}
+          {list}
+        </View>
+        <View style={{ marginTop: space.xl }}>{composer}</View>
       </ScrollView>
-      <View style={{ paddingBottom: Platform.OS === 'ios' ? insets.bottom : 0, backgroundColor: colors.bgElevated }}>
-        <Composer
-          replyTo={replyTo}
-          onCancelReply={() => setReplyTo(null)}
-          onSubmit={submit}
-          submitting={post.isPending}
-          emailDomain={config.data?.site.email_domain ?? 'stg-segeberg.de'}
-          moderated={config.data?.comments.moderated ?? true}
-        />
-      </View>
+    );
+  }
+
+  return (
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }}>
+      <Stack.Screen options={{ title: total ? pluralize(total, 'Kommentar', 'Kommentare') : 'Kommentare' }} />
+      <ScrollView contentContainerStyle={[styles.list, { paddingBottom: space.xl }]} keyboardDismissMode="interactive" keyboardShouldPersistTaps="handled">
+        {list}
+      </ScrollView>
+      <View style={{ backgroundColor: colors.bgElevated }}>{composer}</View>
     </KeyboardAvoidingView>
   );
 }

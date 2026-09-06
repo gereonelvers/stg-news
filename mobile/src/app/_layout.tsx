@@ -8,8 +8,12 @@ import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { PERSIST_MAX_AGE, persister, queryClient } from '@/api/persist';
+import { useDevDriver } from '@/lib/devDriver';
 import { postIdFromResponse, setupNotifications } from '@/lib/notifications';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
+
+/** iOS 26 headers are Liquid Glass already; only older iOS needs a blur. */
+const legacyBlur = Platform.OS === 'ios' && parseInt(String(Platform.Version), 10) < 26 ? ('systemChromeMaterial' as const) : undefined;
 import { brand } from '@/theme/tokens';
 
 export const unstable_settings = { anchor: '(tabs)' };
@@ -35,6 +39,7 @@ function Navigation() {
   const router = useRouter();
 
   useNotificationRouting();
+  useDevDriver();
 
   const navTheme = {
     ...(isDark ? DarkTheme : DefaultTheme),
@@ -60,10 +65,10 @@ function Navigation() {
           contentStyle: { backgroundColor: colors.bg },
         }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="artikel/[id]" options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial', headerShadowVisible: false }} />
-        <Stack.Screen name="ressort/[id]" options={{ headerLargeTitle: true, headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />
-        <Stack.Screen name="autor/[id]" options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />
-        <Stack.Screen name="seite/[slug]" options={{ title: '', headerLargeTitle: true, headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />
+        <Stack.Screen name="artikel/[id]" options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: legacyBlur, headerShadowVisible: false }} />
+        <Stack.Screen name="ressort/[id]" options={{ headerLargeTitle: true, headerTransparent: Platform.OS === 'ios', headerBlurEffect: legacyBlur }} />
+        <Stack.Screen name="autor/[id]" options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: legacyBlur }} />
+        <Stack.Screen name="seite/[slug]" options={{ title: '', headerLargeTitle: true, headerTransparent: Platform.OS === 'ios', headerBlurEffect: legacyBlur }} />
         <Stack.Screen
           name="kommentare/[id]"
           options={{

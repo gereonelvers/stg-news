@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/Icon';
@@ -19,7 +19,7 @@ export function Masthead() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   return (
-    <View style={[styles.wrap, { paddingTop: insets.top + space.sm }]}>
+    <View style={[styles.wrap, { paddingTop: (Platform.OS === 'ios' ? 0 : insets.top) + space.sm }]}>
       <View style={styles.row}>
         <Image source={isDark ? wordmarkDark : wordmark} style={styles.logo} contentFit="contain" accessibilityLabel="Schüler texten Gedanken" />
         <Tap
