@@ -1,5 +1,6 @@
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { textOn } from '@/lib/colors';
 import { useTheme } from '@/theme/ThemeProvider';
 import { radius, space } from '@/theme/tokens';
 import { Icon, type IconName } from './Icon';
@@ -21,7 +22,7 @@ export function Button({ label, onPress, icon, variant = 'primary', size = 'md',
   const { colors } = useTheme();
   const accent = color ?? colors.tint;
   const bg = variant === 'primary' ? accent : variant === 'secondary' ? colors.surface : 'transparent';
-  const fg = variant === 'primary' ? colors.textOnTint : accent;
+  const fg = variant === 'primary' ? (color ? textOn(color) : colors.textOnTint) : accent;
   return (
     <Tap
       onPress={onPress}

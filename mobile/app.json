@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "stgsz",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "primaryColor": "#99183F",
     "ios": {
       "bundleIdentifier": "net.stg-sz.app",
@@ -52,7 +51,6 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "locales": {},
     "plugins": [
       "expo-router",
       [

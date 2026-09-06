@@ -20,7 +20,7 @@ export function JoinCard({ instagram }: { instagram?: string }) {
           Die Schülerzeitung sucht immer Leute, die Lust auf Texte, Fotos, Interviews oder Memes haben. Egal welche Klasse.
         </Txt>
         <View style={styles.actions}>
-          <Button label="Mehr erfahren" variant="primary" color="#FFFFFF" onPress={() => router.push({ pathname: '/seite/[slug]', params: { slug: 'ueber-uns' } })} style={{ backgroundColor: '#FFF' }} />
+          <Button label="Mehr erfahren" variant="primary" color="#FFFFFF" onPress={() => router.push({ pathname: '/seite/[slug]', params: { slug: 'ueber-uns' } })} />
           {instagram ? <Button label="Instagram" variant="ghost" color="#FFFFFF" icon="camera" onPress={() => openLink(instagram)} /> : null}
         </View>
       </View>

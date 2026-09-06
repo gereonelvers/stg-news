@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { useTheme } from '@/theme/ThemeProvider';
-import { displayFont } from '@/theme/tokens';
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -24,7 +23,7 @@ export default function TabsLayout() {
       rippleColor={colors.tintSoft}
       labelVisibilityMode="labeled"
       disableTransparentOnScrollEdge={false}>
-      <NativeTabs.Trigger name="start">
+      <NativeTabs.Trigger name="(start)">
         <NativeTabs.Trigger.Label>Start</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: 'newspaper', selected: 'newspaper.fill' }} md="newspaper" />
       </NativeTabs.Trigger>
@@ -48,5 +47,4 @@ export default function TabsLayout() {
   );
 }
 
-export const unstable_settings = { initialRouteName: 'start' };
-export const tabLabelFont = displayFont(600);
+export const unstable_settings = { initialRouteName: '(start)' };

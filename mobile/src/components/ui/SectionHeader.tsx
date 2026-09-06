@@ -22,7 +22,7 @@ export function SectionHeader({ title, emoji, accent, actionLabel = 'Alle', onAc
       <View style={{ flex: 1 }}>
         <View style={styles.titleRow}>
           {accent ? <View style={[styles.bar, { backgroundColor: accent }]} /> : null}
-          <Txt variant="sectionTitle" numberOfLines={1} style={{ flexShrink: 1 }}>
+          <Txt variant="sectionTitle" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72} style={{ flexShrink: 1 }}>
             {emoji ? `${emoji} ` : ''}
             {title}
           </Txt>

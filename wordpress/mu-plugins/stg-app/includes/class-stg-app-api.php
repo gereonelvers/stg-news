@@ -265,21 +265,32 @@ final class STG_App_API {
 	public static function get_categories(): WP_REST_Response {
 		$terms = get_terms( [ 'taxonomy' => 'category', 'hide_empty' => true, 'orderby' => 'count', 'order' => 'DESC' ] );
 		$items = [];
+		$used  = []; // image ids already shown as another Ressort's cover
 		foreach ( $terms as $term ) {
 			$cat = STG_App_Format::category( $term, true );
-			// Cover image: newest post with an image in this category.
-			$q = new WP_Query( [ 'cat' => $term->term_id, 'posts_per_page' => 3, 'post_status' => 'publish', 'no_found_rows' => true, 'ignore_sticky_posts' => true ] );
+			// Cover image: the newest post in this category whose image no other Ressort uses yet.
+			$q = new WP_Query( [ 'cat' => $term->term_id, 'posts_per_page' => 8, 'post_status' => 'publish', 'no_found_rows' => true, 'ignore_sticky_posts' => true ] );
 			$cat['cover'] = null;
 			$cat['latest'] = null;
+			$fallback = null;
 			foreach ( $q->posts as $p ) {
 				if ( ! $cat['latest'] ) {
 					$cat['latest'] = STG_App_Format::iso_date( $p );
 				}
 				$img = STG_App_Format::post_image( $p );
-				if ( $img ) {
+				if ( ! $img ) {
+					continue;
+				}
+				$key = $img['id'] ?: $img['src'];
+				if ( ! isset( $used[ $key ] ) ) {
 					$cat['cover'] = $img;
+					$used[ $key ] = true;
 					break;
 				}
+				$fallback = $fallback ?? $img;
+			}
+			if ( ! $cat['cover'] && $fallback ) {
+				$cat['cover'] = $fallback;
 			}
 			$items[] = $cat;
 		}

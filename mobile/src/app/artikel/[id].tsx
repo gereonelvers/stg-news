@@ -67,7 +67,7 @@ export default function ArticleScreen() {
   }, [post?.related]);
 
   const heroWidth = Math.min(width, maxContentWidth);
-  const heroHeight = Math.round(width * HERO_RATIO) + (Platform.OS === 'ios' ? 0 : insets.top);
+  const heroHeight = Math.round(width * (Platform.OS === 'ios' ? HERO_RATIO : 0.62));
   const image = post?.image?.sizes?.large?.src ?? post?.image?.src;
 
   const heroStyle = useAnimatedStyle(() => ({
@@ -96,8 +96,8 @@ export default function ArticleScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: '', headerTransparent: true, headerBlurEffect: 'systemChromeMaterial' }} />
-      {cardForActions ? (
+      <Stack.Screen options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />
+      {cardForActions && (Platform.OS === 'ios' || (bookmarkIcon && shareIcon)) ? (
         <Stack.Toolbar placement="right">
           <Stack.Toolbar.Button icon={bookmarkIcon} accessibilityLabel={saved ? 'Lesezeichen entfernen' : 'Merken'} onPress={() => toggle(cardForActions)} tintColor={colors.tint}>
             {bookmarkIcon ? undefined : saved ? 'Gemerkt' : 'Merken'}
@@ -109,11 +109,11 @@ export default function ArticleScreen() {
       ) : null}
       <Animated.ScrollView ref={scrollRef} style={{ backgroundColor: colors.bg }} contentContainerStyle={{ paddingBottom: insets.bottom + space.xxxl }} scrollEventThrottle={16} contentInsetAdjustmentBehavior="never">
         {/* Hero */}
-        <View style={{ height: image ? heroHeight : insets.top + 64, backgroundColor: colors.surface, overflow: 'hidden' }}>
+        <View style={{ height: image ? heroHeight : Platform.OS === 'ios' ? insets.top + 64 : space.sm, backgroundColor: colors.surface, overflow: 'hidden' }}>
           {image ? (
             <Animated.View style={[StyleSheet.absoluteFill, heroStyle]}>
               <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" transition={300} cachePolicy="disk" priority="high" accessibilityLabel={post?.image?.alt} />
-              <LinearGradient colors={['rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']} locations={[0, 0.5]} style={StyleSheet.absoluteFill} />
+              {Platform.OS === 'ios' ? <LinearGradient colors={['rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']} locations={[0, 0.5]} style={StyleSheet.absoluteFill} /> : null}
             </Animated.View>
           ) : null}
         </View>

@@ -40,5 +40,5 @@ export function PostTile({ post, accent }: { post: PostCard; accent?: string }) 
 const styles = StyleSheet.create({
   tile: { width: TILE_WIDTH, borderRadius: radius.lg, overflow: 'hidden' },
   imageWrap: { width: TILE_WIDTH, height: Math.round(TILE_WIDTH * 0.62) },
-  body: { padding: space.md, gap: 6, minHeight: 104 },
+  body: { padding: space.md, gap: 6, minHeight: 92 },
 });

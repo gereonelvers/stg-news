@@ -16,6 +16,7 @@ import { ErrorView } from '@/components/ui/ErrorView';
 import { Separator } from '@/components/ui/Row';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { SkeletonHero, SkeletonList } from '@/components/ui/Skeleton';
+import { StatusBarScrim } from '@/components/ui/StatusBarScrim';
 import { Txt } from '@/components/ui/Txt';
 import { rememberCards } from '@/lib/cardCache';
 import { haptic } from '@/lib/haptics';
@@ -44,6 +45,7 @@ export default function StartScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
+      <StatusBarScrim />
       <ScrollView
         style={{ backgroundColor: colors.bg }}
         contentInsetAdjustmentBehavior="automatic"

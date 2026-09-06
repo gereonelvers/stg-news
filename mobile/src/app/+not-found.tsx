@@ -10,7 +10,7 @@ export default function NotFound() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center' }}>
       <Stack.Screen options={{ title: 'Nicht gefunden' }} />
-      <EmptyState emoji="🧭" title="Hier gibt es nichts" message="Der Link führt ins Leere. Vielleicht wurde der Artikel verschoben." actionLabel="Zur Startseite" onAction={() => router.replace('/start')} />
+      <EmptyState emoji="🧭" title="Hier gibt es nichts" message="Der Link führt ins Leere. Vielleicht wurde der Artikel verschoben." actionLabel="Zur Startseite" onAction={() => router.replace('/')} />
     </View>
   );
 }

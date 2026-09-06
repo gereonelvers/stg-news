@@ -58,7 +58,7 @@ function Navigation() {
           contentStyle: { backgroundColor: colors.bg },
         }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="artikel/[id]" options={{ title: '', headerTransparent: true, headerBlurEffect: 'systemChromeMaterial', headerShadowVisible: false }} />
+        <Stack.Screen name="artikel/[id]" options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial', headerShadowVisible: false }} />
         <Stack.Screen name="ressort/[id]" options={{ headerLargeTitle: true, headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />
         <Stack.Screen name="autor/[id]" options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />
         <Stack.Screen name="seite/[slug]" options={{ title: '', headerLargeTitle: true, headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />

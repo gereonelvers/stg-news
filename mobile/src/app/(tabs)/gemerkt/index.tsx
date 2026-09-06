@@ -84,7 +84,7 @@ export default function GemerktScreen() {
               title="Noch nichts gemerkt"
               message="Tippe in einem Artikel auf das Lesezeichen, dann landet er hier. Zum Beispiel für die Bahnfahrt."
               actionLabel="Artikel entdecken"
-              onAction={() => router.navigate('/start')}
+              onAction={() => router.navigate('/')}
             />
           </View>
         }
