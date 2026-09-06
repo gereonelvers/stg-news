@@ -47,3 +47,4 @@ example
 google-services.json
 *-firebase-adminsdk-*.json
 stg-firebase-adminsdk-*.json
+play-service-account.json
