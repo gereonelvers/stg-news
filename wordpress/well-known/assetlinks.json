@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "net.stgsz.app",
+      "sha256_cert_fingerprints": [
+        "E2:8A:12:5F:CF:FE:A7:F3:FD:D5:AB:5D:45:4C:BB:06:8C:08:F0:B3:B9:C4:4E:BB:90:2C:66:4C:29:AA:B7:B9",
+        "95:D4:64:EE:07:C4:E1:09:64:F5:49:48:28:9B:B6:7E:7F:BB:B6:CA:D3:79:10:A6:B3:79:46:DE:B8:A6:9E:FE"
+      ]
+    }
+  }
+]

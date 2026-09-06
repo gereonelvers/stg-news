@@ -19,11 +19,13 @@ require_once STG_APP_DIR . 'includes/class-stg-app-format.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-devices.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-push.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-api.php';
+require_once STG_APP_DIR . 'includes/class-stg-app-links.php';
 
 add_action( 'plugins_loaded', static function () {
 	STG_App_Devices::maybe_install();
 	STG_App_Push::init();
 	STG_App_API::init();
+	STG_App_Links::init();
 } );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
