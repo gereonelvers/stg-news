@@ -1,0 +1,116 @@
+{
+  "expo": {
+    "name": "STG Schülerzeitung",
+    "slug": "stg-schuelerzeitung",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "stgsz",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "primaryColor": "#99183F",
+    "ios": {
+      "bundleIdentifier": "net.stg-sz.app",
+      "buildNumber": "1",
+      "icon": "./assets/expo.icon",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDisplayName": "Schülerzeitung",
+        "CFBundleDevelopmentRegion": "de",
+        "CFBundleLocalizations": ["de"],
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": { "NSAllowsArbitraryLoadsInWebContent": true }
+      },
+      "associatedDomains": ["applinks:stg-sz.net", "applinks:www.stg-sz.net"],
+      "config": { "usesNonExemptEncryption": false }
+    },
+    "android": {
+      "package": "com.elvers.gereon.stgnewsapp",
+      "versionCode": 25,
+      "adaptiveIcon": {
+        "backgroundColor": "#99183F",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": true,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            { "scheme": "https", "host": "stg-sz.net", "pathPrefix": "/posts" },
+            { "scheme": "https", "host": "www.stg-sz.net", "pathPrefix": "/posts" },
+            { "scheme": "https", "host": "stg-sz.net", "pathPrefix": "/category" },
+            { "scheme": "https", "host": "stg-sz.net", "pathPrefix": "/author" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "locales": {},
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#99183F",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 140,
+          "dark": { "backgroundColor": "#99183F" }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/BarlowCondensed-Medium.ttf",
+            "./assets/fonts/BarlowCondensed-SemiBold.ttf",
+            "./assets/fonts/BarlowCondensed-Bold.ttf",
+            "./assets/fonts/BarlowCondensed-ExtraBold.ttf",
+            "./assets/fonts/BarlowCondensed-BoldItalic.ttf"
+          ],
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "BarlowCondensed",
+                "fontDefinitions": [
+                  { "path": "./assets/fonts/BarlowCondensed-Medium.ttf", "weight": 500 },
+                  { "path": "./assets/fonts/BarlowCondensed-SemiBold.ttf", "weight": 600 },
+                  { "path": "./assets/fonts/BarlowCondensed-Bold.ttf", "weight": 700 },
+                  { "path": "./assets/fonts/BarlowCondensed-ExtraBold.ttf", "weight": 800 },
+                  { "path": "./assets/fonts/BarlowCondensed-BoldItalic.ttf", "weight": 700, "style": "italic" }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#99183F",
+          "defaultChannel": "articles"
+        }
+      ],
+      "expo-sqlite",
+      "expo-video",
+      "expo-audio",
+      "expo-localization",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "apiBase": "https://stg-sz.net/wp-json"
+    }
+  }
+}
