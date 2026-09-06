@@ -37,7 +37,7 @@ src/app/                 Expo Router routes
   artikel/[id].tsx       article reader
   ressort/[id].tsx       category feed ("alle" = everything)
   autor/[id].tsx         author page
-  kommentare/[id].tsx    comments sheet + composer
+  kommentare/[id].tsx    comments thread: docked composer, saved identity, pending echo, sent card
   seite/[slug].tsx       WordPress pages (Über uns, Datenschutz)
   einstellungen.tsx      settings (appearance, text size, push)
 src/api/                 API client, TanStack Query hooks, comments, persisted cache
@@ -45,7 +45,7 @@ src/api/html/            Gutenberg HTML -> block model parser (renders natively)
 src/components/article/  block renderer, rich text, lightbox, link handling
 src/components/cards/    hero / card / row / tile / category / author cards
 src/components/ui/       primitives: Txt, Icon (SF Symbols + Material), Tap, Chip, Avatar, Glass, Skeleton …
-src/store/               zustand stores (settings, bookmarks, recents) persisted in expo-sqlite kv-store
+src/store/               zustand stores (settings, bookmarks, recents, pending comments) persisted in expo-sqlite kv-store
 src/theme/               colour tokens, typography (Barlow Condensed + system font), ThemeProvider
 src/lib/                 dates, colours, haptics, sharing, deep links, notifications
 assets/                  fonts, icons (incl. iOS Icon Composer bundle for Liquid Glass icons), wordmarks
