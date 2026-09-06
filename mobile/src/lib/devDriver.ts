@@ -13,14 +13,20 @@ export function useDevDriver() {
   useEffect(() => {
     if (process.env.EXPO_PUBLIC_UI_DRIVER !== '1') return;
     LogBox.ignoreAllLogs(true);
-    let last = '';
+    let last: string | null = null;
     const timer = setInterval(async () => {
       try {
         const res = await fetch(`http://localhost:8099/route.txt?t=${Date.now()}`);
         if (!res.ok) return;
         const cmd = (await res.text()).trim();
-        if (!cmd || cmd === last) return;
+        // The first poll only primes: a stale command left over from an earlier
+        // run must not fire on every app start.
+        if (last === null || cmd === last) {
+          last = cmd;
+          return;
+        }
         last = cmd;
+        if (!cmd) return;
         const [, action, target] = cmd.match(/^(\S+)\s*(.*)$/) ?? [];
         if (action === 'back') router.back();
         else if (action === 'push' && target) router.push(target as never);

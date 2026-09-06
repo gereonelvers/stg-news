@@ -107,9 +107,9 @@ function useNotificationRouting() {
     const open = (response: Notifications.NotificationResponse | null | undefined) => {
       if (!response) return;
       const key = response.notification.request.identifier || `${response.notification.date}`;
+      const id = postIdFromResponse(response);
       if (handledNotifications.has(key)) return;
       handledNotifications.add(key);
-      const id = postIdFromResponse(response);
       if (id) router.push({ pathname: '/artikel/[id]', params: { id: String(id) } });
     };
     // Cold start: the tap that launched the app.
