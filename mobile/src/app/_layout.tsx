@@ -66,10 +66,11 @@ function Navigation() {
           name="kommentare/[id]"
           options={{
             title: 'Kommentare',
-            presentation: 'formSheet',
-            sheetAllowedDetents: [0.7, 1],
+            presentation: Platform.OS === 'ios' ? 'formSheet' : 'card',
+            sheetAllowedDetents: [0.75, 1],
             sheetGrabberVisible: true,
             headerShown: Platform.OS === 'android',
+            animation: Platform.OS === 'android' ? 'slide_from_bottom' : undefined,
           }}
         />
         <Stack.Screen name="einstellungen" options={{ title: 'Einstellungen', presentation: 'modal' }} />
