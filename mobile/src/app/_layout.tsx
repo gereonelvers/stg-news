@@ -1,6 +1,7 @@
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -23,6 +24,16 @@ SplashScreen.setOptions({ fade: true, duration: 350 });
 setupNotifications();
 
 export default function RootLayout() {
+  // Fonts are embedded natively by the expo-font config plugin in development
+  // builds; loading them here as well makes Expo Go (no config plugins) work.
+  const [fontsReady] = useFonts({
+    'BarlowCondensed-Medium': require('@/assets/fonts/BarlowCondensed-Medium.ttf'),
+    'BarlowCondensed-SemiBold': require('@/assets/fonts/BarlowCondensed-SemiBold.ttf'),
+    'BarlowCondensed-Bold': require('@/assets/fonts/BarlowCondensed-Bold.ttf'),
+    'BarlowCondensed-ExtraBold': require('@/assets/fonts/BarlowCondensed-ExtraBold.ttf'),
+    'BarlowCondensed-BoldItalic': require('@/assets/fonts/BarlowCondensed-BoldItalic.ttf'),
+  });
+  if (!fontsReady) return null;
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: PERSIST_MAX_AGE, buster: 'v1' }}>
