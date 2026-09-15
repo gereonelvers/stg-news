@@ -15,7 +15,7 @@ EAS Build free plan: 15 iOS + 15 Android cloud builds per month. Local builds al
 ```sh
 cd mobile
 npx eas-cli build -p ios --profile production        # first run: log in with the Apple ID, EAS creates the distribution certificate + App Store profile
-npx eas-cli build -p android --profile production    # uses the keystore already stored in EAS
+npx eas-cli build -p android --profile production    # uses the keystore stored in EAS; google-services.json comes from the EAS file variable GOOGLE_SERVICES_JSON (production) via app.config.js, so only local builds need the file in mobile/
 ```
 
 Local alternatives: `npx eas-cli build -p android --profile production --local --output dist/app.aab` (verified working); iOS local production builds need the distribution certificate, which EAS creates during the first cloud build.
@@ -26,10 +26,10 @@ Versioning: `expo.version` in app.json is the marketing version (2.0.0); build n
 
 ```sh
 npx eas-cli submit -p ios --latest      # Apple ID login or an App Store Connect API key; creates the App Store Connect record if missing
-npx eas-cli submit -p android --latest  # needs play-service-account.json (see below) and the app created once manually in Play Console
+npx eas-cli submit -p android --latest  # uses the Play service account key stored on EAS (see below); the app had to be created once manually in Play Console
 ```
 
-Google Play service account (already created on the Cloud side, 2026-09-06): `play-publisher@stg-schuelerzeitung.iam.gserviceaccount.com`, key saved as `mobile/play-service-account.json` (git-ignored), Android Publisher API enabled. The Play developer account `gereonelvers@gmail.com` has the Editor role on the Cloud project so it can be linked under Play Console → Setup → API access if wanted; linking is optional. What must be done in the Play Console UI:
+Google Play service account (already created on the Cloud side, 2026-09-06): `play-publisher@stg-schuelerzeitung.iam.gserviceaccount.com`, Android Publisher API enabled. Its JSON key is stored on EAS as the Play Store submissions key for `net.stgsz.app` (since 2026-09-15), so no local key file is needed; to replace it, run `npx eas-cli credentials -p android` → production → Google Service Account. The Play developer account `gereonelvers@gmail.com` has the Editor role on the Cloud project so it can be linked under Play Console → Setup → API access if wanted; linking is optional. What must be done in the Play Console UI:
 
 1. Create the app (name "STG Schülerzeitung", German, App, Free).
 2. Users and permissions → Invite new users → e-mail `play-publisher@stg-schuelerzeitung.iam.gserviceaccount.com` → app permissions: "Release to testing tracks", "Manage testing tracks and edit tester lists", "Manage production releases", "View app information".
@@ -40,10 +40,10 @@ New personal Play accounts must run a closed test with ≥12 testers for 14 days
 
 ## 3b. Shipping an update
 
-1. Bump `expo.version` in `mobile/app.json` (2.0.1 shipped the comment/keyboard fixes on 2026-09-06) and commit.
+1. Bump `expo.version` in `mobile/app.json` (2.0.1 shipped the comment/keyboard fixes on 2026-09-06; 2.0.2 removed the unused audio permissions on 2026-09-15) and commit.
 2. Build both platforms in the cloud (EAS assigns the next build number / versionCode itself):
    `npx eas-cli build -p ios --profile production --non-interactive` and the same with `-p android`.
-3. Submit: `npx eas-cli submit -p ios --latest --non-interactive` (App Store Connect API key stored on EAS, `ascAppId` 6809216983 in eas.json) and `npx eas-cli submit -p android --latest --non-interactive` (internal track via play-service-account.json; promote in Play Console).
+3. Submit: `npx eas-cli submit -p ios --latest --non-interactive` (App Store Connect API key stored on EAS, `ascAppId` 6809216983 in eas.json) and `npx eas-cli submit -p android --latest --non-interactive` (internal track, Play key stored on EAS; promote in Play Console).
 4. TestFlight processes the build within ~10 minutes; Play's internal track is immediate for testers already on the list.
 
 ## 4. Store listing (German)
