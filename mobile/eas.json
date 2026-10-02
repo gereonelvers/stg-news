@@ -30,6 +30,11 @@
       "android": {
         "track": "internal"
       }
+    },
+    "closed": {
+      "android": {
+        "track": "alpha"
+      }
     }
   }
 }
