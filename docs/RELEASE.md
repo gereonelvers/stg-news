@@ -43,7 +43,25 @@ New personal Play accounts must run a closed test with ≥12 testers for 14 days
 1. Bump `expo.version` in `mobile/app.json` (2.0.1 shipped the comment/keyboard fixes on 2026-09-06; 2.0.2 removed the unused audio permissions on 2026-09-15) and commit.
 2. Build both platforms in the cloud (EAS assigns the next build number / versionCode itself):
    `npx eas-cli build -p ios --profile production --non-interactive` and the same with `-p android`.
-3. Submit: `npx eas-cli submit -p ios --latest --non-interactive` (App Store Connect API key stored on EAS, `ascAppId` 6809216983 in eas.json) and `npx eas-cli submit -p android --latest --non-interactive` (internal track, Play key stored on EAS; promote in Play Console). The `closed` submit profile targets the alpha (closed testing) track, which is the one Play reviews: `npx eas-cli submit -p android --latest --profile closed --non-interactive`. That profile sets `changesNotSentForReview`, because Play refuses to auto-submit while the app is in a review cycle; after submitting, click "Send changes for review" in the Play Console. Only one Play edit may be open at a time, so a stale draft edit makes the submission fail.
+3. Submit: `npx eas-cli submit -p ios --latest --non-interactive` (App Store Connect API key stored on EAS, `ascAppId` 6809216983 in eas.json) and `npx eas-cli submit -p android --latest --non-interactive` (internal track, Play key stored on EAS; promote in Play Console). The `closed` submit profile targets the alpha (closed testing) track, which is the one Play reviews: `npx eas-cli submit -p android --latest --profile closed --non-interactive` (alpha = closed testing, the track Play reviews).
+
+**EAS Submit for Android is unreliable here.** Every attempt so far (2026-10-02 and 2026-10-05) died before reaching Google with `Failed to create worker instance` — an EAS-side error that only shows up in the submission log, which is brotli-compressed:
+
+```sh
+node -e 'const z=require("zlib"),fs=require("fs");console.log(z.brotliDecompressSync(fs.readFileSync(process.argv[1])).toString())' log.bin
+```
+
+The fallback talks to the Play API directly and is what actually shipped 2.0.3 and 2.0.4:
+
+```sh
+npx eas-cli build:list --limit 4 --json      # grab artifacts.applicationArchiveUrl
+curl -sSL -o dist/app.aab "<url>"
+python3 scripts/play-release.py dist/app.aab internal alpha --notes "Was ist neu…"
+```
+
+Note that iOS submission through EAS works fine; only Android is affected.
+
+**Play's review flag flips.** `changesNotSentForReview` must be set exactly while Play will *not* auto-submit the changes (it answered "Please set the query parameter changesNotSentForReview to true" on 2026-10-02), and is rejected once Play does auto-submit ("must not be set", 2026-10-05). `scripts/play-release.py` tries the plain commit first and falls back, so it copes either way; `eas.json` cannot, which is why the profile carries no flag. Only one Play edit may be open at a time.
 4. TestFlight processes the build within ~10 minutes; Play's internal track is immediate for testers already on the list.
 
 ## 4. Store listing (German)

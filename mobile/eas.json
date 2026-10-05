@@ -33,8 +33,7 @@
     },
     "closed": {
       "android": {
-        "track": "alpha",
-        "changesNotSentForReview": true
+        "track": "alpha"
       }
     }
   }
