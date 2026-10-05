@@ -27,8 +27,38 @@ Lint before deploying: `php -l` on every file. A fatal error in an mu-plugin tak
 | GET | `/resolve?url=` | Turn a website URL into `{type, id}` for deep links |
 | POST | `/devices` | Register an Expo push token (`token`, `platform`, `app_version`, `locale`, `categories`) |
 | GET/DELETE | `/devices/{token}` | Inspect / unregister |
+| DELETE | `/comments/{id}?token=` | Delete a comment written in the app. The token comes from the response that created it (`stg_delete_token`) and is a keyed hash, so nothing extra is stored |
+| POST | `/comments/{id}/report` | Report a comment. One report per install; from the second report on, a published comment goes back into moderation and the editors get a mail |
 
-Comments use WordPress core (`/wp/v2/comments`); anonymous posting is enabled, comments are moderated and e-mail-verified.
+## Comments
+
+Posting still goes through WordPress core (`POST /wp/v2/comments`), anonymously. Everything else lives in `class-stg-app-comments.php`:
+
+- Every new comment starts held, whatever the discussion settings say. Editors who may moderate are exempt.
+- Authors on `STG_App_Config::EMAIL_DOMAIN` (`stg-segeberg.de`) get a verification mail; the link in it (`/?stg_verify=<id>&k=<token>`) publishes the comment immediately.
+- Every other address waits for an editor in wp-admin and gets **no** mail. The public form draws roughly twenty bot comments a day, and mailing made-up addresses would bounce and wreck the relay's reputation.
+- The moderation mail to the editors is skipped for comments that carry a link and did not come from the app, which is what bot spam looks like. App comments always notify.
+- `comment-email-verify` used to do the verification and is now **deactivated**. Its plugin file had been edited by hand on the server to mail only `stg-segeberg.de` authors, which is why nobody else ever got a confirmation mail.
+
+## Mail
+
+`class-stg-app-mail.php` routes all WordPress mail through an authenticated SMTP relay (Brevo), because Cloudways provides no usable transport and the domain's SPF record (`-all`) does not cover the web server. Credentials are **not** in this repo; they are defined in `wp-config.php` on the server:
+
+```php
+define( 'STG_SMTP_HOST', 'smtp-relay.brevo.com' );
+define( 'STG_SMTP_PORT', 587 );
+define( 'STG_SMTP_USER', '…' );   // Brevo SMTP login
+define( 'STG_SMTP_PASS', '…' );   // Brevo SMTP key
+define( 'STG_MAIL_FROM', 'mail@stg-sz.net' );
+```
+
+Without those constants the class does nothing and WordPress keeps its default transport. Test with:
+
+```sh
+wp eval 'var_export( wp_mail( "you@example.com", "Test", "Test" ) );'
+```
+
+For delivery to actually land, `stg-sz.net` needs Brevo's DKIM record and `include:spf.brevo.com` in its SPF record.
 
 ## Push notifications
 

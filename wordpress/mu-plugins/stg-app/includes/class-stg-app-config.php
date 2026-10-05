@@ -12,6 +12,9 @@ final class STG_App_Config {
 	/** Brand colours (mirrored in the app's theme). */
 	public const BRAND_PRIMARY = '#99183F';
 
+	/** Addresses on this domain can publish a comment by confirming their e-mail. */
+	public const EMAIL_DOMAIN = 'stg-segeberg.de';
+
 	/**
 	 * Default theme per category slug.
 	 * color  = accent colour used for chips/section headers
@@ -87,7 +90,7 @@ final class STG_App_Config {
 				'school_url'  => 'https://stg-segeberg.de',
 				'instagram'   => 'https://www.instagram.com/stg_schuelerzeitung/',
 				'contact_email' => get_option( 'admin_email' ),
-				'email_domain'  => 'stg-segeberg.de',
+				'email_domain'  => self::EMAIL_DOMAIN,
 				'timezone'    => wp_timezone_string(),
 				'language'    => get_locale(),
 			],
@@ -101,7 +104,13 @@ final class STG_App_Config {
 			'comments'      => [
 				'enabled'            => 'open' === get_option( 'default_comment_status' ),
 				'moderated'          => (bool) get_option( 'comment_moderation' ),
-				'email_verification' => class_exists( 'comment_email_verify' ),
+				// Legacy flag for app <= 2.0.3, which only knew "everybody confirms by
+				// e-mail". Verification now applies to verification_domain only, so the
+				// older copy ("an editor approves it") is the truthful one there.
+				'email_verification' => false,
+				'verification_domain' => STG_App_Comments::verification_domain(),
+				'can_delete'         => true,
+				'can_report'         => true,
 				'require_name_email' => (bool) get_option( 'require_name_email' ),
 				'threaded'           => (bool) get_option( 'thread_comments' ),
 			],

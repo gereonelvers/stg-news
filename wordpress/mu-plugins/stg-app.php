@@ -15,17 +15,21 @@ define( 'STG_APP_VERSION', '1.0.0' );
 define( 'STG_APP_DIR', __DIR__ . '/stg-app/' );
 
 require_once STG_APP_DIR . 'includes/class-stg-app-config.php';
+require_once STG_APP_DIR . 'includes/class-stg-app-mail.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-format.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-devices.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-push.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-api.php';
 require_once STG_APP_DIR . 'includes/class-stg-app-links.php';
+require_once STG_APP_DIR . 'includes/class-stg-app-comments.php';
 
 add_action( 'plugins_loaded', static function () {
+	STG_App_Mail::init();
 	STG_App_Devices::maybe_install();
 	STG_App_Push::init();
 	STG_App_API::init();
 	STG_App_Links::init();
+	STG_App_Comments::init();
 } );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
