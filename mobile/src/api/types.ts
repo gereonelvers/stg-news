@@ -134,6 +134,10 @@ export type AppConfig = {
     email_verification: boolean;
     require_name_email: boolean;
     threaded: boolean;
+    /** Addresses on this domain publish by confirming the mailed link; everyone else waits for an editor. */
+    verification_domain?: string;
+    can_delete?: boolean;
+    can_report?: boolean;
   };
   push: { enabled: boolean };
   min_app_version: string;
@@ -166,6 +170,8 @@ export type WpComment = {
   date: string;
   content: { rendered: string };
   status?: string;
+  /** Only in the response that created the comment: lets this device delete it again. */
+  stg_delete_token?: string | null;
 };
 
 export type CommentNode = {
@@ -178,6 +184,8 @@ export type CommentNode = {
   depth: number;
   /** Written on this device and not yet confirmed/approved on the server. */
   pending?: boolean;
+  /** Pending because the author still has to confirm by e-mail, rather than waiting for an editor. */
+  pendingVerify?: boolean;
 };
 
 export type PostsQuery = {

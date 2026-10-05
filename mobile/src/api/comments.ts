@@ -56,7 +56,11 @@ export function countNodes(nodes: CommentNode[]): number {
  * server thread. Returns the keys of pending comments that have gone live
  * in the meantime so the caller can forget them.
  */
-export function mergePending(tree: CommentNode[], pending: PendingComment[]): { tree: CommentNode[]; resolved: string[] } {
+export function mergePending(
+  tree: CommentNode[],
+  pending: PendingComment[],
+  verifyDomain?: string,
+): { tree: CommentNode[]; resolved: string[] } {
   if (!pending.length) return { tree, resolved: [] };
   const live = new Set<string>();
   const clone = (n: CommentNode): CommentNode => {
@@ -84,6 +88,7 @@ export function mergePending(tree: CommentNode[], pending: PendingComment[]): { 
       children: [],
       depth: parent ? Math.min(parent.depth + 1, 3) : 0,
       pending: true,
+      pendingVerify: isVerifyAddress(p.email, verifyDomain),
     };
     if (parent) parent.children.push(node);
     else out.push(node);
@@ -115,12 +120,18 @@ export function useComments(postId: number) {
 }
 
 /** The server thread plus this device's unconfirmed comments. */
-export function useThread(postId: number) {
+/** True when this address publishes by confirming the mailed link instead of waiting for an editor. */
+export function isVerifyAddress(email: string, verifyDomain?: string): boolean {
+  if (!verifyDomain) return false;
+  return email.trim().toLowerCase().endsWith(`@${verifyDomain.toLowerCase()}`);
+}
+
+export function useThread(postId: number, verifyDomain?: string) {
   const query = useComments(postId);
   const pending = useCommentsStore((s) => s.pending);
   const remove = useCommentsStore((s) => s.remove);
   const mine = useMemo(() => pending.filter((p) => p.post === postId), [pending, postId]);
-  const merged = useMemo(() => (query.data ? mergePending(query.data, mine) : null), [query.data, mine]);
+  const merged = useMemo(() => (query.data ? mergePending(query.data, mine, verifyDomain) : null), [query.data, mine, verifyDomain]);
   useEffect(() => {
     if (merged?.resolved.length) remove(merged.resolved);
   }, [merged, remove]);
@@ -137,11 +148,36 @@ export type NewComment = {
 
 export function usePostComment() {
   const client = useQueryClient();
+  const remember = useCommentsStore((s) => s.remember);
   return useMutation({
     mutationFn: (input: NewComment) => api.post<WpComment>('/wp/v2/comments', input),
-    onSuccess: (_data, vars) => {
+    onSuccess: (data, vars) => {
+      // The server hands out the delete token once, right here.
+      if (data?.id && data.stg_delete_token) remember(data.id, data.stg_delete_token);
       client.invalidateQueries({ queryKey: commentKeys.post(vars.post) });
     },
+  });
+}
+
+/** Delete a comment written on this device, using the token the server returned then. */
+export function useDeleteComment(postId: number) {
+  const client = useQueryClient();
+  const forget = useCommentsStore((s) => s.forget);
+  return useMutation({
+    mutationFn: ({ id, token }: { id: number; token: string }) =>
+      api.delete<{ deleted: boolean; id: number }>(`/stg/v1/comments/${id}`, { token }),
+    onSuccess: (_data, { id }) => {
+      forget(id);
+      client.invalidateQueries({ queryKey: commentKeys.post(postId) });
+    },
+  });
+}
+
+/** Report someone else's comment. Enough reports take it off the site until an editor looks. */
+export function useReportComment() {
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
+      api.post<{ reported: boolean; counted: boolean; hidden: boolean }>(`/stg/v1/comments/${id}/report`, { reason }),
   });
 }
 

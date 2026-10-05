@@ -1,8 +1,8 @@
 import * as Clipboard from 'expo-clipboard';
-import { ActionSheetIOS, Alert, Linking, Platform, StyleSheet, View } from 'react-native';
+import { ActionSheetIOS, Alert, Platform, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
-import { useConfig } from '@/api/queries';
+import { useDeleteComment, useReportComment } from '@/api/comments';
 import type { CommentNode } from '@/api/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
@@ -11,6 +11,7 @@ import { Txt } from '@/components/ui/Txt';
 import { formatRelative } from '@/lib/dates';
 import { haptic } from '@/lib/haptics';
 import { pluralize } from '@/lib/text';
+import { useCommentsStore } from '@/store/comments';
 import { useTheme } from '@/theme/ThemeProvider';
 import { space } from '@/theme/tokens';
 
@@ -19,41 +20,89 @@ type Props = {
   onReply?: (c: CommentNode) => void;
   /** Article preview: no actions, replies collapsed to a count. */
   compact?: boolean;
+  /** The article this thread belongs to – needed to refresh it after deleting. */
+  postId?: number;
 };
 
 const MAX_DEPTH = 3;
 
-function openMenu(comment: CommentNode, contactEmail: string) {
-  const copy = () => Clipboard.setStringAsync(comment.text).then(() => { haptic.selection(); });
-  const report = () => {
-    const subject = encodeURIComponent(`Kommentar melden (#${comment.id})`);
-    const body = encodeURIComponent(`Ich möchte diesen Kommentar melden:\n\nKommentar-ID: ${comment.id}\nVon: ${comment.authorName}\nText: „${comment.text.slice(0, 300)}“\n\nGrund:\n`);
-    Alert.alert('Kommentar melden', 'Die Redaktion prüft gemeldete Kommentare und entfernt sie, wenn sie gegen die Regeln verstoßen.', [
-      { text: 'Abbrechen', style: 'cancel' },
-      { text: 'Per E-Mail melden', style: 'destructive', onPress: () => Linking.openURL(`mailto:${contactEmail}?subject=${subject}&body=${body}`).catch(() => undefined) },
-    ]);
-  };
-  if (Platform.OS === 'ios') {
-    ActionSheetIOS.showActionSheetWithOptions(
-      { title: `${comment.authorName} · ${formatRelative(comment.date)}`, options: ['Abbrechen', 'Text kopieren', 'Melden'], cancelButtonIndex: 0, destructiveButtonIndex: 2 },
-      (i) => (i === 1 ? copy() : i === 2 ? report() : undefined),
-    );
-  } else {
-    Alert.alert(comment.authorName, undefined, [
-      { text: 'Text kopieren', onPress: copy },
-      { text: 'Melden', style: 'destructive', onPress: report },
-      { text: 'Abbrechen', style: 'cancel' },
-    ]);
-  }
-}
-
-export function CommentItem({ comment, onReply, compact = false }: Props) {
+export function CommentItem({ comment, onReply, compact = false, postId }: Props) {
   const { colors } = useTheme();
-  const config = useConfig();
   const isReply = comment.depth > 0;
   const avatar = isReply ? 28 : 36;
   const hasChildren = comment.children.length > 0 && !compact;
-  const pendingLabel = config.data?.comments.email_verification ? 'Wartet auf deine Bestätigung' : 'Wartet auf Freigabe';
+  const pendingLabel = comment.pendingVerify ? 'Wartet auf deine Bestätigung' : 'Wartet auf Freigabe';
+  // A token exists only for comments written on this device, so it doubles as "this one is mine".
+  const token = useCommentsStore((s) => s.tokens?.[String(comment.id)]);
+  const del = useDeleteComment(postId ?? 0);
+  const report = useReportComment();
+
+  const copyText = () => {
+    void Clipboard.setStringAsync(comment.text).then(() => {
+      haptic.selection();
+    });
+  };
+
+  const askDelete = () =>
+    Alert.alert('Kommentar löschen', 'Dein Kommentar wird endgültig entfernt.', [
+      { text: 'Abbrechen', style: 'cancel' },
+      {
+        text: 'Löschen',
+        style: 'destructive',
+        onPress: () =>
+          del.mutate(
+            { id: comment.id, token: token ?? '' },
+            {
+              onSuccess: () => haptic.success(),
+              onError: () => Alert.alert('Hat nicht geklappt', 'Der Kommentar wurde nicht gelöscht. Versuch es später nochmal.'),
+            },
+          ),
+      },
+    ]);
+
+  const askReport = () =>
+    Alert.alert('Kommentar melden', 'Die Redaktion prüft gemeldete Kommentare und entfernt sie, wenn sie gegen die Regeln verstoßen.', [
+      { text: 'Abbrechen', style: 'cancel' },
+      {
+        text: 'Melden',
+        style: 'destructive',
+        onPress: () =>
+          report.mutate(
+            { id: comment.id },
+            {
+              onSuccess: (res) =>
+                Alert.alert(
+                  'Danke für die Meldung',
+                  res?.hidden ? 'Der Kommentar ist jetzt ausgeblendet und wird geprüft.' : 'Die Redaktion schaut sich den Kommentar an.',
+                ),
+              onError: () => Alert.alert('Hat nicht geklappt', 'Die Meldung ging nicht raus. Versuch es später nochmal.'),
+            },
+          ),
+      },
+    ]);
+
+  const openMenu = () => {
+    const mine = Boolean(token);
+    const label = mine ? 'Löschen' : 'Melden';
+    const act = mine ? askDelete : askReport;
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title: `${comment.authorName} · ${formatRelative(comment.date)}`,
+          options: ['Abbrechen', 'Text kopieren', label],
+          cancelButtonIndex: 0,
+          destructiveButtonIndex: 2,
+        },
+        (i) => (i === 1 ? copyText() : i === 2 ? act() : undefined),
+      );
+    } else {
+      Alert.alert(comment.authorName, undefined, [
+        { text: 'Text kopieren', onPress: copyText },
+        { text: label, style: 'destructive', onPress: act },
+        { text: 'Abbrechen', style: 'cancel' },
+      ]);
+    }
+  };
 
   return (
     <Animated.View entering={comment.pending ? FadeIn.duration(260) : undefined} style={styles.row}>
@@ -71,7 +120,7 @@ export function CommentItem({ comment, onReply, compact = false }: Props) {
           </Txt>
           {!compact && !comment.pending ? (
             <Tap
-              onPress={() => openMenu(comment, config.data?.site.contact_email ?? '')}
+              onPress={openMenu}
               hitSlop={10}
               dim
               scaleTo={1}
@@ -108,7 +157,7 @@ export function CommentItem({ comment, onReply, compact = false }: Props) {
         {hasChildren ? (
           <View style={styles.children}>
             {comment.children.map((child) => (
-              <CommentItem key={child.id} comment={child} onReply={onReply} />
+              <CommentItem key={child.id} comment={child} onReply={onReply} postId={postId} />
             ))}
           </View>
         ) : null}

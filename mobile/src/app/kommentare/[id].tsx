@@ -4,7 +4,7 @@ import { Keyboard, Platform, ScrollView, StyleSheet, TextInput, View } from 'rea
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { countNodes, describeCommentError, usePostComment, useThread } from '@/api/comments';
+import { countNodes, describeCommentError, isVerifyAddress, usePostComment, useThread } from '@/api/comments';
 import { useConfig } from '@/api/queries';
 import type { CommentNode } from '@/api/types';
 import { CommentItem } from '@/components/comments/CommentItem';
@@ -37,7 +37,8 @@ export default function KommentareScreen() {
   const dockInset = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value, insets.bottom) + space.sm }));
   const router = useRouter();
   const config = useConfig();
-  const { query, thread } = useThread(id);
+  const verifyDomain = config.data?.comments.verification_domain;
+  const { query, thread } = useThread(id, verifyDomain);
   const post = usePostComment();
   const addPending = useCommentsStore((s) => s.add);
   const prunePending = useCommentsStore((s) => s.prune);
@@ -55,13 +56,15 @@ export default function KommentareScreen() {
 
   const total = thread ? countNodes(thread) : 0;
   const title = total ? pluralize(total, 'Kommentar', 'Kommentare') : 'Kommentare';
-  const verification = config.data?.comments.email_verification ?? true;
   const moderated = config.data?.comments.moderated ?? true;
-  const hint = verification
+  const willVerify = isVerifyAddress(identity?.email ?? '', verifyDomain);
+  const hint = willVerify
     ? 'Echter Name, freundlicher Ton. Du bestätigst deinen Kommentar per E-Mail.'
-    : moderated
-      ? 'Echter Name, freundlicher Ton. Die Redaktion schaltet Kommentare frei.'
-      : 'Echter Name, freundlicher Ton – die Redaktion liest mit.';
+    : verifyDomain
+      ? `Echter Name, freundlicher Ton. Mit einer ${verifyDomain}-Adresse ist dein Kommentar nach dem Klick in der E-Mail sofort online, sonst schaltet ihn die Redaktion frei.`
+      : moderated
+        ? 'Echter Name, freundlicher Ton. Die Redaktion schaltet Kommentare frei.'
+        : 'Echter Name, freundlicher Ton – die Redaktion liest mit.';
 
   useEffect(() => {
     prunePending();
@@ -94,7 +97,7 @@ export default function KommentareScreen() {
       if (!live) addPending({ post: id, parent: replyTo?.id ?? 0, name: who.name, email: who.email, text: content });
       setText('');
       setReplyTo(null);
-      setSent({ email: who.email, next: live ? 'live' : verification ? 'verify' : 'moderate' });
+      setSent({ email: who.email, next: live ? 'live' : isVerifyAddress(who.email, verifyDomain) ? 'verify' : 'moderate' });
       Keyboard.dismiss();
       haptic.success();
       if (!replyTo) setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 350);
@@ -123,7 +126,7 @@ export default function KommentareScreen() {
       {thread.map((c, i) => (
         <View key={c.id} style={{ gap: space.lg }}>
           {i > 0 ? <Separator /> : null}
-          <CommentItem comment={c} onReply={reply} />
+          <CommentItem comment={c} onReply={reply} postId={id} />
         </View>
       ))}
     </View>

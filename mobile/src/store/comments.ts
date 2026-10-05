@@ -22,15 +22,20 @@ const MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
 
 type CommentsState = {
   pending: PendingComment[];
+  /** Delete tokens for comments written on this device, keyed by comment id. */
+  tokens: Record<string, string>;
   add: (c: Omit<PendingComment, 'key' | 'createdAt'>) => PendingComment;
   remove: (keys: string[]) => void;
   prune: () => void;
+  remember: (id: number, token: string) => void;
+  forget: (id: number) => void;
 };
 
 export const useCommentsStore = create<CommentsState>()(
   persist(
     (set, get) => ({
       pending: [],
+      tokens: {},
       add: (c) => {
         const item: PendingComment = { ...c, key: `${c.post}-${Date.now()}`, createdAt: new Date().toISOString() };
         set({ pending: [...get().pending, item] });
@@ -44,6 +49,11 @@ export const useCommentsStore = create<CommentsState>()(
         const cutoff = Date.now() - MAX_AGE_MS;
         const kept = get().pending.filter((p) => new Date(p.createdAt).getTime() > cutoff);
         if (kept.length !== get().pending.length) set({ pending: kept });
+      },
+      remember: (id, token) => set({ tokens: { ...(get().tokens ?? {}), [String(id)]: token } }),
+      forget: (id) => {
+        const { [String(id)]: gone, ...rest } = get().tokens ?? {};
+        if (gone) set({ tokens: rest });
       },
     }),
     { name: 'stg-comments-v1', storage: createJSONStorage(() => kvStorage) },
