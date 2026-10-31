@@ -300,6 +300,8 @@ final class STG_App_API {
 	public static function get_authors( WP_REST_Request $r ): WP_REST_Response {
 		$users = get_users( [
 			'has_published_posts' => [ 'post' ],
+			// Only current staff: former writers are demoted to subscriber and drop out.
+			'role__in'            => apply_filters( 'stg_app_author_roles', STG_App_Config::AUTHOR_ROLES ),
 			'orderby'             => 'post_count',
 			'order'               => 'DESC',
 			'number'              => 200,

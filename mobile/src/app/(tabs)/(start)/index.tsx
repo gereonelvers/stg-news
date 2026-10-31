@@ -11,6 +11,7 @@ import { PostRow } from '@/components/cards/PostRow';
 import { BreakingBanner } from '@/components/home/BreakingBanner';
 import { JoinCard } from '@/components/home/JoinCard';
 import { Masthead } from '@/components/home/Masthead';
+import { FollowRow } from '@/components/home/FollowRow';
 import { SectionRail } from '@/components/home/SectionRail';
 import { ErrorView } from '@/components/ui/ErrorView';
 import { Separator } from '@/components/ui/Row';
@@ -116,7 +117,13 @@ export default function StartScreen() {
             ) : null}
 
             <View style={layout.isWide ? { width: layout.readingWidth + layout.gutter * 2, alignSelf: 'center' } : undefined}>
-              <JoinCard instagram={config.data?.site.instagram} />
+              <JoinCard />
+              <FollowRow
+                instagram={config.data?.site.instagram}
+                podcastName={config.data?.site.podcast_name}
+                podcastSpotify={config.data?.site.podcast_spotify}
+                podcastApple={config.data?.site.podcast_apple}
+              />
             </View>
 
             <View style={styles.footer}>

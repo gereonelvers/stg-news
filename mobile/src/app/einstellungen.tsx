@@ -179,7 +179,7 @@ export default function EinstellungenScreen() {
           <Separator inset={64} />
           <Row title="Impressum" icon="file" onPress={() => router.push({ pathname: '/seite/[slug]', params: { slug: 'ueber-uns' } })} chevron />
           <Separator inset={64} />
-          <Row title="Kontakt & Daten löschen" subtitle="Formular auf stg-sz.net" icon="mail" onPress={() => openLink('https://stg-sz.net/kontakt')} chevron />
+          <Row title="Kontakt & Daten löschen" subtitle="Formular auf stg-sz.net" icon="mail" onPress={() => openLink('https://stg-sz.net/kontakt', { external: true })} chevron />
         </Group>
 
         <Group title="App">

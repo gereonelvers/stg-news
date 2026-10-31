@@ -121,6 +121,9 @@ export type AppConfig = {
     instagram: string;
     contact_email: string;
     email_domain: string;
+    podcast_name?: string;
+    podcast_spotify?: string;
+    podcast_apple?: string;
     timezone: string;
     language: string;
   };

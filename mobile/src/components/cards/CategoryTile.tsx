@@ -24,11 +24,11 @@ export function CategoryTile({ category, width, height = 150 }: { category: Cate
       {image ? <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} cachePolicy="disk" /> : null}
       <LinearGradient colors={[withAlpha(category.color, 0.15), withAlpha(category.color, 0.92)]} locations={[0.1, 1]} style={StyleSheet.absoluteFill} />
       <View style={styles.body}>
-        <Txt style={styles.emoji}>{category.emoji}</Txt>
         <Txt variant="headlineSmall" style={{ color: '#FFF' }} numberOfLines={2}>
           {category.name}
         </Txt>
         <Txt variant="caption" style={{ color: 'rgba(255,255,255,0.8)' }}>
+          {category.emoji ? `${category.emoji}  ` : ''}
           {pluralize(category.count, 'Artikel', 'Artikel')}
         </Txt>
       </View>
@@ -39,5 +39,4 @@ export function CategoryTile({ category, width, height = 150 }: { category: Cate
 const styles = StyleSheet.create({
   tile: { borderRadius: radius.lg, overflow: 'hidden' },
   body: { flex: 1, justifyContent: 'flex-end', padding: space.md, gap: 2 },
-  emoji: { fontSize: 26, lineHeight: 32, marginBottom: space.xs },
 });

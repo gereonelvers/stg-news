@@ -16,6 +16,18 @@ final class STG_App_Config {
 	public const EMAIL_DOMAIN = 'stg-segeberg.de';
 
 	/**
+	 * Roles that count as current editorial staff. The app's Redaktion list only
+	 * shows these; former writers keep their articles but are demoted to
+	 * subscriber in WordPress and drop out of the list. Author pages stay
+	 * reachable either way, because old articles still link to them.
+	 */
+	public const AUTHOR_ROLES = [ 'administrator', 'editor', 'author', 'contributor' ];
+
+	/** "Freistunde", the podcast – both links are on the website as well. */
+	public const PODCAST_SPOTIFY = 'https://open.spotify.com/show/3UVyj9nGBaeIDUaqck5GCh';
+	public const PODCAST_APPLE   = 'https://podcasts.apple.com/de/podcast/freistunde-unser-podcast/id1868680149';
+
+	/**
 	 * Default theme per category slug.
 	 * color  = accent colour used for chips/section headers
 	 * emoji  = playful marker used in push notifications and empty states
@@ -91,6 +103,9 @@ final class STG_App_Config {
 				'instagram'   => 'https://www.instagram.com/stg_schuelerzeitung/',
 				'contact_email' => get_option( 'admin_email' ),
 				'email_domain'  => self::EMAIL_DOMAIN,
+				'podcast_name'    => 'Freistunde',
+				'podcast_spotify' => self::PODCAST_SPOTIFY,
+				'podcast_apple'   => self::PODCAST_APPLE,
 				'timezone'    => wp_timezone_string(),
 				'language'    => get_locale(),
 			],

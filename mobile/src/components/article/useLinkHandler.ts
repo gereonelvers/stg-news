@@ -8,6 +8,13 @@ import type { Resolved } from '@/api/types';
 import { isSiteUrl, routeForUrl } from '@/lib/linking';
 import { useTheme } from '@/theme/ThemeProvider';
 
+export type OpenOptions = {
+  /** Skip the "is this one of our own pages?" lookup – for pages the app cannot render, such as forms. */
+  external?: boolean;
+  /** Hand the link to the system so a native app (Instagram, Spotify, Podcasts) can take it. */
+  system?: boolean;
+};
+
 /**
  * Opens links the way a native app should: site content in-app, everything
  * else in an in-app browser sheet, mail/tel through the system.
@@ -17,18 +24,22 @@ export function useLinkHandler() {
   const { colors } = useTheme();
 
   return useCallback(
-    async (href: string) => {
+    async (href: string, options: OpenOptions = {}) => {
       if (!href) return;
+      if (options.system) {
+        Linking.openURL(href).catch(() => undefined);
+        return;
+      }
       if (/^(mailto|tel|sms):/i.test(href)) {
         Linking.openURL(href).catch(() => undefined);
         return;
       }
-      const route = routeForUrl(href);
+      const route = options.external ? null : routeForUrl(href);
       if (route) {
         router.push(route);
         return;
       }
-      if (isSiteUrl(href) && !/\.(jpe?g|png|gif|webp|pdf)(\?|$)/i.test(href)) {
+      if (!options.external && isSiteUrl(href) && !/\.(jpe?g|png|gif|webp|pdf)(\?|$)/i.test(href)) {
         try {
           const r = await api.get<Resolved>('/stg/v1/resolve', { url: href });
           if (r.type === 'post') return router.push({ pathname: '/artikel/[id]', params: { id: String(r.id) } });

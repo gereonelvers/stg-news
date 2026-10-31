@@ -3,12 +3,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Txt } from '@/components/ui/Txt';
-import { useLinkHandler } from '@/components/article/useLinkHandler';
 import { brand, gutter, radius, space } from '@/theme/tokens';
 
-export function JoinCard({ instagram }: { instagram?: string }) {
+export function JoinCard() {
   const router = useRouter();
-  const openLink = useLinkHandler();
   return (
     <View style={styles.wrap}>
       <View style={styles.card}>
@@ -21,7 +19,6 @@ export function JoinCard({ instagram }: { instagram?: string }) {
         </Txt>
         <View style={styles.actions}>
           <Button label="Mehr erfahren" variant="primary" color="#FFFFFF" onPress={() => router.push({ pathname: '/seite/[slug]', params: { slug: 'ueber-uns' } })} />
-          {instagram ? <Button label="Instagram" variant="ghost" color="#FFFFFF" icon="camera" onPress={() => openLink(instagram)} /> : null}
         </View>
       </View>
     </View>
