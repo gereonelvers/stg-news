@@ -48,3 +48,6 @@ google-services.json
 *-firebase-adminsdk-*.json
 stg-firebase-adminsdk-*.json
 play-service-account.json
+
+# Python bytecode from scripts/
+__pycache__/
