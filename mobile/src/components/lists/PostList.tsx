@@ -88,7 +88,7 @@ export function PostList({
       }
       ItemSeparatorComponent={isWide ? undefined : () => <Separator inset={gutter} />}
       contentContainerStyle={isWide ? { width: containerWidth + g * 2, alignSelf: 'center', paddingHorizontal: g - space.sm / 2 } : undefined}
-      ListHeaderComponent={header}
+      ListHeaderComponent={header ?? undefined}
       ListEmptyComponent={<EmptyState emoji={emptyEmoji} title={emptyTitle} message={emptyMessage} />}
       ListFooterComponent={
         fetchingMore ? (

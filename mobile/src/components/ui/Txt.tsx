@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Text, type TextProps, type TextStyle } from 'react-native';
+import { Text, type HostInstance, type TextProps, type TextStyle } from 'react-native';
 
 import { useTheme } from '@/theme/ThemeProvider';
 import type { ColorTokens } from '@/theme/tokens';
@@ -16,7 +16,7 @@ export type TxtProps = TextProps & {
 
 const DISPLAY_VARIANTS: TypeVariant[] = ['hero', 'display', 'headline', 'headlineSmall', 'title', 'sectionTitle', 'overline', 'chip'];
 
-export const Txt = forwardRef<Text, TxtProps>(function Txt(
+export const Txt = forwardRef<HostInstance, TxtProps>(function Txt(
   { variant = 'body', color = 'text', scaled = false, align, weight, style, ...rest },
   ref,
 ) {

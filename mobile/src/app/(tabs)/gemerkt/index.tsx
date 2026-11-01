@@ -75,7 +75,7 @@ export default function GemerktScreen() {
             <Txt variant="caption" color="textTertiary" style={{ paddingHorizontal: gutter, paddingTop: space.sm, paddingBottom: space.xs }}>
               {posts.length} {posts.length === 1 ? 'Artikel' : 'Artikel'} · Auch offline lesbar, sobald einmal geöffnet
             </Txt>
-          ) : null
+          ) : undefined
         }
         ListEmptyComponent={
           <View style={{ paddingTop: space.xxl }}>

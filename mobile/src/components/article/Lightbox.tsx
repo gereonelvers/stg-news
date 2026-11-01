@@ -44,7 +44,7 @@ export function Lightbox({ images, index, onClose }: Props) {
   return (
     <Modal visible={visible} animationType="fade" onRequestClose={onClose} statusBarTranslucent presentationStyle="overFullScreen" transparent={false}>
       <GestureHandlerRootView style={styles.root}>
-        {Platform.OS === 'android' && <StatusBar barStyle="light-content" backgroundColor="#000" />}
+        {Platform.OS === 'android' && <StatusBar barStyle="light-content" />}
         <FlatList
           ref={list}
           data={images}

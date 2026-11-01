@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Keyboard, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Keyboard, Platform, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance, type TextInputInstance } from 'react-native';
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -46,8 +46,8 @@ export default function KommentareScreen() {
   const setCommenter = useSettings((s) => s.setCommenter);
   const identity: Identity | null = commenter.name && commenter.email ? commenter : null;
 
-  const inputRef = useRef<TextInput>(null);
-  const scrollRef = useRef<ScrollView>(null);
+  const inputRef = useRef<TextInputInstance>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const [text, setText] = useState('');
   const [replyTo, setReplyTo] = useState<CommentNode | null>(null);
   const [identityMode, setIdentityMode] = useState<IdentityMode>('hidden');

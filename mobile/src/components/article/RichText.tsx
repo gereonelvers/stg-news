@@ -31,7 +31,7 @@ export function RichText({ inlines, variant = 'body', scaled = true, color, styl
     <Text style={[base, { color: textColor, fontSize, lineHeight }, style]} numberOfLines={numberOfLines} selectable={selectable} maxFontSizeMultiplier={1.6}>
       {inlines.map((run, i) => {
         if (run.kind === 'br') return '\n';
-        const s: TextStyle = {};
+        const s: { -readonly [K in keyof TextStyle]: TextStyle[K] } = {};
         if (run.bold) s.fontWeight = '700';
         if (run.italic) s.fontStyle = 'italic';
         if (run.underline && !run.href) s.textDecorationLine = 'underline';

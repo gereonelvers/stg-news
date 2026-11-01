@@ -1,5 +1,5 @@
 import { type RefObject } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, TextInput, View, type TextInputInstance } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 import type { CommentNode } from '@/api/types';
@@ -19,7 +19,7 @@ type Props = {
   onCancelReply: () => void;
   identity: Identity | null;
   onEditIdentity: () => void;
-  inputRef: RefObject<TextInput | null>;
+  inputRef: RefObject<TextInputInstance | null>;
   /** Inline error from the last attempt, if any. */
   error: string | null;
   hint: string;

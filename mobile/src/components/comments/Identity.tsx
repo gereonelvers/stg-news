@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View, type TextInputInstance } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { Avatar } from '@/components/ui/Avatar';
@@ -52,8 +52,8 @@ export function IdentityForm({ initial, emailDomain, cta, onSave, onCancel }: Fo
   const [name, setName] = useState(initial?.name ?? '');
   const [email, setEmail] = useState(initial?.email ?? '');
   const [touched, setTouched] = useState(false);
-  const nameRef = useRef<TextInput>(null);
-  const emailRef = useRef<TextInput>(null);
+  const nameRef = useRef<TextInputInstance>(null);
+  const emailRef = useRef<TextInputInstance>(null);
 
   // autoFocus is unreliable inside an animated mount, so focus explicitly.
   useEffect(() => {
