@@ -48,7 +48,7 @@ def access_token(key: dict) -> str:
     return call('https://oauth2.googleapis.com/token', body, method='POST')['access_token']
 
 
-def call(url, data=None, token=None, method='GET', ctype=None, quiet=False):
+def call(url, data=None, token=None, method='GET', ctype=None, quiet=False, timeout=900):
     req = urllib.request.Request(url, data=data, method=method)
     if token:
         req.add_header('Authorization', 'Bearer ' + token)
@@ -57,7 +57,7 @@ def call(url, data=None, token=None, method='GET', ctype=None, quiet=False):
     elif data and data[:1] == b'{':
         req.add_header('Content-Type', 'application/json')
     try:
-        with urllib.request.urlopen(req, timeout=900) as r:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
             raw = r.read()
             return json.loads(raw) if raw else {}
     except urllib.error.HTTPError as e:
@@ -105,8 +105,18 @@ def main() -> int:
     try:
         blob = open(args.aab, 'rb').read()
         print(f'uploading {len(blob) / 1e6:.0f} MB …')
-        version_code = str(call(f'{upload_base}/edits/{edit["id"]}/bundles?uploadType=media',
-                                blob, token, 'POST', ctype='application/octet-stream')['versionCode'])
+        # A bundle this size can stall on a slow link; one retry saves re-running the whole thing.
+        for attempt in (1, 2, 3):
+            try:
+                version_code = str(call(f'{upload_base}/edits/{edit["id"]}/bundles?uploadType=media',
+                                        blob, token, 'POST', ctype='application/octet-stream',
+                                        timeout=3600)['versionCode'])
+                break
+            except (TimeoutError, OSError) as e:
+                if attempt == 3:
+                    raise
+                print(f'   upload attempt {attempt} failed ({type(e).__name__}), retrying …')
+                time.sleep(5)
         print(f'   versionCode {version_code}')
         call(f'{base}/edits/{edit["id"]}/tracks/{args.tracks[0]}',
              json.dumps({'track': args.tracks[0], 'releases': [release(version_code)]}).encode(), token, 'PUT')
