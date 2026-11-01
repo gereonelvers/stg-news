@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   wrap: { gap: space.md, paddingBottom: space.sm },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   logo: { width: 168, height: 53 },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   circle: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
   dateRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
 });

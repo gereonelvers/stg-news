@@ -169,7 +169,7 @@ export default function EinstellungenScreen() {
           <Separator inset={64} />
           <Row title="Website" subtitle="stg-sz.net" icon="globe" onPress={() => openLink(config.data?.site.url ?? 'https://stg-sz.net')} chevron />
           <Separator inset={64} />
-          <Row title="Instagram" subtitle="@stg_schuelerzeitung" icon="camera" onPress={() => openLink(config.data?.site.instagram ?? 'https://www.instagram.com/stg_schuelerzeitung/')} chevron />
+          <Row title="Instagram" subtitle="@stg_schuelerzeitung" icon="instagram" onPress={() => openLink(config.data?.site.instagram ?? 'https://www.instagram.com/stg_schuelerzeitung/')} chevron />
           <Separator inset={64} />
           <Row title="Städtisches Gymnasium Bad Segeberg" icon="school" onPress={() => openLink(config.data?.site.school_url ?? 'https://stg-segeberg.de')} chevron />
         </Group>

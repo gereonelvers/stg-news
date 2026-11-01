@@ -1,5 +1,6 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { SymbolView, type SymbolViewProps, type SymbolWeight } from 'expo-symbols';
-import type { ColorValue, StyleProp, ViewStyle } from 'react-native';
+import type { ColorValue, StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 import { useTheme } from '@/theme/ThemeProvider';
 import type { ColorTokens } from '@/theme/tokens';
@@ -73,13 +74,24 @@ export const ICONS = {
   tag: { ios: 'tag', android: 'label' },
   expand: { ios: 'arrow.up.left.and.arrow.down.right', android: 'zoom_out_map' },
   tune: { ios: 'slider.horizontal.3', android: 'tune' },
-  instagram: { ios: 'camera.circle', android: 'photo_camera' },
   globe: { ios: 'globe', android: 'language' },
   school: { ios: 'building.columns', android: 'school' },
   pencil: { ios: 'pencil.and.scribble', android: 'edit' },
 } as const satisfies Record<string, SymbolName>;
 
-export type IconName = keyof typeof ICONS;
+/**
+ * Brand marks, which neither SF Symbols nor Material Symbols carry – a camera
+ * glyph does not read as "Instagram". These come from Ionicons instead, whose
+ * outline style matches the rest of the set.
+ */
+export const BRAND_ICONS = {
+  instagram: 'logo-instagram',
+} as const;
+
+/** Icons that exist as a platform symbol, and so can go into a native header. */
+export type SymbolIconName = keyof typeof ICONS;
+
+export type IconName = SymbolIconName | keyof typeof BRAND_ICONS;
 
 export type IconProps = {
   name: IconName;
@@ -92,9 +104,20 @@ export type IconProps = {
 export function Icon({ name, size = 22, color = 'text', weight = 'medium', style }: IconProps) {
   const { colors } = useTheme();
   const tint = ((colors as Record<string, string>)[color] ?? color) as ColorValue;
+  if (name in BRAND_ICONS) {
+    return (
+      <Ionicons
+        name={BRAND_ICONS[name as keyof typeof BRAND_ICONS]}
+        size={size}
+        color={tint as string}
+        // Ionicons draws text, so it types its style as a text style.
+        style={style as StyleProp<TextStyle>}
+      />
+    );
+  }
   return (
     <SymbolView
-      name={ICONS[name]}
+      name={ICONS[name as keyof typeof ICONS]}
       size={size}
       tintColor={tint}
       weight={weight}
