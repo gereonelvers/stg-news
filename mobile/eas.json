@@ -7,27 +7,18 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "environment": "development",
-      "ios": {
-        "scheme": "STGSchulerzeitung"
-      }
+      "environment": "development"
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
-      "environment": "preview",
-      "ios": {
-        "scheme": "STGSchulerzeitung"
-      }
+      "environment": "preview"
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production",
-      "ios": {
-        "scheme": "STGSchulerzeitung"
-      }
+      "environment": "production"
     }
   },
   "submit": {

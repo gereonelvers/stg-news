@@ -20,6 +20,8 @@ npx eas-cli build -p android --profile production    # uses the keystore stored 
 
 Local alternatives: `npx eas-cli build -p android --profile production --local --output dist/app.aab` (verified working); iOS local production builds need the distribution certificate, which EAS creates during the first cloud build.
 
+**`expo.name` must stay ASCII.** eas-cli bundles @expo/config-plugins 55, whose `sanitizedName()` drops non-ASCII characters, while the SDK 58 prebuild transliterates them: "STG Schülerzeitung" became `STGSchlerzeitung` for eas-cli but `STGSchulerzeitung` for prebuild, so the iOS build died assigning the provisioning profile to a target that did not exist ("Unknown error. See logs of the Configure Xcode project build phase", with an empty error line in the log). `expo.name` is therefore "STG Schuelerzeitung"; the launcher label on Android is restored by a `withStringsXml` plugin in app.config.js, and on iOS `CFBundleDisplayName` already says "Schülerzeitung". Setting `ios.scheme` in eas.json does **not** help: managed projects ignore it and always use `sanitizedName(expo.name)`.
+
 Versioning: `expo.version` in app.json is the marketing version (2.0.0); build numbers are managed by EAS (`appVersionSource: remote`, auto-increment on production builds).
 
 ## 3. Submit
