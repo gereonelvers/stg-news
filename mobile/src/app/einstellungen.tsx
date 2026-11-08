@@ -153,7 +153,7 @@ export default function EinstellungenScreen() {
                     return (
                       <Tap key={c.id} onPress={() => toggleCategory(c.id)} scaleTo={0.94} style={[styles.catChip, { backgroundColor: on ? withAlpha(c.color, 0.16) : colors.surface2, borderColor: on ? c.color : 'transparent' }]} accessibilityRole="checkbox" accessibilityState={{ checked: on }}>
                         <Txt variant="chip" numberOfLines={1} style={{ color: on ? c.color : colors.textTertiary, flexShrink: 0 }}>
-                          {c.emoji} {c.name}
+                          {c.name}
                         </Txt>
                       </Tap>
                     );

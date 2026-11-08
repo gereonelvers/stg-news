@@ -15,7 +15,7 @@ export function CategoryTile({ category, width, height = 150 }: { category: Cate
   const image = category.cover?.sizes?.medium_large?.src ?? category.cover?.src;
   return (
     <Tap
-      onPress={() => router.push({ pathname: '/ressort/[id]', params: { id: String(category.id), name: category.name, color: category.color, emoji: category.emoji } })}
+      onPress={() => router.push({ pathname: '/ressort/[id]', params: { id: String(category.id), name: category.name, color: category.color } })}
       scaleTo={0.96}
       haptics="light"
       style={[styles.tile, { width, height, backgroundColor: category.color }]}
@@ -28,7 +28,6 @@ export function CategoryTile({ category, width, height = 150 }: { category: Cate
           {category.name}
         </Txt>
         <Txt variant="caption" style={{ color: 'rgba(255,255,255,0.8)' }}>
-          {category.emoji ? `${category.emoji}  ` : ''}
           {pluralize(category.count, 'Artikel', 'Artikel')}
         </Txt>
       </View>

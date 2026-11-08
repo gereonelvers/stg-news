@@ -79,7 +79,12 @@ export default function ArticleScreen() {
   }));
 
   const shareIcon = useHeaderIcon('share', colors.tint);
-  const bookmarkIcon = useHeaderIcon(saved ? 'bookmarkFill' : 'bookmark', colors.tint);
+  // Both states are resolved up front: on Android the icon is an image that
+  // resolves asynchronously, so asking for "the current one" leaves the toolbar
+  // showing the old icon until the new one arrives.
+  const bookmarkOffIcon = useHeaderIcon('bookmark', colors.tint);
+  const bookmarkOnIcon = useHeaderIcon('bookmarkFill', colors.tint);
+  const bookmarkIcon = saved ? bookmarkOnIcon : bookmarkOffIcon;
 
   const cardForActions: PostCard | undefined = post ?? initial;
   const loaded = !!post && post.content !== '';
@@ -98,7 +103,7 @@ export default function ArticleScreen() {
   return (
     <>
       <Stack.Screen options={{ title: '', headerTransparent: Platform.OS === 'ios', headerBlurEffect: 'systemChromeMaterial' }} />
-      {cardForActions && (Platform.OS === 'ios' || (bookmarkIcon && shareIcon)) ? (
+      {cardForActions && (Platform.OS === 'ios' || (bookmarkOffIcon && shareIcon)) ? (
         <Stack.Toolbar placement="right">
           <Stack.Toolbar.Button icon={bookmarkIcon} accessibilityLabel={saved ? 'Lesezeichen entfernen' : 'Merken'} onPress={() => toggle(cardForActions)} tintColor={colors.tint}>
             {bookmarkIcon ? undefined : saved ? 'Gemerkt' : 'Merken'}
@@ -187,7 +192,7 @@ export default function ArticleScreen() {
           {/* Related */}
           {loaded && post!.related.length ? (
             <View>
-              <SectionHeader title={post!.primary_category ? `Mehr aus ${post!.primary_category.name}` : 'Mehr lesen'} emoji={post!.primary_category?.emoji} onAction={post!.primary_category ? () => router.push({ pathname: '/ressort/[id]', params: { id: String(post!.primary_category!.id), name: post!.primary_category!.name, color: post!.primary_category!.color, emoji: post!.primary_category!.emoji } }) : undefined} />
+              <SectionHeader title={post!.primary_category ? `Mehr aus ${post!.primary_category.name}` : 'Mehr lesen'} onAction={post!.primary_category ? () => router.push({ pathname: '/ressort/[id]', params: { id: String(post!.primary_category!.id), name: post!.primary_category!.name, color: post!.primary_category!.color } }) : undefined} />
               {post!.related.map((r, i) => (
                 <View key={r.id}>
                   {i > 0 ? <Separator inset={gutter} /> : null}

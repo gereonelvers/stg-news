@@ -30,7 +30,7 @@ export function PostRow({ post, showCategory = true, showAuthor = true, right, c
         <Image source={{ uri: thumb }} style={[styles.thumb, card && styles.thumbCard, { backgroundColor: colors.skeleton }]} contentFit="cover" transition={200} cachePolicy="disk" />
       ) : (
         <View style={[styles.thumb, { backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }]}>
-          <Txt style={{ fontSize: 28 }}>{post.primary_category?.emoji ?? '📰'}</Txt>
+          <Txt style={{ fontSize: 28 }}>📰</Txt>
         </View>
       )}
       {right}

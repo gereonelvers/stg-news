@@ -23,7 +23,7 @@ export function PostTile({ post, accent }: { post: PostCard; accent?: string }) 
           <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="disk" />
         ) : (
           <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center', backgroundColor: accent ?? colors.surface2 }]}>
-            <Txt style={{ fontSize: 40 }}>{post.primary_category?.emoji ?? '📰'}</Txt>
+            <Txt style={{ fontSize: 40 }}>📰</Txt>
           </View>
         )}
       </View>

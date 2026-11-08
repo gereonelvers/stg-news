@@ -10,7 +10,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { gutter, space } from '@/theme/tokens';
 
 export default function RessortScreen() {
-  const params = useLocalSearchParams<{ id: string; name?: string; color?: string; emoji?: string }>();
+  const params = useLocalSearchParams<{ id: string; name?: string; color?: string }>();
   const { colors, isDark } = useTheme();
   const all = params.id === 'alle';
   const categoryId = all ? undefined : Number(params.id);
@@ -18,7 +18,6 @@ export default function RessortScreen() {
   const category = useMemo(() => categories.data?.find((c) => c.id === categoryId), [categories.data, categoryId]);
   const name = category?.name ?? params.name ?? (all ? 'Alle Artikel' : 'Ressort');
   const color = category?.color ?? params.color;
-  const emoji = category?.emoji ?? params.emoji;
   const accent = color ? accentFor(color, isDark) : colors.tint;
 
   const posts = usePosts({ category: categoryId });
@@ -39,7 +38,7 @@ export default function RessortScreen() {
         hasMore={posts.hasNextPage}
         onRetry={() => posts.refetch()}
         showCategory={all}
-        emptyEmoji={emoji ?? '📰'}
+        emptyEmoji="📰"
         emptyTitle="Hier ist noch nichts"
         emptyMessage="In diesem Ressort wurde noch kein Artikel veröffentlicht."
         header={
@@ -51,7 +50,6 @@ export default function RessortScreen() {
             ) : null}
             {total !== undefined ? (
               <Txt variant="overline" style={{ color: accent }}>
-                {emoji ? `${emoji} ` : ''}
                 {total} Artikel
               </Txt>
             ) : null}

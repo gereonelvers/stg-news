@@ -20,10 +20,9 @@ export function SectionRail({ category, posts }: { category: CategoryFull; posts
     <>
       <SectionHeader
         title={category.name}
-        emoji={category.emoji}
         accent={accent}
         subtitle={category.count ? `${category.count} Artikel` : undefined}
-        onAction={() => router.push({ pathname: '/ressort/[id]', params: { id: String(category.id), name: category.name, color: category.color, emoji: category.emoji } })}
+        onAction={() => router.push({ pathname: '/ressort/[id]', params: { id: String(category.id), name: category.name, color: category.color } })}
       />
       <FlatList
         horizontal

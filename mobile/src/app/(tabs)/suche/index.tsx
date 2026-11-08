@@ -80,7 +80,7 @@ export default function SucheScreen() {
             </Txt>
             <View style={styles.chips}>
               {(categories.data ?? []).slice(0, 14).map((c) => (
-                <Chip key={c.id} category={c} size="md" emoji />
+                <Chip key={c.id} category={c} size="md" />
               ))}
             </View>
           </View>
@@ -132,7 +132,7 @@ export default function SucheScreen() {
                   </Txt>
                   <View style={styles.chips}>
                     {search.data.categories.map((c) => (
-                      <Chip key={c.id} category={c} size="md" emoji />
+                      <Chip key={c.id} category={c} size="md" />
                     ))}
                   </View>
                 </View>

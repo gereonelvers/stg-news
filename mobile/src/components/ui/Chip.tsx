@@ -12,13 +12,12 @@ type ChipProps = {
   category: Category;
   variant?: 'soft' | 'solid' | 'onImage';
   size?: 'sm' | 'md';
-  emoji?: boolean;
   navigable?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
 /** Category label. `onImage` is for use over photos, `solid` for headers. */
-export function Chip({ category, variant = 'soft', size = 'sm', emoji = false, navigable = true, style }: ChipProps) {
+export function Chip({ category, variant = 'soft', size = 'sm', navigable = true, style }: ChipProps) {
   const { isDark } = useTheme();
   const router = useRouter();
   const accent = accentFor(category.color, isDark);
@@ -28,11 +27,6 @@ export function Chip({ category, variant = 'soft', size = 'sm', emoji = false, n
 
   const content = (
     <View style={[styles.base, size === 'md' && styles.md, { backgroundColor: bg }, style]}>
-      {emoji && (
-        <Txt variant="chip" style={{ color: fg, letterSpacing: 0 }}>
-          {category.emoji}{' '}
-        </Txt>
-      )}
       <Txt variant="chip" style={[{ color: fg }, size === 'md' && { fontSize: 15, lineHeight: 18 }]} numberOfLines={1}>
         {category.name}
       </Txt>
@@ -47,7 +41,7 @@ export function Chip({ category, variant = 'soft', size = 'sm', emoji = false, n
       hitSlop={6}
       accessibilityRole="button"
       accessibilityLabel={`Ressort ${category.name}`}
-      onPress={() => router.push({ pathname: '/ressort/[id]', params: { id: String(category.id), name: category.name, color: category.color, emoji: category.emoji } })}>
+      onPress={() => router.push({ pathname: '/ressort/[id]', params: { id: String(category.id), name: category.name, color: category.color } })}>
       {content}
     </Tap>
   );
